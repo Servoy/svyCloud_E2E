@@ -507,7 +507,7 @@ When servoy data-servoydefault-check component with name orders.isValidated I wa
 
 Inserts the given text into the password input component
 ```
-- When servoy data-servoydefault-password component with name {elementName} the text {password} is inserted
+When servoy data-servoydefault-password component with name {elementName} the text {password} is inserted
 ```
 Example:
 ```
@@ -516,7 +516,7 @@ When servoy data-servoydefault-password component with name login.passwordField 
 
 Clicks on the combobox with the given name
 ```
-- When servoy combobox component with name {elementName} is clicked
+When servoy combobox component with name {elementName} is clicked
 ```
 Example:
 ```
@@ -755,7 +755,7 @@ When servoy data-aggrid-groupingtable component with name companies.companyTable
 Since the grouping table can be grouping, this test searches for a row in the table that matches the given text. After that it will either expand or collapse the row. Row levels are required to expand/collapse the correct row level (1 indexed)
 Note: the table first has to be grouped before this test works. rowOption has to be replaced by either 'collapse' or 'expand'
 ```
-- When servoy data-aggrid-groupingtable component with name {elementName} I want to {rowOption} row level {rowLevel} with {rowText} as text
+When servoy data-aggrid-groupingtable component with name {elementName} I want to {rowOption} row level {rowLevel} with {rowText} as text
 ```
 Examples:
 ```
@@ -766,7 +766,7 @@ When servoy data-aggrid-groupingtable component with name companies.groupingTabl
 Sorts the grouping grid by a header with the given text
 **Note**: this test is NOT case sensitive
 ```
-- When servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}
+When servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}
 ```
 Example: 
 ```
@@ -777,7 +777,7 @@ When servoy data-aggrid-groupingtable component with name companies.groupingTabl
 Groups the grouping table by the given text
 Note: this test is case sensitive
 ```
-- When servoy data-aggrid-groupingtable component with name {elementName} I want to group the table by {tableHeaderText}
+When servoy data-aggrid-groupingtable component with name {elementName} I want to group the table by {tableHeaderText}
 ```
 Example:
 ```
@@ -855,7 +855,7 @@ When servoy data-aggrid-groupingtable component with name companies.groupingTabl
 
 Finds a record in the grouping table that matches the given text
 ```
-- When servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the row with text {rowText}
+When servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the row with text {rowText}
 ```
 Example:
 ```
