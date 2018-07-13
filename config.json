@@ -1,0 +1,17 @@
+{
+    "configurations":{
+        "capabilities":{
+            
+        },
+        "multiCapabilities":[{
+            "browserName": "chrome",
+            "chromeOptions": {
+              "args": ["--headless", "--disable-gpu"]
+            }
+        }],
+
+        "specs": [
+            "./features/*.feature"
+        ]
+    }
+}
