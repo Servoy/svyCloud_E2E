@@ -26,7 +26,7 @@ exports.config = {
   ],
 
   cucumberOpts: {
-    require: ['features/step_definitions/servoy_step_definitions.js',
+    require: ['features/step_definitions/servoy_step_definitions_chrome.js',
       'env.js',
   'features/step_definitions/hooks.js'],
     tags: false,
