@@ -26,7 +26,6 @@ node_modules
 
 # Protractor Report #
 reports/*
-
 screenshots/**
 
 # Eclipse #
@@ -36,3 +35,6 @@ bin
 # Jenkins build files #
 build
 libs/jsUnit
+
+# Visual Stupio Code #
+.vscode/*

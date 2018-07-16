@@ -1810,10 +1810,13 @@ function findRecordTableComponent(elementName, recordText, shouldClick, callback
 	baseTable.first().element(by.xpath("//span[text()='" + recordText + "']")).isPresent().then(function (isPresent) {
 		if(isPresent) {
 			if(shouldClick) {
-				clickElement(baseTable.first().element(by.xpath("//span[text()='" + recordText + "']"))).then(function(){
-					found = true;
-					wrapUp(callback, "scrollEvent");
+				browser.executeScript("arguments[0].scrollIntoView(true);", baseTable.first().element(by.xpath("//span[text()='" + recordText + "']")).getWebElement()).then(function () {
+					clickElement(baseTable.first().element(by.xpath("//span[text()='" + recordText + "']"))).then(function(){
+						found = true;
+						wrapUp(callback, "scrollEvent");
+					});
 				});
+				
 			} else {
 				found = true;
 				wrapUp(callback, "scrollEvent");
