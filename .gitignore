@@ -1,0 +1,38 @@
+# eclipse metadata #
+*/.metadata
+.metadata
+.svn
+*/.svn
+
+# OS Files #
+Thumbs.db
+*/Thumbs.db
+.DS_Store
+*/.DS_Store
+
+# logs #
+.log
+
+# Other extensions #
+*/.zip
+.zip
+*/.DS_Store
+*.DS_Store
+package-lock.json
+
+# Node JS Modules #
+*/node_modules
+node_modules
+
+# Protractor Report #
+reports/*
+
+screenshots/**
+
+# Eclipse #
+bin
+.project
+
+# Jenkins build files #
+build
+libs/jsUnit
