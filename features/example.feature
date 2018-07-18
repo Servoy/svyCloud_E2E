@@ -34,4 +34,3 @@ Then I want to sleep for 5 seconds
 Examples:
 |password          | customer           | dateYear | dateMonth      | dateDay |
 |my secret password| LILA-Supermercado  | 2003     | june           | 19      |
-|my hidden password| The Big Cheese     | 2025     | august         | 26      |

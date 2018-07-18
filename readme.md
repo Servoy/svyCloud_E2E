@@ -73,12 +73,12 @@ Example:
 Given I go to https://www.servoy.com
 ```
 
-During the deployment of the application, the URL of the application gets passed as parameter. This parameter ensures that the test will always navigate to the URL of the deployed application.
+During the deployment of the application, the URL of the application gets passed as a parameter. This parameter ensures that the test will always navigate to the URL of the deployed application.
 ```
 Given I go to the test domain
 ```
 
-This step compares the currentURL with the given URL
+This step compares the current URL with the given URL
 ```
 Then I expect the url to be {browserUrl}
 ```
@@ -94,7 +94,7 @@ Then I want to navigate back
 ```
 
 
-This step presses 'f5' and refreshes the page
+This step presses 'F5' and refreshes the page
 ```
 Then I want to refresh the page
 ```
