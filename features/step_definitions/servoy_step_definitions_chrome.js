@@ -136,25 +136,31 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
 						return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
 					});
-				}).then(function () {
+				})/*.then(function () {
 					wrapUp(callback, "Calendar event");
 				}).catch(function (error) {
 					console.log(error.message);
 					tierdown(true);
-				});
+				});*/
 			} else {
 				clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
 					return clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
 						return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
 					});
-				}).then(function () {
+				})/*.then(function () {
 					wrapUp(callback, "Calendar event")
 				}).catch(function (error) {
 					console.log(error.message);
 					tierdown(true);
-				});
+				});*/
 			}
-		});
+		}).then(function(){
+			element(by.xpath("//th[@class='picker-switch']")).getText().then(function(calYear){
+				if(calYear.toLowerCase() === month.toLowerCase() + " " + year) {
+					wrapUp(callback, "Calendar event")
+				}
+			});
+		})
 	});
 
 	When('servoy calendar component I want to select day {day}', { timeout: 15 * 1000 }, function (day, callback) {
@@ -251,6 +257,172 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				break;
 			case "tab":
 				browser.actions().sendKeys(protractor.Key.TAB).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "escape":
+				browser.actions().sendKeys(protractor.Key.ESCAPE).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "backspace":
+				browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "delete":
+				browser.actions().sendKeys(protractor.Key.DELETE).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "space":
+				browser.actions().sendKeys(protractor.Key.SPACE).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "page up":
+			case "pageup":
+				element(by.xpath("//body")).click().then(function(){
+					browser.actions().sendKeys(protractor.Key.PAGE_UP).perform().then(function () {
+						wrapUp(callback, "keypressEvent");
+					}).catch(function (error) {
+						console.log(error.message);
+						tierdown(true);
+					});
+				});
+				break;
+			case "page down":
+			case "pagedown":
+				element(by.xpath("//body")).click().then(function(){
+					browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform().then(function () {
+						wrapUp(callback, "keypressEvent");
+					}).catch(function (error) {
+						console.log(error.message);
+						tierdown(true);
+					});
+				});
+				break;
+			case "end":
+				browser.actions().sendKeys(protractor.Key.END).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "home":
+				browser.actions().sendKeys(protractor.Key.HOME).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f1":
+				browser.actions().sendKeys(protractor.Key.F1).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f2":
+				browser.actions().sendKeys(protractor.Key.F2).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f3":
+				browser.actions().sendKeys(protractor.Key.F3).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f4":
+				browser.actions().sendKeys(protractor.Key.F4).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f5":
+				browser.actions().sendKeys(protractor.Key.F5).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f6":
+				browser.actions().sendKeys(protractor.Key.F6).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f7":
+				browser.actions().sendKeys(protractor.Key.f7).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f8":
+				browser.actions().sendKeys(protractor.Key.F8).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f9":
+				browser.actions().sendKeys(protractor.Key.F9).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f10":
+				browser.actions().sendKeys(protractor.Key.F10).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f11":
+				browser.actions().sendKeys(protractor.Key.F11).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;
+			case "f12":
+				browser.actions().sendKeys(protractor.Key.F12).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
 				}).catch(function (error) {
 					console.log(error.message);
@@ -1681,8 +1853,8 @@ function sendKeys(elem, input) {
 					if(text != input) {
 						sendKeys(elem, input);
 					}
-				})
-			})
+				});
+			});
 		});
 	});
 }
@@ -1707,12 +1879,6 @@ function sendComboboxKeys(elem, input) {
 }
 
 function waitUntillElementIsGone(elem) {
-	// return browser.wait(function() {
-	// 	return elem.isPresent().then(function(present) {
-	// 		return !present;
-	// 	});
-	// });
-
 	return browser.wait(EC.not(EC.presenceOf(elem)));
 }
 
@@ -1952,6 +2118,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	});
 }
 
+//EXTRA TABLE
 //recursive function that keeps scrolling until it finds the element
 function dataServoyExtraTableScroll(elementName, text, shouldClick, callback){
 	//Step 1 - Wait untill the table component is visible
