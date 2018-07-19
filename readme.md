@@ -1,33 +1,85 @@
 ## End to end testing
 
-End to end instructions to get it to work locally, which steps are currently supported + examples and explanation
-
-Local installation guide:
-# Cloning the jenkins-scripts repo
-To get the tests to work locally, the jenkins-repository has to be cloned (https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse). Be sure to clone the master branch.
+End to end instructions about how to get Cucumber testing to work locally, which test steps are currently supported, a list with examples and per example a short explanation.
 
 # NodeJS installation 
-After the repository has been cloned, NodeJS has to be installed (https://nodejs.org/en/). Once installed add an environmental variable. This variable has to point to the root of the NodeJS installation folder (e.g: C:\Program Files\nodejs).
+NodeJS has to be installed. You can download it from https://nodejs.org/en/download/
 
-Once this is done, open a command prompt or any similar application and test if NodeJS works by running the 'node --version' command. If this works, then NodeJS has successfully recognized the installation of NodeJS.
+For Windows, once NodeJS is installed 2 environment variables have to be added.
+The first variable points towards the folder where the global Node packages are installed.
+
+The global NodeJS packages are normally installed in the %APPDATA%/Roaming/npm directory (e.g. C:/Users/username/AppData/Roaming/npm).
+
+Press the Windows key and search for 'environment variables'. You should see an option called **Edit the system environment variables**. Select this option.
+
+A window called **System Properties** should appear. Navigate to the **Advanced** tab and click on the **Environment Variables** option.
+
+A window called **Environment Variables** should appear. Two environment variables should be added. These variables allows you to execute NodeJS and Protractor calls from any directory. In the **User variables for 'username'** list, select the **Path** variable and click Edit. If the Path variable does not exist, create it by clicking 'New'. Set the **Variable name** as 'Path' and the **Variable value** as the directory path.
+
+This enables the execution of commands from the packages that are installed in your global package list.
+
+The next variable that has to be added has to point towards the root installation folder of NodeJS. Without this, you cannot execute any NodeJS calls outside the NodeJS folder.
+
+Underneath the **System Variables** list, select the **Path** variable and click Edit. Add a new variable and paste the root location of NodeJS (e.g. C:/Program Files/nodejs).
+
+Once this is done, open a command prompt or any similar application and test if NodeJS works by executing the 'node --version' command. If this returns a version number, NodeJS is good to go.
+
+Local installation guide:
+# Setting up your workspace
+To get the tests to work locally, either the jenkins-repository has to be cloned (https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse), or the zip file has to be downloaded (https://source.servoy.com/rest/archive/latest/projects/SC/repos/qapaas-e2e/archive?at=refs%2Ftags%2Frelease-1.0&format=zip) and extracted.
 
 # Setup E2E environment
-Navigate the command prompt to the E2E folder of the jenkins-scripts repository and type in the following commands: 'npm install'. This will install all node packages that are in the package.
-After this is done, execute the following command: 'npm install -g protractor@5.1.1'. This will enable the usage of the webdriver (see next step) and starting the test from any location.
+Open a bash or command prompt and navigate to the qapaas-e2e folder and execute the following commands: 'npm install'. This will install all node packages that are required for e2e testing (minus Protractor)
+After this is done, execute the following command: 'npm install -g protractor@5.1.1'. This will enable the usage of the webdriver (see next step) and allow you to start the tests from any directory. Make sure the -g is also part of the command!
+
+From the same directory, execute the following commands:
+- npm list 
+
+You should see the following packages installed:
+
+* chai
+* cucumber
+* cucumber-html-reporter
+* expect
+* find 
+* fs-extra
+* js-base64
+* jsonfile
+* lodash
+* open
+* protractor-cucumber-framework (this should give an *unmet peer dependency* warning)
+* restler
+* universal analytics (is disabled in E2E testing)
+* wd
+* wd-bridge
+
+Execute the following command to validate that Protractor is installed globally:
+
+- npm list -g protractor
+
+You should see the Protractor package installed
+
+Now that all the packages are installed, the webdriver can be updated and started.
 
 # Starting the webdriver
-Start another command prompt or similar application and type in the following commands:
+Start another command prompt or bash and execute the following commands:
  - webdriver-manager update
  - webdriver-manager start
 
 The 'update' command gets the latest drivers for the most common browsers (Firefox and Chrome)
-The 'start' command starts the webdriver. The tests cannot run without the webdriver since the webdriver is a communication hatch between the protractor tests and the browser. Without it, the browser cannot receieve commands
+The 'start' command starts the webdriver. The tests cannot run without the webdriver since the webdriver is a communication hatch between Protractor and the browser. Without it the browser cannot receieve commands.
+
+**Note**: If both commands are not recognized, make sure that the environment variable that is directed towards the global package folder is setup correctly. Execute the following command: 'npm list -g'. This will give you the list of all packages and the installation directory. Make sure the directory matches the environment variable. 
 
 # Writing a test
-To start the test, a .feature file has to be created. An example has been put in the features folder.
+To start the test, a .feature file has to be created. An example has been put in the features folder. 
+
+Replace the content of the example by any of the steps currently supported.
+
+**Note**: a(n) (empty) data table is required by the HTML reporter. Without a data table, the test will not start.
 
 # Starting the tests
-Once all these steps are finished, the test can start by navigating to the E2E folder and running the command 'protractor singleConfig_chrome.config'.
+Once all these steps are finished, the test can start by navigating to the qapaas-e2e folder and executing the 'protractor config_chrome.config' command.
 
 # Supported components
 List of all currently supported steps to test servoy components and to navigate to an URL. Each step will be given one or more examples.
@@ -35,18 +87,19 @@ Each step starts with the word 'Given', 'Then' or 'When', followed by the name o
 After this part the step describes what it will do.
 There are several steps which do not test a component (like navigation, pressing a button (like ENTER or TAB)), thus not requiring a data-svy-name.
 
-NOTE
+**NOTE**:
 - Everything between brackets '{}' will be considered a variable. This variable can contain any text but must not be surrounded by quotes or double quotes
-- Supported browsers: Chrome / Firefox (partially)
-- Most step have a variable called 'elementName'. This variable is the data-svy-name of the component. The data-svy-name is only visible if the solution is deployed with test mode enabled and is always equal to the formname.elementName.
+- Supported browsers: Chrome / Firefox (partially). Working on support for Firefox and IE
+- Most step have a variable called 'elementName'. This variable is the data-svy-name of the component. The data-svy-name is only visible if the solution is deployed with test mode enabled and is always equal to the formname.elementName. 
 Targetting an element by data-svy-name prevents targetting the wrong element since it is always unique.
 - For now, certain tests are case sensitive, meaning, the word protractor is not equal to the word Protractor. Most tests do have partial text 
 recognition meaning the word tractor will be found in the word protractor
+- Cucumber tests are very gramar dependent. We are working on building an auto-complete functionality to prevent tests from failing due to the incorrectly spelling part of the test step.
 - Including a seperate test (like a login test) into a test file is not supported
 - This list is not final. Based upon new requirements, new tests will be created
 - Custom components are currently not supported
 - In certain situations, the data-svy-name of a component is not required. This happens (among others) when clicking on an element inside a  combobox or typeahead component. If either of these components is selected, a container with a specific class is created. The tests use these containers to find the correct item. Once the test no longer has one of these components selected, the containers disappear. 
-- If a page that contain angular, the test will crash unless the 'ignoreSynchronization' option is set to true. ignoreSynchronization is an option that allows protractor to wait for Angular promises such as timeouts of http requests. To allow protractor to test a non-angular application, change the onPrepare function of the configuration file to the following:
+- If a page is tested that does not contain angular, the test will crash unless the 'ignoreSynchronization' option is set to true. ignoreSynchronization is an option that allows protractor to wait for Angular promises such as timeouts or HTTP requests. To allow protractor to test a non-angular application, change the onPrepare function of the configuration file (config_chrome.js) to the following:
 ```
     browser.driver.executeScript(function () {
       return {
@@ -59,7 +112,7 @@ recognition meaning the word tractor will be found in the word protractor
       browser.ignoreSynchronization = true;
     });
 ```
-
+**Examples**
 ___
 **URL navigation**
 ___
@@ -176,8 +229,9 @@ Then I want to sleep for 1 second
 
 This presses a button on the keyboard (not case sensitive)
 As of 12th of july 2017 , the current keys are supported:
- - ENTER
- - TAB
+ - Enter
+ - Tab
+
 ```
 When I press {browserAction}
 ```
@@ -185,8 +239,9 @@ Examples:
 ```
 When I press enter
 When I press tab
-```
 
+
+```
 This zooms the current browser out/in to a given percentage (only a number is required)
 ```
 Then I want to zoom the page out to {percentage} percent
