@@ -1748,9 +1748,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY TABPANEL COMPONENT
 
 	//PERFORMANCE LOGGING
-	Then('I want to log the time it toke to do the {event} event', { timeout: 60 * 1000 }, function (event, callback) {
+	Then('I want to log the time it took to do the {event} event', { timeout: 60 * 1000 }, function (event, callback) {
 		var duration = calcBlockDuration(new Date());
-		console.log('The ' + event + ' event toke ' + duration + ' miliseconds');
+		console.log('The ' + event + ' event took ' + duration + ' miliseconds');
 		analytics.event('Scenario 1', "Performance", event, duration).send();
 		callback();
 	});
@@ -1816,7 +1816,7 @@ function validate(input, inputToCompare) {
 
 function wrapUp(callback, performanceEvent) {
 	var duration = calcStepDuration(new Date());
-	console.log('Step toke ' + duration + ' miliseconds');
+	console.log('Step took ' + duration + ' miliseconds');
 	analytics.event('Scenario 1', "Performance", performanceEvent, duration).send();
 	callback();
 }
