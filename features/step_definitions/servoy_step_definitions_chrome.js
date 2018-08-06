@@ -1121,6 +1121,75 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			});
 		});
 	});	
+
+
+	//BOOTSTRAP COMPONENTS INSIDE A FORMCOMPONENT
+	When('formcomponent with the name {formComponentName} a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
+				var tField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
+				browser.wait(EC.visibilityOf(tField), 30 * 1000, 'Textfield not found!').then(function(){
+					console.log('Text input component found');
+					sendKeys(tField, text).then(function () {
+						wrapUp(callback, "insertTextEvent");
+					});
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('formcomponent with the name {formComponentName} a bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
+				var button = fComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css("button"));
+				clickElement(button).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('formcomponent with the name {formComponentName} a bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
+				var button = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
+				clickElement(button).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('formcomponent with the name {formComponentName} a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function(){
+			var inputField = selectComponent.element(by.xpath("//option[text()='"+text+"']"));
+			inputField.isPresent().then(function(isPresent){
+				console.log(isPresent);
+				if(isPresent) {
+					clickElement(inputField).then(function(){
+						wrapUp(callback, "clickEvent");
+					});
+				}
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END BOOTSTRAP COMPONENTS INSIDE A FORMCOMPONENT
 	//END BOOTSTRAP COMPONENTS
 
 	//SERVOY GROUPING GRID COMPONENT
