@@ -43,7 +43,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Given('I go to the test domain', { timeout: 60 * 1000}, function(callback) {
+	Given('I navigate to the test domain', { timeout: 60 * 1000}, function(callback) {
 		console.log("Opening testdomain URL: " + browser.params.testDomainURL);
 		browser.get(browser.params.testDomainURL).then(function () {
 			wrapUp(callback, "navigateURLEvent")
