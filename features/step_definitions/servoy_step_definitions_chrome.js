@@ -1759,6 +1759,35 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true)
 		});
 	});
+
+	When('default input-dialog I want to insert the text {text}', {timeout: 30 * 1000}, function(text, callback){
+		var dialog = element(by.xpath("//div[@class='modal-dialog']"));
+		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog not found!').then(function(){
+			var inputField = dialog.element(by.css("input"));
+			sendKeys(inputField, text).then(function(){
+				wrapUp(callback, "insertEvent");
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true)
+			});
+		});
+	});
+
+	When('default select-dialog I want to select the combobox item with the text {text}', {timeout: 30 * 1000}, function(text, callback){
+		var dialog = element(by.xpath("//div[@class='modal-dialog']"));
+		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog not found!').then(function(){
+			var selectField = dialog.element(by.css("select"));
+			clickElement(selectField).then(function(){
+				var optionField = selectField.element(by.cssContainingText("option", text));
+				clickElement(optionField).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true)
+			});
+		});
+	});	
 	//END MODEL DIALOG COMPONENT
 
 	//SERVOY WINDOW COMPONENT 

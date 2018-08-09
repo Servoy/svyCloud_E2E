@@ -128,7 +128,7 @@ Given I go to https://www.servoy.com
 
 During the deployment of the application, the URL of the application gets passed as a parameter. This parameter ensures that the test will always navigate to the URL of the deployed application.
 ```
-Given I go to the test domain
+Given I navigate to the test domain
 ```
 
 This step compares the current URL with the given URL
@@ -581,7 +581,7 @@ When servoy combobox component with name fruits.fruitList is clicked
 
 Looks inside the combobox container and selects item number x
 ```
-- Then servoy combobox component I want to select number {comboboxNumber} in the combobox
+Then servoy combobox component I want to select number {comboboxNumber} in the combobox
 ```
 Example:
 ```
@@ -946,7 +946,7 @@ When servoy data-aggrid-groupingtable component with name companies.groupingTabl
 
 Validates that the grouping table consists of x rows. Do note that it only counts the rows currently visible in the viewport.
 ```
-- Then servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {rowNumber} row(s)
+Then servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {rowNumber} row(s)
 ```
 Examples:
 ```
@@ -997,7 +997,7 @@ ___
 Modal-dialog component
 ___
 
-Presses the modal-dialog button with the given text 
+Presses the modal-dialog button with the given text. This can be used in any dialog (info/warning/error, etc.)
 Note: this test is case sensitive
 ```
 When default modal-dialog component the button with the text {text} is pressed
@@ -1009,6 +1009,24 @@ When default modal-dialog component the button with the text Cancel is pressed
 ```
 
 
+Inserts the given text into the input field. Only works in a 'showInfoDialog'.
+```
+When default input-dialog I want to insert the text {text}
+```
+Example:
+```
+When default input-dialog I want to insert the text Example input dialog text
+```
+
+
+Clicks the input field and selects the option field with the given text. Only works on a 'showSelectDialog'
+```
+When default select-dialog I want to select the combobox item with the text {text}
+```
+Example:
+```
+When default select-dialog I want to select the combobox item with the text {text}
+```
 
 Certain dialogs cover the rest of the application with a gray overlay. If the test tries to interact with any component while this is active, an error will be given. To prevent such errors from happening, this test will wait until the overlay is gone. Example:
 ```
