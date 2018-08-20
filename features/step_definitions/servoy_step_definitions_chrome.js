@@ -1895,6 +1895,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END HTMLVIEW COMPONENT
 
+	//data-bootstrapextracomponents-navbar
+	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab {tabText} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, callback){
+		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(tab), 30 * 1000, 'Element not found!').then(function(){
+			var tabElement = tab.element(by.cssContainingText("a", tabText));
+			browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
+				clickElement(tabElement).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(false);
+		});
+	});
+	//END data-bootstrapextracomponents-navbar
+
 	After(function () {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
@@ -2085,7 +2102,6 @@ function findRecordTableComponent(elementName, recordText, shouldClick, callback
 				found = true;
 				wrapUp(callback, "scrollEvent");
 			}
-
 		} else {
 			baseTable.all(by.xpath("//input")).each(function(rowItems) {
 				rowItems.getAttribute('value').then(function(value) {
