@@ -3,7 +3,7 @@ Feature: Testing the Sample Gallery
 
 Given I go to https://tomcat.demo.servoy-cloud.eu/sampleGallery/solutions/sampleGallery/index.html?f=galleryMain
 When servoy sidenav component with name galleryMain.nav tab Working with Data is clicked
-When servoy sidenav component with name galleryMain.nav tab Cryptography is clicked 
+When servoy sidenav component with name galleryMain.nav tab Cryptography is clicked
 
 When servoy combobox component with name exampleCrypto.algorithm is clicked
 Then servoy combobox component I want to select number 1 in the combobox
