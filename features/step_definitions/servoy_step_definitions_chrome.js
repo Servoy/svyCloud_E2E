@@ -1011,7 +1011,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY BUTTON
 	When('servoy button component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-servoydefault-button[starts-with(@data-svy-name, '" + elementName + "')]/button"))).then(function () {
+		clickElement(element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"))).then(function () {
 			wrapUp(callback, "Click event");
 		}).catch(function (error) {
 			console.log(error.message);
