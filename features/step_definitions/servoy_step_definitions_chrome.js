@@ -27,6 +27,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('I want to navigate to {url} in a new tab', {timeout: 60 * 1000}, function(url, callback){
+		browser.executeScript("return window.open(arguments[0], '_blank')", url).then(function(){
+			browser.getAllWindowHandles().then(function (handles) {
+				console.log(handles)
+				browser.switchTo().window(handles[Object.keys(handles)[Object.keys(handles).length-1]]).then(function () {
+					wrapUp(callback, "navigateURLEvent");
+				});				
+			});
+		});
+	});
+
 	//URL VALIDATION
 	Then('I expect the url to be {browserUrl}', { timeout: 30 * 1000 }, function (url, callback) {
 		browser.getCurrentUrl().then(function (browserUrl) {
