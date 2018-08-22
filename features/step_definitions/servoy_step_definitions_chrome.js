@@ -108,9 +108,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('I want to sleep for {second} second(s)', {timeout: 30 * 1000}, function (timer, callback) {
+	Then('I want to {activity} for {second} second(s)', {timeout: 120 * 1000}, function (activity, timer, callback) {
 		browser.sleep((parseInt(timer) * 1000)).then(function () {
-			wrapUp(callback, "Sleep");
+			wrapUp(callback, "sleepEvent");
 		});
 	});
 
@@ -244,7 +244,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY SELECT2TOKENIZER COMPONENT
 
 	//BROWSER ACTION
-	When('I press {browserAction}', { timeout: 60 * 1000 }, function (browserAction, callback) {
+	When('I press {browserAction}', { timeout: 15 * 1000 }, function (browserAction, callback) {
 		browserAction = browserAction.toLowerCase();
 		switch (browserAction) {
 			case "enter":
@@ -255,6 +255,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 				break;
+			case "control":
+				browser.actions().sendKeys(protractor.Key.CONTROL).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+				break;	
 			case "tab":
 				browser.actions().sendKeys(protractor.Key.TAB).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
@@ -433,6 +441,44 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log("Unknown browser action");
 				tierdown(true);
 		}
+	});
+
+	When('I want to press the {browserAction} key with the {key} key', { timeout: 15 * 1000 }, function (browserAction, key, callback) {		
+		browserAction = browserAction.toLowerCase();
+		var Key = protractor.Key;
+		
+		switch (browserAction) {
+			case "control":
+				if(key.toLowerCase() === 't'){
+					browser.executeScript("return window.open(arguments[0], '_blank')").then(function(){
+						wrapUp(callback, "navigateEvent");
+					})
+				} else {
+					browser.actions().keyDown(protractor.Key.CONTROL).sendKeys(key).perform().then(function () {
+						wrapUp(callback, "keypressEvent");
+					}).catch(function (error) {
+						console.log(error.message);
+						tierdown(true);
+					});
+				}
+				break;
+			case "alt": 
+				browser.actions().keyDown(protractor.Key.ALT).sendKeys(key).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+			case "shift": 
+				browser.actions().keyDown(protractor.Key.SHIFT).sendKeys(key).perform().then(function () {
+					wrapUp(callback, "keypressEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+		}
+		
+		
 	});
 	//END BROWSER ACTION
 
@@ -840,35 +886,39 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	
 	When('servoy data-servoydefault-check component with name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
-		checkbox.isSelected().then(function (isChecked) {
-			return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
-		}).then(function(isChecked){
-			if(isChecked) {
-				clickElement(checkbox).then(function () {
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+			checkbox.isSelected().then(function (isChecked) {
+				return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
+			}).then(function(isChecked){
+				if(isChecked) {
+					clickElement(checkbox).then(function () {
+						wrapUp(callback, "checkboxEvent");
+					})
+				} else {
 					wrapUp(callback, "checkboxEvent");
-				})
-			} else {
-				wrapUp(callback, "checkboxEvent");
-			}
-		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
-		});
+				}
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		})
 	});
 
 	When('servoy data-servoydefault-check component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkBoxState, callback) {
 		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
-		checkbox.isSelected().then(function (isChecked) {
-			return !isChecked && checkBoxState.toLowerCase() === "unchecked" || isChecked && checkBoxState.toLowerCase() === "checked"
-		}).then(function(isChecked) {
-			if (isChecked) {
-				wrapUp(callback, "checkboxEvent");
-			} else {
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+			checkbox.isSelected().then(function (isChecked) {
+				return !isChecked && checkBoxState.toLowerCase() === "unchecked" || isChecked && checkBoxState.toLowerCase() === "checked"
+			}).then(function(isChecked) {
+				if (isChecked) {
+					wrapUp(callback, "checkboxEvent");
+				} else {
+					tierdown(true);
+				}
+			}).catch(function (error) {
+				console.log(error.message);
 				tierdown(true);
-			}
-		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			});
 		});
 	});
 
@@ -982,9 +1032,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(error)
 				});
 			} else {
-				var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']/div/div/span[2]"));
-				browser.wait(EC.visibilityOf(label), 10 * 1000, 'Label not found!').then(function(){
-					clickElement(label).then(function(){
+				var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']"));
+				browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
+					clickElement(element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']/div"))).then(function(){
 						wrapUp(callback, "clickEvent");
 					}).catch(function(error){
 						tierdown(error)
@@ -1122,8 +1172,78 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});	
 
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+			textField.getAttribute('value').then(function(textFieldText){
+				if(text === textFieldText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
+				}
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(false);
+		})
+	});	
 
-	//BOOTSTRAP COMPONENTS INSIDE A FORMCOMPONENT
+	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select button number {number}', {timeout: 30 * 1000}, function(elementName, number, callback){
+		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+			var button = group.all(by.css("button")).get(number - 1);
+			browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function(){
+				clickElement(button).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);			
+		})
+	});
+
+	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+			group.all(by.css("button")).each(function(button){
+				button.getText().then(function(buttonText){
+					if(buttonText.toLowerCase() === text.toLowerCase()) {
+						clickElement(button).then(function(){
+							wrapUp(callback, "clickEvent");
+						});
+					}
+				})
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);			
+		})
+	});
+
+	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var found = false;
+		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+			group.all(by.css("button")).each(function(button){
+				button.getText().then(function(buttonText){
+					if(buttonText.toLowerCase().indexOf(text) > -1) {
+						if(found === false) {
+							clickElement(button).then(function(){
+								found = true;					
+								wrapUp(callback, "clickEvent");
+							});
+						}
+					}
+				})
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);			
+		})
+	});
+
+	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
@@ -1171,25 +1291,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
-
-	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function(){
-			var inputField = selectComponent.element(by.xpath("//option[text()='"+text+"']"));
-			inputField.isPresent().then(function(isPresent){
-				console.log(isPresent);
-				if(isPresent) {
-					clickElement(inputField).then(function(){
-						wrapUp(callback, "clickEvent");
-					});
-				}
-			});
-		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
-		});
-	});
-	//END BOOTSTRAP COMPONENTS INSIDE A FORMCOMPONENT
+	//END BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//END BOOTSTRAP COMPONENTS
 
 	//SERVOY GROUPING GRID COMPONENT
@@ -1787,7 +1889,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				tierdown(true)
 			});
 		});
-	});	
+	});
 	//END MODEL DIALOG COMPONENT
 
 	//SERVOY WINDOW COMPONENT 
@@ -1932,7 +2034,7 @@ function validate(input, inputToCompare) {
 function wrapUp(callback, performanceEvent) {
 	var duration = calcStepDuration(new Date());
 	console.log('Step took ' + duration + ' miliseconds');
-	analytics.event('Scenario 1', "Performance", performanceEvent, duration).send();
+	// analytics.event('Scenario 1', "Performance", performanceEvent, duration).send();
 	callback();
 }
 
@@ -2102,6 +2204,7 @@ function findRecordTableComponent(elementName, recordText, shouldClick, callback
 				found = true;
 				wrapUp(callback, "scrollEvent");
 			}
+
 		} else {
 			baseTable.all(by.xpath("//input")).each(function(rowItems) {
 				rowItems.getAttribute('value').then(function(value) {
