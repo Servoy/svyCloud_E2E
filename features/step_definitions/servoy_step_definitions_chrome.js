@@ -2025,6 +2025,112 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END data-bootstrapextracomponents-navbar
 
+	//LISTBOX COMPONENT
+	//CHECK IF X AMOUNT OF ROWS EXIST
+	When('servoy data-servoydefault-listbox with name {elementName} I want to validate that there are {rowCount} rows', {timeout: 30 * 1000}, function(elementName, expectedCount, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			listBox.all(by.css("option")).count().then(function(count){
+				if(count == expectedCount) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Invalid count. Expected: " + expectedCount + ". Got " + count);					
+				}
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	
+	When('servoy data-servoydefault-listbox with name {elementName} I want to select row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, rowNumber, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			var row = listBox.all(by.css("option")).get(rowNumber - 1);
+			browser.wait(EC.visibilityOf(row), 30 * 1000, 'Row not found!').then(function(){
+				clickElement(row).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	//SELECT ROW BY PARTIAL MATCH
+	When('servoy data-servoydefault-listbox with name {elementName} I want to select the row with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			listBox.all(by.css("option")).each(function(row){
+				row.getAttribute('value').then(function(value){
+					if(value.indexOf(text) > -1) {
+						clickElement(row).then(function(){
+							wrapUp(callback, "validateEvent");
+						});
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	//SELECT ROW BY EXACT MATCH
+	When('servoy data-servoydefault-listbox with name {elementName} I want to select the row with the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			listBox.all(by.css("option")).each(function(row){
+				row.getAttribute('value').then(function(value){
+					if(value === text) {
+						clickElement(row).then(function(){
+							wrapUp(callback, "validateEvent");
+						});
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	//VALIDATE BY PARTIAL MATCH
+	When('servoy data-servoydefault-listbox with name {elementName} I want to validate that a row with the partial text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			listBox.all(by.css("option")).each(function(row){
+				row.getAttribute('value').then(function(value){
+					if(value.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent");
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	//VALIDATE BY EXACT MATCH
+	When('servoy data-servoydefault-listbox with name {elementName} I want to validate that a row with the exact text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
+			listBox.all(by.css("option")).each(function(row){
+				row.getAttribute('value').then(function(value){
+					if(value === text) {
+						wrapUp(callback, "validateEvent");
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+	//END LISTBOX COMPONENT
+
 	After(function () {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
