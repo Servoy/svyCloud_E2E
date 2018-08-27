@@ -38,6 +38,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('I want to switch to browser tab {tabNumber}', {timeout: 15 * 1000}, function(tabNumber, callback){
+		browser.getAllWindowHandles().then(function(handles) {
+			var newTabHandle = handles[tabNumber - 1];
+			browser.switchTo().window(newTabHandle).then(function () {
+				wrapUp(callback, "navigateEvent");
+			});
+		});
+	});
+
 	//URL VALIDATION
 	Then('I expect the url to be {browserUrl}', { timeout: 30 * 1000 }, function (url, callback) {
 		browser.getCurrentUrl().then(function (browserUrl) {
