@@ -130,48 +130,40 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var monthTo = monthList.indexOf(month.toLowerCase());
 		var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		var yearTo = year;
-		element(by.xpath("//th[@class='picker-switch']")).getText().then(function(calYear){
-			var yearFrom = calYear.split(" ")[1];
-			if (yearFrom != yearTo) { //switch years if end dates aint equal
-				clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-					if (yearFrom < yearTo) {
-						for (var x = 0; x < (yearTo - yearFrom); x++) {
-							clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
+		var dateHeaderText = element(by.xpath("//th[@class='picker-switch']"));
+		browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
+			dateHeaderText.getText().then(function (calYear) {
+				var yearFrom = calYear.split(" ")[1];
+				if (yearFrom != yearTo) { //switch years if end dates aint equal
+					clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
+						if (yearFrom < yearTo) {
+							for (var x = 0; x < (yearTo - yearFrom); x++) {
+								clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
+							}
+						} else {
+							for (var x = 0; x < (yearFrom - yearTo); x++) {
+								clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
+							}
 						}
-					} else {
-						for (var x = 0; x < (yearFrom - yearTo); x++) {
-							clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
-						}
-					}
-				}).then(function () {
-					clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-						return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+					}).then(function () {
+						clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
+							return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+						});
 					});
-				})/*.then(function () {
-					wrapUp(callback, "Calendar event");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});*/
-			} else {
-				clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-					return clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-						return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+				} else {
+					clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
+						return clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
+							return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+						});
 					});
-				})/*.then(function () {
-					wrapUp(callback, "Calendar event")
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});*/
-			}
-		}).then(function(){
-			element(by.xpath("//th[@class='picker-switch']")).getText().then(function(calYear){
-				if(calYear.toLowerCase() === month.toLowerCase() + " " + year) {
-					wrapUp(callback, "Calendar event")
 				}
+			}).then(function () {		
+				wrapUp(callback, "Calendar event");			
 			});
-		})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true)
+		})	
 	});
 
 	When('servoy calendar component I want to select day {day}', { timeout: 15 * 1000 }, function (day, callback) {
