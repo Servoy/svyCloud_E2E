@@ -14,6 +14,7 @@ var analytics = userAnalytics('UA-93980847-1');
 var find = require('find');
 var fs = require('fs-extra');
 var timeoutAgAction = 60 * 1000;
+var storedValues = [];
 
 defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BASIC NAGIVATION
@@ -1170,11 +1171,57 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"))).then(function () {
-			wrapUp(callback, "clickEvent");
-		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+			clickElement(button).then(function () {
+				wrapUp(callback, "clickEvent");
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		});		
+	});
+
+	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (elementName, state, callback) {
+		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+			button.isEnabled().then(function(buttonState) {
+				if(!buttonState && state === 'disabled' || buttonState && state === 'enabled') {
+					wrapUp(callback, "validateEvent");
+				} else {
+					if(!buttonState) {
+						console.log('Button is currently disabled. Expected it to be enabled.')
+					} else {
+						console.log('Button is currently enabled. Expected it to be disabled.')
+					}
+				}
+			});
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button its text partially equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+			button.getText().then(function(buttonText){
+				if(buttonText.indexOf(text) > -1) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
+				}
+			});
+		});
+	});
+	
+	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button its text equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+			button.getText().then(function(buttonText){
+				if(buttonText === text) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
+				}
+			});
 		});
 	});
 
@@ -1228,7 +1275,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + rowText);
 				}
 			})
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
@@ -1255,6 +1302,52 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 		})
+	});
+
+	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
+		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+			checkbox.isSelected().then(function (isChecked) {			
+				if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
+					wrapUp(callback, "checkboxEvent");
+				} else {
+					console.log('Validation failed. State of the checkbox does not match the expected state!');
+					tierdown(true);
+				}
+			}).catch(function (error) {
+				console.log(error.message);
+			});
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/span"));
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+			checkbox.getText().then(function(inputText) {
+				if(inputText === text) {
+					wrapUp(callback, "validateEvent")
+				} else {
+					console.log("Validation failed. Expected " + text + ". Got " + inputText);
+				}
+			})
+		}).catch(function(error){
+			tierdown(true);
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label partially equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/span"));
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+			checkbox.getText().then(function(inputText) {
+				if(inputText.indexOf(text) > -1) {
+					wrapUp(callback, "validateEvent")
+				} else {
+					console.log("Validation failed. Expected " + text + ". Got " + inputText);
+				}
+			})
+		}).catch(function(error){
+			tierdown(true);
+		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-badge component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -1486,6 +1579,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(elementName, callback){
+		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+				console.log(labelText)
+				if(!labelText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
+				}
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -1501,6 +1611,133 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	When('bootstrap data-bootstrapcomponents-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
+		var label = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(label), 15 * 1000, 'Datalabel not found!').then(function(){
+			clickElement(label).then(function(){
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+				if(text === labelText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+				}
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(elementName, callback){
+		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+				console.log(labelText)
+				if(!labelText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
+				}
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+				if(labelText.indexOf(text) > -1) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+				}
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	}); 
+
+	When('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
+		var dataLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(dataLabel), 15 * 1000, 'Datalabel not found!').then(function(){
+			clickElement(dataLabel).then(function(){
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	
+
+	When("bootstrap data-bootstrapextracomponents-switch component with name {elementName} I want to change the state to {switchText}", {timeout: 30 * 1000}, function(elementName, switchText, callback){
+		var servoySwitch = element(by.xpath("//data-bootstrapextracomponents-switch[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(servoySwitch), 20 * 1000, 'Switch not found!').then(function () {
+			//Margin determins whether the switch is turned off or on
+			servoySwitch.element(by.xpath("//div[@class='bootstrap-switch-container']")).getCssValue("margin-left").then(function (margin) {
+				//Get the text of the left part of the switch
+				servoySwitch.element(by.xpath("//span[contains(@class, 'bootstrap-switch-handle-on')]")).getText().then(function (textOn) {
+					//Less than 0 means that the switch is turned off
+					if (parseInt(margin) < 0) {
+						//because the switch is off, we need to validate if the onText is equal to the given text
+						//if it's equal, that means the switch has to be turned on
+						if (textOn.toLowerCase() === switchText.toLowerCase()) {
+							clickElement(servoySwitch).then(function() {
+								wrapUp(callback, "switchEvent");
+							})							
+						} else {
+							//the text does not equal the onText. Now it needs to check if it actually equals the offText
+							//if it doesn't equal the offtext, an unknown state has been given
+							servoySwitch.element(by.xpath("//span[contains(@class, 'bootstrap-switch-handle-off')]")).getText().then(function (textOff) {
+								if(textOff.toLowerCase() === switchText.toLowerCase()) {
+									wrapUp(callback, "switchEvent");
+								} else {
+									console.log('Neither the off nor on text of the switch equals the given text!');
+									tierdown(true);
+								}
+							});	
+						}
+					} else { //Switch is turned on
+						if (textOn.toLowerCase() === switchText.toLowerCase()) {
+							servoySwitch.element(by.xpath("//span[contains(@class, 'bootstrap-switch-handle-off')]")).getText().then(function (textOff) {
+								if(textOff.toLowerCase() === switchText.toLowerCase()) {
+									wrapUp(callback, "switchEvent");
+								} else {
+									console.log('Neither the off nor on text of the switch equals the given text!');
+									tierdown(true);
+								}
+							});
+						} else {
+							clickElement(servoySwitch).then(function() {
+								wrapUp(callback, "switchEvent");
+							});					
+						}
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
@@ -1537,7 +1774,80 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	//END TEXT FIELDS
+	//DATA LABELS	
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					if(text === labelText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
 
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					console.log(labelText)
+					if(!labelText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected no value. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					if(labelText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	}); 
+
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var dataLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.visibilityOf(dataLabel), 15 * 1000, 'Datalabel not found!').then(function(){
+				clickElement(dataLabel).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function(error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
+	//END DATA LABELS
 	//LABELS
 	When('formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
@@ -1591,6 +1901,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	Then('formcomponent with the name {elementName} with a bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label has no text', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-label[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function () {
+				bootstrapLabel.element(by.css("span")).getText().then(function (labelText) {
+					if (!labelText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected no value. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
 	//END LABELS
 
 	//BUTTONS
@@ -1606,6 +1935,26 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (formComponentName, elementName, state, callback) {
+		var formComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(formComponent), 15 * 1000, 'Form component not found!').then(function(){
+			var button = formComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css("button"));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				button.isEnabled().then(function(buttonState) {
+					if(!buttonState && state === 'disabled' || buttonState && state === 'enabled') {
+						wrapUp(callback, "validateEvent");
+					} else {
+						if(!buttonState) {
+							console.log('Button is currently disabled. Expected it to be enabled.')
+						} else {
+							console.log('Button is currently enabled. Expected it to be disabled.')
+						}
+					}
+				});
+			});
 		});
 	});
 	//END BUTTONS
@@ -1667,10 +2016,103 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//COMBOBOX
 
-	//END COMBOBOX
+	//CHECKBOX
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
+			checkbox.isSelected().then(function (isChecked) {
+				console.log(isChecked);
+				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+					clickElement(checkbox).then(function () {
+						wrapUp(callback, "checkboxEvent");
+					})
+				} else {
+					console.log('Checkbox did not have to be changed');
+					wrapUp(callback, "checkboxEvent");
+				}
+			}).catch(function (error) {
+				console.log(error.message);
+			})
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
+			checkbox.isSelected().then(function (isChecked) {			
+				if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
+					wrapUp(callback, "checkboxEvent");
+				} else {
+					console.log('Validation failed. State of the checkbox does not match the expected state!');
+					tierdown(true);
+				}
+			}).catch(function (error) {
+				console.log(error.message);
+			})
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("span"));
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+				checkbox.getText().then(function(inputText) {
+					if(inputText === text) {
+						wrapUp(callback, "validateEvent")
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + inputText);
+					}
+				})
+			}).catch(function(error){
+				tierdown(true);
+			});
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label partially equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("span"));
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+				checkbox.getText().then(function(inputText) {
+					if(inputText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent")
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + inputText);
+					}
+				})
+			}).catch(function(error){
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
+	//END CHECKBOX
+
+	//END CHECKBOX
 	//END BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//END BOOTSTRAP COMPONENTS
+
+	//FORM COMPONENTS
+	//Wildcard element existance validation
+	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var wildcard = fComponent.element(by.css("*[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element not found!').then(function(){
+				wrapUp(callback, "validateEvent");
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END FORMCOMPONENTS
 
 	//SERVOY GROUPING GRID COMPONENT
 	When('servoy data-aggrid-groupingtable component with name {elementName} I scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
@@ -2519,6 +2961,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		})
 	});
 
+	//SERVOY PDF VIEWER
 	Then('servoy data-pdfviewer-pdf-js-viewer component with name {elementName} I expect it to be visible', {timeout: 30 * 1000}, function(elementName, callback){
 		var viewer = element(by.xpath("//data-pdfviewer-pdf-js-viewer[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(viewer), 20 * 1000, 'PDF viewer not found!').then(function(){
@@ -2528,6 +2971,178 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END SERVOY PDF VIEWER
+
+	//SERVOY EXTRA SLIDER
+	When('servoy extra slider component with name {elementName} I want to slide it to value {value} where the value is stored in the element with name {storedElementName}', {timeout: 30 * 1000}, function(elementName, value, storedElementName, callback){
+		var slider = element(by.xpath("//div[@data-svy-name='" + elementName + "']"));
+		getValueOfElement("*", storedElementName).then(function(tempStoredValue){
+			value = parseInt(value);
+			browser.wait(EC.visibilityOf(slider), 30 * 1000, 'Slider not found!').then(function(){
+				var sliderIcon = slider.element(by.xpath("//span[contains(@class, 'ui-slider-handle')]"));
+				sliderIcon.click().then(function(){
+					var Key = protractor.Key;
+					//to calculate the amount of times the 'left' or right' button has to be clicked, the value of of 1 'click' needs to be calculated
+					var steps;
+					if(value < tempStoredValue) {
+						browser.actions().sendKeys(Key.ARROW_LEFT).perform().then(function(){
+							//calculate sliderSteps
+							getValueOfElement("*", storedElementName).then(function(storedValue){
+								steps = (storedValue > value)? storedValue-value : value-storedValue;
+								for (var x = 0; x < steps; x++) {
+									browser.actions().sendKeys(Key.ARROW_LEFT).perform();
+								}
+							})
+							
+						});
+					} else {
+						browser.actions().sendKeys(Key.ARROW_RIGHT).perform().then(function(){
+							//calculate sliderSteps
+							getValueOfElement("*", storedElementName).then(function(storedValue){
+								steps = (storedValue > value)? storedValue-value : value-storedValue;
+								console.log('Steps: ' + steps);
+								for(var x = 0; x < (value/steps); x++) {
+									browser.actions().sendKeys(Key.ARROW_RIGHT).perform();
+								}
+							})
+						});
+					}
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('servoy extra data-servoyextra-slider component with name {elementName} I want to set the {min|max} value to {value} where the step size is {stepSize}', {timeout: 15 * 1000}, function(elementName, sliderParam, value, stepSize, callback){
+		var slider = element(by.xpath("//data-servoyextra-slider[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(slider), 30 * 1000, 'Slider not found!').then(function(){
+			var sliderMin = slider.element(by.xpath("//span[contains(@class, 'rz-model-value')]")); //min selected value
+			var sliderMax = slider.element(by.xpath("//span[contains(@class, 'rz-model-high')]")); //max selected value
+			var sliderMinLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-min')]")); //min slider icon
+			var sliderMaxLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-max')]")); //max slider icon
+			var sliderMinValue = slider.element(by.xpath("//span[contains(@class, 'rz-floor')]")); //min achievable value
+			sliderMin.getText().then(function (minValue) {
+				sliderMax.getText().then(function (maxValue) {
+					//gets the width of the slider (difference between max/min value)
+					sliderMinLoc.getLocation().then(function (minLoc) {
+						sliderMaxLoc.getLocation().then(function (maxLoc) {
+							//basic check to see if the values can be set
+							// if(sliderParam.toLowerCase() === 'max' && minValue > value || sliderParam.toLowerCase() === 'min' && maxValue < value) {
+							var width = maxLoc.x - minLoc.x;							
+
+							if (sliderParam.toLowerCase() === 'min') {
+								browser.actions()
+									.mouseMove(sliderMinLoc.getWebElement())
+									.mouseDown()
+									.mouseMove({ x: Math.round(width / (maxValue - minValue) * parseInt(value)), y: 0 })
+									.mouseUp()
+									.perform().then(function () {
+										sliderMin.getAttribute('textContent').then(function(newMinValue){
+											if(newMinValue === value) {
+												wrapUp(callback, "slideEvent");
+											} else {
+												//Since decimal pixels are not possible, a new calculation has to be made to see if the steps are possible
+												//e.g.: min val achievable: 1, max val achievable: 10, steps: 3, meaning value 5 is not possible. Only 1, 4, 7, 10
+												sliderMinValue.getAttribute('textContent').then(function(minSliderValue){
+													var testVal = parseInt(minSliderValue) + value;													
+													if(testVal % stepSize === 0) {
+														if(parseInt(newMinValue) < parseInt(value)) {
+															moveSliderByArrowKey(sliderMinLoc, 'right', sliderMin, sliderMax, stepSize, parseInt(value), callback);
+														} else {
+															moveSliderByArrowKey(sliderMinLoc, 'left', sliderMin, sliderMax, stepSize, parseInt(value), callback);
+														}
+													} else {
+														console.log('Exact value is not reachable with the step size.');
+														tierdown(true);
+													}
+												});
+												
+											}
+										});
+									});
+							}
+
+							if (sliderParam.toLowerCase() === 'max') {
+								var difference = parseInt(sliderWidth.width);
+								browser.actions()
+									.mouseMove(sliderMaxLoc.getWebElement())
+									.mouseDown()
+									.mouseMove({ x: Math.round((difference / (maxValue - minValue) * parseInt(value)) * -1), y: 0 })
+									.mouseUp()
+									.perform().then(function () {
+										sliderMax.getAttribute('textContent').then(function(newMaxValue){
+											if(newMaxValue === value) {
+												wrapUp(callback, "slideEvent");
+											} else {
+												moveSliderByArrowKey(sliderMinLoc, side, sliderMin, sliderMax, stepSize, parseInt(value), callback);
+											}
+										});
+									});
+							}
+							// }
+						});
+					});
+				});
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END SERVOY EXTRA SLIDER
+
+	//STORE VALUES
+	When('servoy {componentType} with name {elementName} I want to store the value', {timeout: 30 * 1000}, function(componentType, elementName, callback){		
+		var wildCard = element(by.xpath("//" + componentType + "[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(wildCard), 15 * 1000, 'Element not found!').then(function(){
+			console.log('Storing the value in position ' + (storedValues.length + 1));
+			switch(componentType){
+				case "data-servoydefault-label":
+				case "data-servoydefault-button":
+					wildCard.element(by.css("span[class='ng-binding']")).getText().then(function(text){
+						storedValues.push(text);
+						wrapUp(callback, "storeValueEvent");
+					});
+					break;
+
+				case "data-bootstrapcomponents-label":
+				case "data-bootstrapcomponents-datalabel":
+					wildCard.element(by.css("span")).getText().then(function(text){
+						storedValues.push(text);
+						wrapUp(callback, "storeValueEvent");
+					});					
+					break;
+				
+				case "data-bootstrapcomponents-textbox":
+					wildCard.element(by.css("input")).getAttribute('value').then(function(text) {
+						storedValues.push(text);
+						wrapUp(callback, "storeValueEvent");
+					});					
+					break;
+				
+				case "input":
+					wildCard.getAttribute('value').then(function(text){
+						storedValues.push(text);
+						wrapUp(callback, "storeValueEvent");
+					})					
+					break;
+				
+				default: 
+					console.log('Unknown component type. Supported types are: "data-servoydefault-label", "data-bootstrapcomponents-label", "data-bootstrapcomponents-datalabel", "data-bootstrapcomponents-textbox", "input", "data-servoydefault-button"')
+					tierdown(true);
+					break;
+			}
+		});
+	});
+
+	Then('I want to clear the list of stored values', {timeout: 10 * 1000}, function(callback){
+		storedValues = null;
+		callback();
+	});
+	//END STORE VALUES
+
 	After(function () {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
@@ -2540,6 +3155,71 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		console.log('Starting scenario');
 	});
 });
+
+/*
+* @param {element} elemToMove - slider icon that has to be moved
+* @param {String} sideToMove - slider has to move to the left or right
+* @param {element} sliderMin - current value of the min slider
+* @param {element} sliderMax - current value of the max slider
+* @param {Number} stepSize - increment of 1 key press (left or right)
+* @param {Number} expectedValue - value to be reached
+* @param {Object} callback - resolves the promise
+*/
+function moveSliderByArrowKey(elemToMove, sideToMove, sliderMin, sliderMax, stepSize, expectedValue, callback) {
+	sliderMin.getAttribute('textContent').then(function (minValue) {
+		sliderMax.getAttribute('textContent').then(function (maxValue) {
+			var difference = parseInt(expectedValue) - parseInt(minValue);
+			var remainingSteps = difference / parseInt(stepSize);
+			if (remainingSteps < 0) {
+				remainingSteps *= -1;
+			}
+			console.log(remainingSteps);
+			// browser.sleep(1000);
+			for (var i = 0; i < remainingSteps; i++) {
+				if (sideToMove === 'left') {
+					browser.actions().sendKeys(protractor.Key.ARROW_LEFT).perform().then(function () {
+						browser.sleep(300);
+						// console.log('Excecuting LEFT click');
+					});
+				} else {
+					browser.actions().sendKeys(protractor.Key.ARROW_RIGHT).perform().then(function () {
+						browser.sleep(300);
+						// console.log('Excecuting RIGHT click');
+					});
+				}
+			}
+		});
+	}).then(function () {
+		sliderMin.getAttribute('textContent').then(function(val){
+			if(val == expectedValue) {
+				console.log('Success')
+				wrapUp(callback, ""); 
+			} else {
+				
+			}
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+}
+
+function arrowKey(side) {
+	if(side === 'left') {
+		return browser.actions().sendKeys(protractor.Key.ARROW_LEFT).perform();
+	} else {
+		return browser.actions().sendKeys(protractor.Key.ARROW_RIGHT).perform();
+	}
+}
+
+function getValueOfElement(elementType, elementName) {
+	var elem = element(by.xpath("//" + elementType+ "[@data-svy-name='" + elementName +"']"));
+	return browser.wait(EC.visibilityOf(elem), 30 * 1000, 'Element not found!').then(function(){
+		return elem.getText().then(function(text){			
+			return text;
+		})
+	})
+}
 
 function validate(input, inputToCompare) {
 	return expect(input).toBe(inputToCompare);
