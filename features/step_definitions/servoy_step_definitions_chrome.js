@@ -1170,6 +1170,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName+"']/input"));
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+			clickElement(textField).then(function() {
+				wrapUp(callback, "insertTextEvent");
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
+
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
 		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
@@ -1757,7 +1769,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
-	
+
 	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-textbox component with name {cElementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
@@ -2099,7 +2111,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP COMPONENTS
 
 	//FORM COMPONENTS
-	//Wildcard element existance validation
+	//WILDCARD ELEMENT EXISTANCE VALIDATION
 	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
@@ -2112,6 +2124,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to not be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent.first()), 30 * 1000, 'Formcomponent not found!').then(function(){
+			fComponent.all(by.css("*[data-svy-name='" + elementName + "']")).then(function(items) {
+				if(items.length === 0) {
+					wrapUp(callback, "validateEvent");
+				}
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END WILDCARD ELEMENT EXISTANCE VALIDATION
 	//END FORMCOMPONENTS
 
 	//SERVOY GROUPING GRID COMPONENT
@@ -2820,7 +2847,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab {tabText} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, callback){
 		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(tab), 30 * 1000, 'Element not found!').then(function(){
-			var tabElement = tab.element(by.xpath("//a[text()='"+ tabText+"']"));
+			var tabElement = tab.element(by.xpath("//a[text()='"+tabText+"']"));
 			browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
 				clickElement(tabElement).then(function(){
 					wrapUp(callback, "clickEvent");
@@ -2950,16 +2977,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END FONT AWESOME
 
+	//Wildcard check
 	Then('I expect an element with the name {elementName} to be present', {timeout: 20 * 1000}, function(elementName, callback){
 		var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
 		browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function(){
 			wrapUp(callback, "validateEvent");
 		}).catch(function(error){
-			console.log("Element with the given name has not been found!");
 			console.log(error.message);
 			tierdown(true)
 		})
 	});
+
+	Then('I expect an element with the name {elementName} to not be present', {timeout: 20 * 1000}, function(elementName, callback){
+		element.all(by.xpath("//*[@data-svy-name='" + elementName+"']")).then(function(items){
+			if(items.length === 0) {
+				wrapUp(callback, "validateEvent"); 
+			} else {
+				console.log('Validation failed! Expected 0 matches, got ' + items.length);
+				tierdown(true);
+			}
+		}).catch(function(error){
+			console.log(error.message)
+		});
+		
+
+	});
+	//END WILDCARD CHECK
+
 
 	//SERVOY PDF VIEWER
 	Then('servoy data-pdfviewer-pdf-js-viewer component with name {elementName} I expect it to be visible', {timeout: 30 * 1000}, function(elementName, callback){
@@ -2976,32 +3020,32 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//SERVOY EXTRA SLIDER
 	When('servoy extra slider component with name {elementName} I want to slide it to value {value} where the value is stored in the element with name {storedElementName}', {timeout: 30 * 1000}, function(elementName, value, storedElementName, callback){
 		var slider = element(by.xpath("//div[@data-svy-name='" + elementName + "']"));
-		getValueOfElement("*", storedElementName).then(function(tempStoredValue){
+		getValueOfElement("*", storedElementName).then(function (tempStoredValue) {
 			value = parseInt(value);
-			browser.wait(EC.visibilityOf(slider), 30 * 1000, 'Slider not found!').then(function(){
+			browser.wait(EC.visibilityOf(slider), 30 * 1000, 'Slider not found!').then(function () {
 				var sliderIcon = slider.element(by.xpath("//span[contains(@class, 'ui-slider-handle')]"));
-				sliderIcon.click().then(function(){
+				sliderIcon.click().then(function () {
 					var Key = protractor.Key;
 					//to calculate the amount of times the 'left' or right' button has to be clicked, the value of of 1 'click' needs to be calculated
 					var steps;
-					if(value < tempStoredValue) {
-						browser.actions().sendKeys(Key.ARROW_LEFT).perform().then(function(){
+					if (value < tempStoredValue) {
+						browser.actions().sendKeys(Key.ARROW_LEFT).perform().then(function () {
 							//calculate sliderSteps
-							getValueOfElement("*", storedElementName).then(function(storedValue){
-								steps = (storedValue > value)? storedValue-value : value-storedValue;
+							getValueOfElement("*", storedElementName).then(function (storedValue) {
+								steps = (storedValue > value) ? storedValue - value : value - storedValue;
 								for (var x = 0; x < steps; x++) {
 									browser.actions().sendKeys(Key.ARROW_LEFT).perform();
 								}
 							})
-							
+
 						});
 					} else {
-						browser.actions().sendKeys(Key.ARROW_RIGHT).perform().then(function(){
+						browser.actions().sendKeys(Key.ARROW_RIGHT).perform().then(function () {
 							//calculate sliderSteps
-							getValueOfElement("*", storedElementName).then(function(storedValue){
-								steps = (storedValue > value)? storedValue-value : value-storedValue;
+							getValueOfElement("*", storedElementName).then(function (storedValue) {
+								steps = (storedValue > value) ? storedValue - value : value - storedValue;
 								console.log('Steps: ' + steps);
-								for(var x = 0; x < (value/steps); x++) {
+								for (var x = 0; x < (value / steps); x++) {
 									browser.actions().sendKeys(Key.ARROW_RIGHT).perform();
 								}
 							})
@@ -3009,79 +3053,98 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
-		}).catch(function(error){
+		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
 		});
 	});
 
-	When('servoy extra data-servoyextra-slider component with name {elementName} I want to set the {min|max} value to {value} where the step size is {stepSize}', {timeout: 15 * 1000}, function(elementName, sliderParam, value, stepSize, callback){
+	When('servoy extra data-servoyextra-slider component with name {elementName} I want to set the {min|max} value to {value} where the step size is {stepSize}', { timeout: 15 * 1000 }, function (elementName, sliderParam, value, stepSize, callback) {
 		var slider = element(by.xpath("//data-servoyextra-slider[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(slider), 30 * 1000, 'Slider not found!').then(function(){
+		browser.wait(EC.presenceOf(slider), 30 * 1000, 'Slider not found!').then(function () {
 			var sliderMin = slider.element(by.xpath("//span[contains(@class, 'rz-model-value')]")); //min selected value
 			var sliderMax = slider.element(by.xpath("//span[contains(@class, 'rz-model-high')]")); //max selected value
 			var sliderMinLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-min')]")); //min slider icon
 			var sliderMaxLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-max')]")); //max slider icon
 			var sliderMinValue = slider.element(by.xpath("//span[contains(@class, 'rz-floor')]")); //min achievable value
+			var leftPartOfSlider = slider.element(by.xpath("//span[contains(@class, 'rz-bar-wrapper')]")); //most left part of the slider
 			sliderMin.getText().then(function (minValue) {
 				sliderMax.getText().then(function (maxValue) {
 					//gets the width of the slider (difference between max/min value)
 					sliderMinLoc.getLocation().then(function (minLoc) {
 						sliderMaxLoc.getLocation().then(function (maxLoc) {
-							//basic check to see if the values can be set
-							// if(sliderParam.toLowerCase() === 'max' && minValue > value || sliderParam.toLowerCase() === 'min' && maxValue < value) {
-							var width = maxLoc.x - minLoc.x;							
+							leftPartOfSlider.getSize().then(function (sliderSize) {
+								leftPartOfSlider.getLocation().then(function (leftSlideLoc) {
+									//basic check to see if the values can be set
+									// if(sliderParam.toLowerCase() === 'max' && minValue > value || sliderParam.toLowerCase() === 'min' && maxValue < value) {
 
-							if (sliderParam.toLowerCase() === 'min') {
-								browser.actions()
-									.mouseMove(sliderMinLoc.getWebElement())
-									.mouseDown()
-									.mouseMove({ x: Math.round(width / (maxValue - minValue) * parseInt(value)), y: 0 })
-									.mouseUp()
-									.perform().then(function () {
-										sliderMin.getAttribute('textContent').then(function(newMinValue){
-											if(newMinValue === value) {
-												wrapUp(callback, "slideEvent");
-											} else {
-												//Since decimal pixels are not possible, a new calculation has to be made to see if the steps are possible
-												//e.g.: min val achievable: 1, max val achievable: 10, steps: 3, meaning value 5 is not possible. Only 1, 4, 7, 10
-												sliderMinValue.getAttribute('textContent').then(function(minSliderValue){
-													var testVal = parseInt(minSliderValue) + value;													
-													if(testVal % stepSize === 0) {
-														if(parseInt(newMinValue) < parseInt(value)) {
-															moveSliderByArrowKey(sliderMinLoc, 'right', sliderMin, sliderMax, stepSize, parseInt(value), callback);
-														} else {
-															moveSliderByArrowKey(sliderMinLoc, 'left', sliderMin, sliderMax, stepSize, parseInt(value), callback);
-														}
+									// var width = maxLoc.x - minLoc.x;
+									var width = sliderSize.width;
+									console.log('Pixels to move: ' + (width / (maxValue - minValue) * parseInt(value) - (minLoc.x - leftSlideLoc.x)));
+									if (sliderParam.toLowerCase() === 'min') {
+										browser.actions()
+											.mouseMove(sliderMinLoc.getWebElement())
+											.mouseDown()
+											.mouseMove({ x: Math.round(width / (maxValue - minValue) * parseInt(value) - (minLoc.x - leftSlideLoc.x)), y: 0 })
+											.mouseUp()
+											.perform().then(function () {
+												sliderMin.getAttribute('textContent').then(function (newMinValue) {
+													if (newMinValue === value) {
+														wrapUp(callback, "slideEvent");
 													} else {
-														console.log('Exact value is not reachable with the step size.');
-														tierdown(true);
+														//Since decimal pixels are not possible, a new calculation has to be made to see if the steps are possible
+														//e.g.: min val achievable: 1, max val achievable: 10, steps: 3, meaning value 5 is not possible. Only 1, 4, 7, 10
+														sliderMinValue.getAttribute('textContent').then(function (minSliderValue) {
+															var testVal = parseInt(minSliderValue) + value;
+															if (testVal % stepSize === 0) {
+																if (parseInt(newMinValue) < parseInt(value)) {
+																	moveSliderByArrowKey('right', sliderMin, stepSize, parseInt(value), callback);
+																} else {
+																	moveSliderByArrowKey('left', sliderMin, stepSize, parseInt(value), callback);
+																}
+															} else {
+																console.log('Exact value is not reachable with the step size.');
+																tierdown(true);
+															}
+														});
+
 													}
 												});
-												
-											}
-										});
-									});
-							}
+											});
+									}
 
-							if (sliderParam.toLowerCase() === 'max') {
-								var difference = parseInt(sliderWidth.width);
-								browser.actions()
-									.mouseMove(sliderMaxLoc.getWebElement())
-									.mouseDown()
-									.mouseMove({ x: Math.round((difference / (maxValue - minValue) * parseInt(value)) * -1), y: 0 })
-									.mouseUp()
-									.perform().then(function () {
-										sliderMax.getAttribute('textContent').then(function(newMaxValue){
-											if(newMaxValue === value) {
-												wrapUp(callback, "slideEvent");
-											} else {
-												moveSliderByArrowKey(sliderMinLoc, side, sliderMin, sliderMax, stepSize, parseInt(value), callback);
-											}
-										});
-									});
-							}
-							// }
+									if (sliderParam.toLowerCase() === 'max') {
+										browser.actions()
+											.mouseMove(sliderMaxLoc.getWebElement())
+											.mouseDown()
+											.mouseMove({ x: Math.round(width / (maxValue - minValue) * parseInt(value) - (maxLoc.x - leftSlideLoc.x)), y: 0 })
+											.mouseUp()
+											.perform().then(function () {
+												sliderMax.getAttribute('textContent').then(function (newMaxValue) {
+													if (newMaxValue === value) {
+														wrapUp(callback, "slideEvent");
+													} else {
+														// moveSliderByArrowKey(side, sliderMin, stepSize, parseInt(value), callback);
+														sliderMinValue.getAttribute('textContent').then(function (maxSliderValue) {
+															var testVal = parseInt(maxSliderValue) + value;
+															if (testVal % stepSize === 0) {
+																if (parseInt(newMaxValue) < parseInt(value)) {
+																	moveSliderByArrowKey('right', sliderMax, stepSize, parseInt(value), callback);
+																} else {
+																	moveSliderByArrowKey('left', sliderMax, stepSize, parseInt(value), callback);
+																}
+															} else {
+																console.log('Exact value is not reachable with the step size.');
+																tierdown(true);
+															}
+														});
+													}
+												});
+											});
+									}
+									// }
+								})
+							})
 						});
 					});
 				});
@@ -3165,42 +3228,36 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 * @param {Number} expectedValue - value to be reached
 * @param {Object} callback - resolves the promise
 */
-function moveSliderByArrowKey(elemToMove, sideToMove, sliderMin, sliderMax, stepSize, expectedValue, callback) {
-	sliderMin.getAttribute('textContent').then(function (minValue) {
-		sliderMax.getAttribute('textContent').then(function (maxValue) {
-			var difference = parseInt(expectedValue) - parseInt(minValue);
-			var remainingSteps = difference / parseInt(stepSize);
-			if (remainingSteps < 0) {
-				remainingSteps *= -1;
+function moveSliderByArrowKey(sideToMove, sliderVal, stepSize, expectedValue, callback) {
+	sliderVal.getAttribute('textContent').then(function (val) {
+		var difference = parseInt(expectedValue) - parseInt(val);
+		var remainingSteps = difference / parseInt(stepSize);
+		if (remainingSteps < 0) {
+			remainingSteps *= -1;
+		}
+		console.log(remainingSteps);
+		for (var i = 0; i < remainingSteps * 2; i++) {
+			if (sideToMove === 'left') {
+				browser.actions().sendKeys(protractor.Key.ARROW_LEFT).perform().then(function () {
+					// browser.sleep(300);
+					// console.log('Excecuting LEFT click');
+				});
+			} else {
+				browser.actions().sendKeys(protractor.Key.ARROW_RIGHT).perform().then(function () {
+					// browser.sleep(300);
+					// console.log('Excecuting RIGHT click');
+				});
 			}
-			console.log(remainingSteps);
-			// browser.sleep(1000);
-			for (var i = 0; i < remainingSteps; i++) {
-				if (sideToMove === 'left') {
-					browser.actions().sendKeys(protractor.Key.ARROW_LEFT).perform().then(function () {
-						browser.sleep(300);
-						// console.log('Excecuting LEFT click');
-					});
-				} else {
-					browser.actions().sendKeys(protractor.Key.ARROW_RIGHT).perform().then(function () {
-						browser.sleep(300);
-						// console.log('Excecuting RIGHT click');
-					});
-				}
-			}
-		});
+		}
 	}).then(function () {
-		sliderMin.getAttribute('textContent').then(function(val){
+		sliderVal.getAttribute('textContent').then(function(val){
 			if(val == expectedValue) {
 				console.log('Success')
 				wrapUp(callback, ""); 
 			} else {
 				
 			}
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);
-		})
+		});
 	});
 }
 
