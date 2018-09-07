@@ -2844,11 +2844,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END HTMLVIEW COMPONENT
 
 	//data-bootstrapextracomponents-navbar
-	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab {tabText} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, callback){
+	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, tabLevel, callback){
 		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(tab), 30 * 1000, 'Element not found!').then(function(){
-			// var tabElement = tab.element(by.xpath("//a[text()='"+tabText+"']"));
-			var tabElement = tab.element(by.cssContainingText("a", tabText));
+			var tabElement;
+			switch(parseInt(tabLevel)){
+				case 1: 
+					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-dropdown')]"));
+					break;
+				case 2:
+					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					break;
+				case 3:
+					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					break;
+				default:
+					console.log('Only level tabLevel 1 and 2 are supported')
+					break;
+			}
+			browser.sleep(500);
 			browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
 				clickElement(tabElement).then(function(){
 					wrapUp(callback, "clickEvent");
