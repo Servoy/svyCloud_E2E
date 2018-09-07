@@ -205,29 +205,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY SELECT2TOKENIZER COMPONENT
 	When('servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-servoyextra-select2tokenizer[@data-svy-name='" + elementName + "']/div/span/span/span/ul/li/input"))).then(function () {
-			wrapUp(callback, "Click event");
-		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
-		});
+		var tokenizer = element(by.xpath("//data-servoyextra-select2tokenizer[@data-svy-name='" + elementName + "']/div/span/span/span/ul/li/input"));
+		browser.wait(EC.visibilityOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
+			clickElement(tokenizer).then(function () {
+				wrapUp(callback, "Click event");
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		})
+		
 	});
 
 	When('servoy select2tokenizer component record number {rowNumber} is clicked', { timeout: 60 * 1000 }, function (rowNumber, callback) {
-		browser.sleep(500).then(function(){
-			var container = element.all(by.xpath("//span[contains(@class, 'select2-results')]"));
+		var container = element.all(by.xpath("//span[contains(@class, 'select2-results')]"));
+		browser.wait(EC.presenceOf(container), 15 * 1000, 'Tokenizer container not found!').then(function () {
 			var containerUl = container.all(by.xpath("//ul[@aria-expanded='true']"));
 			var rows = containerUl.all(by.xpath("//li[contains(@class, 'select2-results__option')]"));
 			var searchRow = rows.get(0);
-			searchRow.getText().then(function(text){
-				browser.wait(EC.not(EC.textToBePresentInElementValue(searchRow, 'Searching...'))).then(function(hasChanged){
-					if(hasChanged || text !== 'Searching...'){
-						clickElement(rows.get(rowNumber - 1)).then(function(){
+			searchRow.getText().then(function (text) {
+				browser.wait(EC.not(EC.textToBePresentInElementValue(searchRow, 'Searching...'))).then(function (hasChanged) {
+					if (hasChanged || text !== 'Searching...') {
+						clickElement(rows.get(rowNumber - 1)).then(function () {
 							wrapUp(callback, "clickEvent");
-						})
+						});
 					}
 				});
-			});
+			})
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -617,6 +621,26 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log('Invalid amount of rows found. Found: ' + count + ". Expected: " + rowCount);
 					tierdown(true);
 				}
+			});
+		});
+	});
+
+	When('servoy table component with name {elementName} I want to double click row {rowNumber}', {timeout: 60 * 1000}, function(elementName, rowNumber, callback){
+		var baseTable = element.all(by.xpath("//div[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(baseTable.first()), 30 * 1000, 'Table not found!').then(function(){
+			var recordToClick = baseTable.all(by.xpath("//div[contains(@class, 'ui-grid-row')]")).get(rowNumber - 1);
+			doubleClickElement(recordToClick).then(function(){
+				wrapUp(callback, "clickEvent");
+			});
+		});
+	});
+
+	When('servoy table component with name {elementName} I want to click row {rowNumber}', {timeout: 60 * 1000}, function(elementName, rowNumber, callback){
+		var baseTable = element.all(by.xpath("//div[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(baseTable.first()), 30 * 1000, 'Table not found!').then(function(){
+			var recordToClick = baseTable.all(by.xpath("//div[contains(@class, 'ui-grid-row')]")).get(rowNumber - 1);
+			clickElement(recordToClick).then(function(){
+				wrapUp(callback, "clickEvent");
 			});
 		});
 	});
@@ -2843,37 +2867,53 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END HTMLVIEW COMPONENT
 
-	//data-bootstrapextracomponents-navbar
+	//DATA-BOOTSTRAPEXTRACOMPONENTS-NAVBAR
 	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, tabLevel, callback){
 		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(tab), 30 * 1000, 'Element not found!').then(function(){
-			var tabElement;
-			switch(parseInt(tabLevel)){
+		browser.wait(EC.presenceOf(tab), 30 * 1000, 'Navbar not found!').then(function(){
+			var tabElement;			
+			switch(parseInt(tabLevel)){				
 				case 1: 
 					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-dropdown')]"));
+					browser.sleep(3000);
+					tabElement.isPresent().then(function(isPresent){
+						if(!isPresent) {
+							tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-item')]"));
+						}
+						browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
+							clickElement(tabElement).then(function(){
+								wrapUp(callback, "clickEvent");
+							});
+						});
+					});
 					break;
 				case 2:
 					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
+						clickElement(tabElement).then(function(){
+							wrapUp(callback, "clickEvent");
+						});
+					});
 					break;
 				case 3:
 					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
+						clickElement(tabElement).then(function(){
+							wrapUp(callback, "clickEvent");
+						});
+					});
 					break;
 				default:
-					console.log('Only level tabLevel 1 and 2 are supported')
+					console.log('Only level tabLevel 1 and 2 are supported');
+					tierdown(true);
 					break;
 			}
-			browser.sleep(500);
-			browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
-				clickElement(tabElement).then(function(){
-					wrapUp(callback, "clickEvent");
-				});
-			});
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(false);
 		});
 	});
-	//END data-bootstrapextracomponents-navbar
+	//END DATA-BOOTSTRAPEXTRACOMPONENTS-NAVBAR
 
 	//LISTBOX COMPONENT
 	//CHECK IF X AMOUNT OF ROWS EXIST
@@ -3016,6 +3056,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 		
 
+	});
+
+	Then('I expect an element with the name {elementName} to contain the class {className}', {timeout: 30 * 1000}, function(elementName, className, callback){
+		var inputGroup = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
+		browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
+			var elemWithClass = inputGroup.element(by.xpath("//*[contains(@class, '" + className + "')]"));
+			browser.wait(EC.presenceOf(elemWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function(){
+				wrapUp(callback, "validateEvent");
+			});
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(true);
+		})
 	});
 	//END WILDCARD CHECK
 
@@ -3221,6 +3274,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END STORE VALUES
 
+	//SET IGNORESYNCHRONIZATION
+	When('I want to set the synchronization to {option}', {timeout: 10 * 1000}, function(option, callback){
+		if(option === "true") {
+			browser.ignoreSynchronization = true; 			
+		} else {
+			browser.ignoreSynchronization = false;
+		}
+		wrapUp(callback, "");
+	})
+	//END SET IGNORESYNCHRONIZATION
+
 	After(function () {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
@@ -3308,6 +3372,14 @@ function clickElement(elem) {
 	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
 		return browser.wait(EC.elementToBeClickable(elem), 30000, 'Element not clickable').then(function () {
 			return elem.click();
+		});
+	});
+}
+
+function doubleClickElement(elem) {
+	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
+		return browser.wait(EC.elementToBeClickable(elem), 30000, 'Element not clickable').then(function () {
+			return browser.actions().doubleClick(elem).perform();
 		});
 	});
 }
