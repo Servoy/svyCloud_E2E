@@ -3049,7 +3049,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END HTMLVIEW COMPONENT
 
 	//DATA-BOOTSTRAPEXTRACOMPONENTS-NAVBAR
-	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, tabLevel, callback){
+	When('bootstrap data-bootstrapextracomponents-navbar component with the name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, tabLevel, callback){
 		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(tab), 30 * 1000, 'Navbar not found!').then(function(){
 			var tabElement;			
