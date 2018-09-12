@@ -1917,9 +1917,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" +formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
-			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-					console.log(labelText)
+			browser.wait(EC.presenceOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getAttribute('textContent').then(function(labelText){
+					console.log('Text: ' + labelText)
 					if(!labelText) {
 						wrapUp(callback, "validateEvent");
 					} else {
@@ -3089,6 +3089,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 					break;
 			}
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(false);
+		});
+	});
+
+	When('bootstrap data-bootstrapextracomponents-navbar component with name {elementName} the tab {tabText} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, callback){
+		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(tab), 30 * 1000, 'Navbar not found!').then(function () {
+			var tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-dropdown')]"));
+			browser.sleep(3000);
+			tabElement.isPresent().then(function (isPresent) {
+				if (!isPresent) {
+					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-item')]"));
+				}
+				browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function () {
+					clickElement(tabElement).then(function () {
+						wrapUp(callback, "clickEvent");
+					});
+				});
+			});
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(false);
