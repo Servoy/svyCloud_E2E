@@ -8,7 +8,7 @@
           }],
 
         "specs": [
-            "./features/*.feature"
+            "./exampleFeatures/example.feature"
         ]
     }
 }

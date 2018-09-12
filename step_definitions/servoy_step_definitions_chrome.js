@@ -1,6 +1,6 @@
 'use strict';
 var proc = require('process');
-var { defineSupportCode } = require('../../lib/cucumberLoader').load();
+var { defineSupportCode } = require('../lib/cucumberLoader').load();
 var EC = protractor.ExpectedConditions;
 var element = browser.element;
 var expect = require('expect');
@@ -625,21 +625,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy table component with name {elementName} I want to double click row {rowNumber}', {timeout: 60 * 1000}, function(elementName, rowNumber, callback){
+	When('servoy table component with name {elementName} on row {rowNumber} I want to double click on the element with the name {componentElementName}', {timeout: 60 * 1000}, function(elementName, rowNumber, componentElementName, callback){
 		var baseTable = element.all(by.xpath("//div[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(baseTable.first()), 30 * 1000, 'Table not found!').then(function(){
-			var recordToClick = baseTable.all(by.xpath("//div[contains(@class, 'ui-grid-row')]")).get(rowNumber - 1);
-			doubleClickElement(recordToClick).then(function(){
+			var record = baseTable.all(by.css("div[role=row]")).get(rowNumber - 1);
+			var elementToClick = record.element(by.css("*[data-svy-name='" + componentElementName + "']"));
+
+			doubleClickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
 		});
 	});
 
-	When('servoy table component with name {elementName} I want to click row {rowNumber}', {timeout: 60 * 1000}, function(elementName, rowNumber, callback){
+	When('servoy table component with name {elementName} on row {rowNumber} I want to click on the element with the name {componentElementName}', {timeout: 60 * 1000}, function(elementName, rowNumber, componentElementName, callback){
 		var baseTable = element.all(by.xpath("//div[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(baseTable.first()), 30 * 1000, 'Table not found!').then(function(){
-			var recordToClick = baseTable.all(by.xpath("//div[contains(@class, 'ui-grid-row')]")).get(rowNumber - 1);
-			clickElement(recordToClick).then(function(){
+			var record = baseTable.all(by.css("div[role=row]")).get(rowNumber - 1);
+			var elementToClick = record.element(by.css("*[data-svy-name='" + componentElementName + "']"));
+
+			clickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
 		});
@@ -676,6 +680,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 			element.all(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']")).each(function (rowItems) {
 				clickElement(rowItems.all(by.xpath("div/table/tbody/tr")).get(rowNumber - 1)).then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		});
+	});
+
+	When('servoy extra table component with name {elementName} I want to double click row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
+		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {			
+			element.all(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']")).each(function (rowItems) {
+				browser.actions().doubleClick(rowItems.all(by.xpath("div/table/tbody/tr")).get(rowNumber - 1)).perform().then(function () {
 					wrapUp(callback, "clickEvent");
 				});
 			}).catch(function (error) {
@@ -956,6 +973,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy default input component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
+		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
+			clickElement(inputField).then(function(){
+				wrapUp(callback, 'insertEvent');
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
 	When('servoy default input component with name {elementName} I want to clear the text field', {timeout: 30 * 1000}, function(elementName, callback){
 		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
@@ -993,7 +1025,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	
 	When('servoy data-servoydefault-check component with name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+		browser.wait(EC.presenceOf(checkbox), 25 * 1000, 'Checkbox not found!').then(function(){
 			checkbox.isSelected().then(function (isChecked) {
 				return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
 			}).then(function(isChecked){
@@ -1004,11 +1036,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					wrapUp(callback, "checkboxEvent");
 				}
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
-			});
-		})
+			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
 	});
 
 	When('servoy data-servoydefault-check component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkBoxState, callback) {
@@ -1206,6 +1238,35 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
+		var textField = fComponent.element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
+		browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textbox not found!').then(function () {
+			textField.getAttribute('value').then(function (value) {
+				if (!value) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected an empty text field. Got " + value);
+				}
+			});
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+			textField.getAttribute('value').then(function(textFieldText){
+				if(text === textFieldText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
+				}
+			})
+		}).catch(function(error){
+			console.log(error.message);
+			tierdown(false);
+		})
+	});	
+
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
 		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
@@ -1262,12 +1323,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"))).then(function () {
-			wrapUp(callback, "clickEvent");
+		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
+			clickElement(selectComponent).then(function () {
+				wrapUp(callback, "clickEvent");
+			});
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		});
+		});	
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
@@ -1397,22 +1461,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});	
 
-	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
-			textField.getAttribute('value').then(function(textFieldText){
-				if(text === textFieldText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
-				}
-			})
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(false);
-		})
-	});	
-
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select button number {number}', {timeout: 30 * 1000}, function(elementName, number, callback){
 		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
@@ -1498,7 +1546,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to select {day} {month} {year}', { timeout: 120 * 1000 }, function (elementName, day, month, year, callback) {
 		var calendar = element(by.xpath("//data-bootstrapcomponents-calendar[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(calendar), 30 * 1000, 'Calendar not found!').then(function () {
-			clickElement(calendar.element(by.xpath("//span[@class='input-group-addon']"))).then(function () {
+			clickElement(calendar.element(by.css("span[class='input-group-addon']"))).then(function () {
 				var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 				var monthTo = monthList.indexOf(month.toLowerCase());
 				var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -1572,7 +1620,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
 			var button = inputGroup.all(by.css("button")).get(fieldNumber - 1);
 			browser.wait(EC.visibilityOf(button), 20 * 1000, 'Button not found!').then(function(){
-				clickElement(inputField).then(function(){
+				clickElement(button).then(function(){
 					wrapUp(callback, "insertEvent");
 				});
 			});
@@ -1809,6 +1857,42 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			});
 		});
 	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var textField = fComponent.element(by.css("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']")).element(by.css("input"));
+			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+				textField.getAttribute('value').then(function (textFieldText) {
+					if (text === textFieldText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
+					}
+				})
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(false);
+		});
+	});	
+	
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
+			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+				clickElement(textField).then(function () {
+					wrapUp(callback, "insertTextEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+			});
+		});
+	});
+
+
 	//END TEXT FIELDS
 	//DATA LABELS	
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
@@ -2052,6 +2136,40 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (formComponentName, elementName, rowNumber, callback) {
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent.first()), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var selectTable = fComponent.all(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).all(by.css("select"));
+			if (rowNumber) {
+				selectTable.all(by.css('option')).then(function (options) {
+					options[rowNumber].click().then(function () {
+						wrapUp(callback, "clickEvent");
+					})
+				});
+			}
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent.first()), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var table = fComponent.all(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).all(by.css("select"));
+			var row = table.first().element(by.css("option[selected='selected']"));
+			browser.wait(EC.presenceOf(row), 30 * 1000, 'No row is selected!').then(function () {
+				row.getText().then(function (rowText) {
+					if (rowText === text) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + rowText);
+					}
+				})
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			})
+		});
+	});
 	//COMBOBOX
 
 	//CHECKBOX
@@ -2130,10 +2248,98 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END CHECKBOX
 
-	//END CHECKBOX
+	//INPUT GROUP
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to insert the text {text} in field number {fieldNumber}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, fieldNumber, callback) {
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
+				var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
+				sendKeys(inputField, text).then(function () {
+					wrapUp(callback, "insertEvent");
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
+				var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
+				inputField.clear().then(function () {
+					wrapUp(callback, "insertEvent");
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
+				var button = inputGroup.all(by.css("button")).get(fieldNumber - 1);
+				browser.wait(EC.visibilityOf(button), 20 * 1000, 'Button not found!').then(function () {
+					clickElement(button).then(function () {
+						wrapUp(callback, "insertEvent");
+					});
+				});
+			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, text, callback){
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
+				var inputField = inputGroup.all(by.css("input")).get(fieldNumber - 1);
+				inputField.getAttribute('value').then(function (fieldText) {
+					if (fieldText === text) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + fieldText);
+					}
+				})
+			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END INPUT GROUP
 	//END BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//END BOOTSTRAP COMPONENTS
-
+	//DEFAULT COMPONENTS INSIDE FORM COMPONENTS
+	When('Formcomponent with the name {formComponentName} with a servoy default input component with name {elementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
+		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var inputField = fComponent.element(by.css("input[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function () {
+				clickElement(inputField).then(function () {
+					wrapUp(callback, 'insertEvent');
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END DEFAULT COMPONENTS INSIDE FORM COMPONENTS
 	//FORM COMPONENTS
 	//WILDCARD ELEMENT EXISTANCE VALIDATION
 	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
@@ -2173,35 +2379,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to {rowOption} row level {rowLevel} with {rowText} as text', { timeout: timeoutAgAction }, function (elementName, rowOption, rowLevel, rowText, callback) {
 		findRecordByRowLevel(elementName, rowText, rowOption, rowLevel - 1, callback);
 	});
-
-	function findRecordByRowLevel(elementName, recordText, rowOption, level, callback) {
-		var found = false;
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function () {
-			table.each(function (row) {
-				var elementToClick = row.all(by.xpath('//*[text()="' + recordText + '"]'));
-				browser.wait(elementToClick.first().isPresent()).then(function (isPresent) {
-					if (isPresent) {
-						if (rowOption == 'expand') {
-							clickElement(elementToClick.all(by.xpath("..")).first().element(by.css(".glyphicon.glyphicon-plus.ag-icon"))).then(function () {
-								found = true;
-								wrapUp(callback, "gridExpand");
-							});
-						} else if (rowOption == 'collapse') {
-							clickElement(elementToClick.all(by.xpath("..")).last().element(by.css(".glyphicon.glyphicon-minus.ag-icon"))).then(function () {
-								found = true;
-								wrapUp(callback, "gridCollapse");
-							});
-						}
-					}
-				});
-			}).then(function () {
-				if (!found) {
-					groupingGridTableScroll(elementName, recordText, callback, true, null, rowOption, level);
-				}
-			});
-		});
-	}
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, sortBy, callback) {
 		var grid = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
@@ -2372,6 +2549,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
 		groupingGridTableScroll(elementName, text, callback, true, className);
 	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
+		groupingGridTableScroll(elementName, text, callback, true, className);
+	});	
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
@@ -3070,6 +3251,40 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		})
 	});
+
+	Then('I expect an element with the name {elementName} to be {visible|hidden|}', {timeout: 15 * 1000}, function(elementName, visibility, callback) {
+		var elem = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function(){
+			var parent = elem.element(by.xpath(".."));
+			parent.getCssValue('display').then(function(isHidden){
+				if(isHidden === 'none' && visibility.toLowerCase() === 'hidden' || isHidden != 'none'  && visibility.toLowerCase() === 'visible') {
+					wrapUp(callback, "validateEvent");
+				} else {
+					console.log('Validation failed! Excepted element to be ' + visibility)
+					tierdown(true);
+				} 
+			})
+		});
+	});
+
+	Then('formcomponent with the name {fComponentName} I expect an element with the name {elementName} to be {visible|hidden|}', { timeout: 15 * 1000 }, function (formComponentName, elementName, visibility, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
+			var elem = fComponent.element(by.css("*[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function () {
+				var parent = elem.element(by.xpath(".."));
+				parent.getCssValue('display').then(function (isHidden) {
+					console.log('Visibility: ' + isHidden)
+					if (isHidden === 'none' && visibility.toLowerCase() === 'hidden' || isHidden != 'none' && visibility.toLowerCase() === 'visible') {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log('Validation failed! Excepted element to be ' + visibility)
+						tierdown(true);
+					}
+				})
+			});
+		});
+	});
 	//END WILDCARD CHECK
 
 
@@ -3579,7 +3794,7 @@ function scrollToElementTableComponent(elementName, recordText, shouldClick, cal
 	});
 }
 
-// SERVOY EXTRA TABLE
+// SERVOY GROUPING TABLE
 function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level){
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
@@ -3670,6 +3885,35 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 		if(found) {
 			wrapUp(callback, "scrollEvent");
 		}
+	});
+}
+
+function findRecordByRowLevel(elementName, recordText, rowOption, level, callback) {
+	var found = false;
+	var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+	browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function () {
+		table.each(function (row) {
+			var elementToClick = row.all(by.xpath('//*[text()="' + recordText + '"]'));
+			browser.wait(elementToClick.first().isPresent()).then(function (isPresent) {
+				if (isPresent) {
+					if (rowOption == 'expand') {
+						clickElement(elementToClick.all(by.xpath("..")).first().element(by.css(".glyphicon.glyphicon-plus.ag-icon"))).then(function () {
+							found = true;
+							wrapUp(callback, "gridExpand");
+						});
+					} else if (rowOption == 'collapse') {
+						clickElement(elementToClick.all(by.xpath("..")).last().element(by.css(".glyphicon.glyphicon-minus.ag-icon"))).then(function () {
+							found = true;
+							wrapUp(callback, "gridCollapse");
+						});
+					}
+				}
+			});
+		}).then(function () {
+			if (!found) {
+				groupingGridTableScroll(elementName, recordText, callback, true, null, rowOption, level);
+			}
+		});
 	});
 }
 

@@ -1,24 +1,26 @@
 var startDate;
-var conf = require('./config.json');
+var conf = require('./features/config.json');
 var jsonDirectory = 'reports/cucumber_reports/';
-
+var customStepsDirectory = 'features/custom_step_definitions/custom_step_definitions.js';
 exports.config = {
   seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
   framework: 'custom',
+
   params: {
     testDomainURL: '',
     screenshotDirectory: 'reports/screenshots/',
-    htmlDirectory: 'reports/html_reports/'
+    htmlDirectory: 'reports/html_reports/',
+    jsonDirectory: 'reports/cucumber_reports/'
   },
-  // path relative to the current config file
+
   frameworkPath: require.resolve('protractor-cucumber-framework'),
 
   cucumberOpts: {
-    require: ['features/step_definitions/servoy_step_definitions_firefox.js',
-      'env.js',
-      'features/step_definitions/hooks.js'],
+    require: ['step_definitions/servoy_step_definitions_chrome.js',
+      customStepsDirectory,
+      'lib/env.js',
+      'lib/hooks.js'],
     tags: false,
-    // format: 'pretty',
     format: ['json:reports/cucumber_reports/report.json', 'pretty'],
     profile: false,
     keepAlive: false,
@@ -34,7 +36,6 @@ exports.config = {
 
   onPrepare: () => {
     console.log('onPrepare');
-    // browser.driver.manage().window().maximize();
     browser.driver.executeScript(function () {
       return {
         width: window.screen.availWidth,

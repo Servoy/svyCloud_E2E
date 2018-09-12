@@ -11,10 +11,6 @@ Then servoy combobox component I want to select number 1 in the combobox
 When servoy data-servoydefault-check component with name exampleCrypto.useKey I want it to be checked
 When servoy button component with name exampleCrypto.generateKey is clicked
 
-When servoy sidenav component with name galleryMain.nav tab Text Searching is clicked
-When servoy table component with name ordersList.svy_lvp_ordersList I scroll and select the record with <customer> as text
-Then I want to sleep for 5 seconds
-
 When servoy sidenav component with name galleryMain.nav tab Common Components is clicked
 When servoy sidenav component with name galleryMain.nav tab Field Components is clicked
 When servoy sidenav component with name galleryMain.nav tab Calendar Field is clicked
