@@ -1830,7 +1830,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 				var tField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 				browser.wait(EC.visibilityOf(tField), 30 * 1000, 'Textfield not found!').then(function(){
-					console.log('Text input component found');
 					sendKeys(tField, text).then(function () {
 						wrapUp(callback, "insertTextEvent");
 					});
@@ -2173,23 +2172,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//COMBOBOX
 
 	//CHECKBOX
-	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
-			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
-			checkbox.isSelected().then(function (isChecked) {
-				console.log(isChecked);
-				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-					clickElement(checkbox).then(function () {
+			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+				checkbox.isSelected().then(function (isChecked) {
+					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+						checkbox.click().then(function () {
+							wrapUp(callback, "checkboxEvent");
+						})
+					} else {
+						console.log('Checkbox did not have to be changed');
 						wrapUp(callback, "checkboxEvent");
-					})
-				} else {
-					console.log('Checkbox did not have to be changed');
-					wrapUp(callback, "checkboxEvent");
-				}
-			}).catch(function (error) {
-				console.log(error.message);
+					}
+				})
 			})
+		}).catch(function (error) {
+			console.log(error.message);
 		});
 	});
 
