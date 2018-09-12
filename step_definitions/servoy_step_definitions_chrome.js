@@ -205,7 +205,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY SELECT2TOKENIZER COMPONENT
 	When('servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var tokenizer = element(by.xpath("//data-servoyextra-select2tokenizer[@data-svy-name='" + elementName + "']/div/span/span/span/ul/li/input"));
+		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
 		browser.wait(EC.visibilityOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
 			clickElement(tokenizer).then(function () {
 				wrapUp(callback, "Click event");
