@@ -1115,7 +1115,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//SERVOY PASSWORD FIELD
 	When('servoy data-servoydefault-password component with name {elementName} the text {password} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var inputField = element(by.xpath("//data-servoydefault-password[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.visibility(inputField), 15 * 1000, 'Input field not found!').then(function () {
+		browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
 			sendKeys(inputField, text).then(function () {
 				wrapUp(callback, 'insertEvent');
 			});
