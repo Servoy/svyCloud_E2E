@@ -263,7 +263,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy select2tokenizer component with name {elementName} the text {recordText} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
-		var elem = element(by.xpath("//data-servoyextra-select2tokenizer[@data-svy-name='" + elementName + "']/div/span/span/span/ul/li/input"));
+		var elem = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
 		sendKeys(elem, text).then(function () {
 			wrapUp(callback, "Click event");
 		}).catch(function (error) {
@@ -556,7 +556,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				}
 			});
-		});		
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		});	
 	});
 
 	When('servoy table component with name {elementName} I want to select element number {number} with name {elemName}',{timeout: 30 * 1000} ,function(elementName, rowNumber, elemName, callback){
@@ -566,6 +569,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(elem).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -608,7 +614,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				}
 			});
-		});	
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		});
 	});
 
 	Then('servoy table component with name {elementName} I want to validate that there is/are {rowCount} row(s) currently visible', {timeout: 60 * 1000}, function(elementName, rowCount, callback){
@@ -622,6 +631,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				}
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -634,6 +646,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			doubleClickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -646,6 +661,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -657,6 +675,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.executeScript("arguments[0].scrollIntoView(true);", tableHeader.getWebElement()).then(function(){
 				wrapUp(callback, "scrollEvent");
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END SERVOY TABLE COMPONENT
@@ -686,6 +707,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -699,6 +723,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -775,12 +802,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy extra table component with name {elementName} I want to validate that there are {rowCount} row(s)', { timeout: 30 * 1000 }, function (elementName, rowCount, callback) {
-		element.all(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']/div/table/tbody/tr")).count().then(function(count){
-			console.log('Records found: ' + count);
-			if(count == rowCount){
-				console.log("Count matches with the amount of rows");
-				wrapUp(callback, "validateEvent");
-			}
+		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function () {
+			element.all(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']/div/table/tbody/tr")).count().then(function (count) {
+				console.log('Records found: ' + count);
+				if (count == rowCount) {
+					console.log("Count matches with the amount of rows");
+					wrapUp(callback, "validateEvent");
+				}
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -799,6 +832,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				}
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -824,14 +860,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY AGENDA COMPONENT
 	When('servoy agenda component with name {elementName} I want to see my appointments on {day} {month} {year}', { timeout: 60 * 1000 }, function (elementName, day, month, year, callback) {
-		clickElement(element(by.xpath("//div[@data-svy-name='" + elementName + "']/div/div[8]"))).then(function () {
-			clickElement(element(by.xpath("//div[@data-svy-name='" + elementName + "']/div/div[11]"))).then(function () {
-				return navigateCalendar(elementName, month, year);
-			}).then(function (done) {
-				if (done) {
-					wrapUp(callback, "calendarEvent");
-				}
-			});
+		var agendaComponent = element(by.xpath("//div[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(agendaComponent), 15 * 1000, 'Agenda not found!').then(function () {
+			clickElement(element(by.xpath("//div[@data-svy-name='" + elementName + "']/div/div[8]"))).then(function () {
+				clickElement(element(by.xpath("//div[@data-svy-name='" + elementName + "']/div/div[11]"))).then(function () {
+					return navigateCalendar(elementName, month, year);
+				}).then(function (done) {
+					if (done) {
+						wrapUp(callback, "calendarEvent");
+					}
+				});
+			})
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -895,8 +934,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY TYPAHEAD
 	When('servoy default typeahead component with name {elementName} the text {text} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
-		sendKeys(element(by.xpath("//input[@data-svy-name='" + elementName + "']")), text).then(function () {
-			wrapUp(callback, "Insert value event");
+		var typeahead = element(by.xpath("//input[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function () {
+			sendKeys(typeahead, text).then(function () {
+				wrapUp(callback, "Insert value event");
+			});
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -912,6 +954,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -953,6 +998,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log('Actual value: ' + value);
 				}
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END SERVOY TYPEAHEAD
@@ -1058,15 +1106,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
 	//SERVOY PASSWORD FIELD
 	When('servoy data-servoydefault-password component with name {elementName} the text {password} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var inputField = element(by.xpath("//data-servoydefault-password[@data-svy-name='"+elementName+"']/input"));
-		sendKeys(inputField, text).then(function(){
-			wrapUp(callback, 'insertEvent');
-		}).catch(function(error){
+		var inputField = element(by.xpath("//data-servoydefault-password[@data-svy-name='" + elementName + "']/input"));
+		browser.wait(EC.visibility(inputField), 15 * 1000, 'Input field not found!').then(function () {
+			sendKeys(inputField, text).then(function () {
+				wrapUp(callback, 'insertEvent');
+			});
+		}).catch(function (error) {
 			tierdown(error)
 		});
 	});
@@ -1074,8 +1127,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY COMBOBOX
 	When('servoy combobox component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName + "']"))).then(function () {
-			wrapUp(callback, "Click event");
+		var combobox = element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName + "']"));
+		borwser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
+			clickElement(combobox).then(function () {
+				wrapUp(callback, "Click event");
+			})
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -1150,8 +1206,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY BUTTON
 	When('servoy button component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"))).then(function () {
-			wrapUp(callback, "Click event");
+		var button = element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibility(button), 15 * 1000, 'Button not found!').then(function () {
+			clickElement(button).then(function () {
+				wrapUp(callback, "Click event");
+			})
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -1178,9 +1237,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}).catch(function(error){
 						tierdown(error)
 					});
+				}).catch(function(error){
+					tierdown(error)
 				});
 			}
-		});		
+		}).catch(function(error){
+			tierdown(error)
+		});
 	});
 
 	Then('servoy data-servoydefault-label component with name {elementName} I want to validate that the label equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -1210,6 +1273,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 			}
+		}).catch(function(error){
+			tierdown(error)
 		});
 	})
 	//END SERVOY LABEL
@@ -3364,16 +3429,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy extra data-servoyextra-slider component with name {elementName} I want to set the {min|max} value to {value} where the step size is {stepSize}', { timeout: 15 * 1000 }, function (elementName, sliderParam, value, stepSize, callback) {
-		var slider = element(by.xpath("//data-servoyextra-slider[@data-svy-name='" + elementName + "']"));
+		var slider = element(by.css("data-servoyextra-slider[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(slider), 30 * 1000, 'Slider not found!').then(function () {
-			var sliderMin = slider.element(by.xpath("//span[contains(@class, 'rz-model-value')]")); //min selected value
-			var sliderMax = slider.element(by.xpath("//span[contains(@class, 'rz-model-high')]")); //max selected value
-			var sliderMinLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-min')]")); //min slider icon
-			var sliderMaxLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-max')]")); //max slider icon
-			var sliderMinValue = slider.element(by.xpath("//span[contains(@class, 'rz-floor')]")); //min achievable value
-			var leftPartOfSlider = slider.element(by.xpath("//span[contains(@class, 'rz-bar-wrapper')]")); //most left part of the slider
-			sliderMin.getText().then(function (minValue) {
-				sliderMax.getText().then(function (maxValue) {
+			var sliderMin = slider.element(by.className("rz-model-value")); //min selected value
+			var sliderMax = slider.element(by.className("rz-model-high")); //max selected value
+			var sliderMinLoc = slider.element(by.className("rz-pointer-min")); //min slider icon
+			var sliderMaxLoc = slider.element(by.className("rz-pointer-max")); //max slider icon
+			var sliderMinValue = slider.element(by.className("rz-floor")); //min achievable value
+			var leftPartOfSlider = slider.element(by.className("rz-bar-wrapper")); //most left part of the slide
+
+
+			// var sliderMin = slider.element(by.xpath("//span[contains(@class, 'rz-model-value')]")); //min selected value
+			// var sliderMax = slider.element(by.xpath("//span[contains(@class, 'rz-model-high')]")); //max selected value
+			// var sliderMinLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-min')]")); //min slider icon
+			// var sliderMaxLoc = slider.element(by.xpath("//span[contains(@class, 'rz-pointer-max')]")); //max slider icon
+			// var sliderMinValue = slider.element(by.xpath("//span[contains(@class, 'rz-floor')]")); //min achievable value
+			// var leftPartOfSlider = slider.element(by.xpath("//span[contains(@class, 'rz-bar-wrapper')]")); //most left part of the slider
+			sliderMin.getAttribute('textContent').then(function (minValue) {
+				sliderMax.getAttribute('textContent').then(function (maxValue) {
 					//gets the width of the slider (difference between max/min value)
 					sliderMinLoc.getLocation().then(function (minLoc) {
 						sliderMaxLoc.getLocation().then(function (maxLoc) {
@@ -3535,10 +3608,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 });
 
 /*
-* @param {element} elemToMove - slider icon that has to be moved
 * @param {String} sideToMove - slider has to move to the left or right
-* @param {element} sliderMin - current value of the min slider
-* @param {element} sliderMax - current value of the max slider
+* @param {Number} sliderVal - current slider value
 * @param {Number} stepSize - increment of 1 key press (left or right)
 * @param {Number} expectedValue - value to be reached
 * @param {Object} callback - resolves the promise
@@ -3551,7 +3622,7 @@ function moveSliderByArrowKey(sideToMove, sliderVal, stepSize, expectedValue, ca
 			remainingSteps *= -1;
 		}
 		console.log(remainingSteps);
-		for (var i = 0; i < remainingSteps * 2; i++) {
+		for (var i = 0; i < remainingSteps; i++) {
 			if (sideToMove === 'left') {
 				browser.actions().sendKeys(protractor.Key.ARROW_LEFT).perform().then(function () {
 					// browser.sleep(300);
@@ -3764,6 +3835,7 @@ function groupingGridScrollToTop(elementName, callback) {
 function findRecordTableComponent(elementName, recordText, shouldClick, callback) {
 	var found = false;
 	var baseTable = element.all(by.xpath("//div[@data-svy-name='" + elementName + "']"));
+	browser.wait(EC.presenceOf(baseTable), 15 * 1000, 'Table ')
 	baseTable.first().element(by.xpath("//span[text()='" + recordText + "']")).isPresent().then(function (isPresent) {
 		if(isPresent) {
 			if(shouldClick) {
@@ -3972,5 +4044,8 @@ function dataServoyExtraTableScroll(elementName, text, shouldClick, callback){
 			console.log(error.message);
 			tierdown(true);
 		});
+	}).catch(function(error) {
+		console.log(error.message);
+		tierdown(true);
 	});
 }
