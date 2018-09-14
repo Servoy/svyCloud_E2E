@@ -1207,7 +1207,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//SERVOY BUTTON
 	When('servoy button component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
 		var button = element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibility(button), 15 * 1000, 'Button not found!').then(function () {
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
 			clickElement(button).then(function () {
 				wrapUp(callback, "Click event");
 			})
