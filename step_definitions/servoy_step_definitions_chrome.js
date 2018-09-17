@@ -36,6 +36,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "navigateURLEvent");
 				});				
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -45,6 +48,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.switchTo().window(newTabHandle).then(function () {
 				wrapUp(callback, "navigateEvent");
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -53,7 +59,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.getCurrentUrl().then(function (browserUrl) {
 			if(browserUrl === url) {
 				wrapUp(callback, "validateEvent");
+			} else {
+				console.log('Validation failed. Expected URL: ' + url + '. Current URL: ' + browserUrl)
 			}
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END URL VALIDATION
@@ -61,6 +72,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	Then('I want to navigate back', {timeout: 15 * 1000}, function(callback){
 		browser.navigate().back().then(function(){
 			wrapUp(callback, "navigateEvent");
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -92,6 +106,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -134,8 +151,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY CALENDAR COMPONENT
 	When('servoy calendar component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		clickElement(element(by.xpath("//data-servoydefault-calendar[@data-svy-name='" + elementName + "']/div/span[1]"))).then(function () {
-			wrapUp(callback, "Click event");
+		var calendar = element(by.xpath("//data-servoydefault-calendar[@data-svy-name='" + elementName + "']/div/span[1]"));
+		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function () {
+			clickElement(calendar).then(function () {
+				wrapUp(callback, "Click event");
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			})
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -145,6 +168,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	Then('I want to {activity} for {second} second(s)', {timeout: 120 * 1000}, function (activity, timer, callback) {
 		browser.sleep((parseInt(timer) * 1000)).then(function () {
 			wrapUp(callback, "sleepEvent");
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -199,7 +225,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 	//END SERVOY CALENDAR COMPONENT
 
@@ -213,8 +239,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		})
-		
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});		
 	});
 
 	When('servoy select2tokenizer component record number {rowNumber} is clicked', { timeout: 60 * 1000 }, function (rowNumber, callback) {
@@ -506,9 +534,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log(error.message);
 					tierdown(true);
 				});
-		}
-		
-		
+		}		
 	});
 	//END BROWSER ACTION
 
@@ -694,6 +720,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(elemCell).call(), 30000, 'Element not visible').then(function () {
 				wrapUp(callback, "render extra table");
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1200,6 +1229,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END SERVOY COMBOBOX
@@ -1288,6 +1320,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1300,6 +1335,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1313,6 +1351,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected an empty text field. Got " + value);
 				}
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1329,7 +1370,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(false);
-		})
+		});
 	});	
 
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -1341,6 +1382,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});		
 	});
 
@@ -1357,7 +1401,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						console.log('Button is currently enabled. Expected it to be disabled.')
 					}
 				}
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1370,7 +1420,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
 				}
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	
@@ -1383,7 +1439,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
 				}
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1414,8 +1476,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
-
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (elementName, rowNumber, callback) {
@@ -1425,6 +1486,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				options[rowNumber].click().then(function () {
 					wrapUp(callback, "clickEvent");
 				})
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
 			});
 		}
 	});
@@ -1440,6 +1504,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + rowText);
 				}
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1449,7 +1516,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
@@ -1511,6 +1578,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			})
 		}).catch(function(error){
+			console.log(error.message);
 			tierdown(true);
 		});
 	});
@@ -1523,6 +1591,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});	
 
@@ -1538,7 +1609,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);			
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -1556,7 +1627,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);			
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -1578,7 +1649,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);			
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want option {optionNumber} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
@@ -1601,6 +1672,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1651,6 +1725,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true)
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1664,7 +1741,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
@@ -1677,7 +1754,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
@@ -1692,7 +1769,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	Then('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(elementName, fieldNumber, text, callback){
@@ -1709,7 +1786,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -1884,7 +1961,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
@@ -1919,6 +1996,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1953,6 +2033,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1975,6 +2058,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -1995,6 +2081,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2014,6 +2103,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	}); 
 
@@ -2029,6 +2121,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END DATA LABELS
@@ -2102,6 +2197,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END LABELS
@@ -2139,6 +2237,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END BUTTONS
@@ -2212,6 +2313,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					})
 				});
 			}
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2232,6 +2336,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//COMBOBOX
@@ -2272,6 +2379,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {
 				console.log(error.message);
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2290,6 +2400,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function(error){
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2309,6 +2422,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END CHECKBOX
@@ -2327,7 +2443,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
@@ -2343,7 +2459,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
@@ -2361,7 +2477,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, text, callback){
@@ -2447,16 +2563,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, sortBy, callback) {
 		var grid = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		grid.each(function (menuItems) {
-			menuItems.all(by.css('.ag-table-header')).each(function (sortHeader) {
-				sortHeader.getText().then(function (text) {
-					if (text.toLowerCase().indexOf(sortBy.toLowerCase()) > -1) {
-						clickElement(sortHeader).then(function () {
-							wrapUp(callback, "tableSortingEvent");
-						});
-					}
+		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
+			grid.each(function (menuItems) {
+				menuItems.all(by.css('.ag-table-header')).each(function (sortHeader) {
+					sortHeader.getText().then(function (text) {
+						if (text.toLowerCase().indexOf(sortBy.toLowerCase()) > -1) {
+							clickElement(sortHeader).then(function () {
+								wrapUp(callback, "tableSortingEvent");
+							});
+						}
+					});
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2491,17 +2612,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to ungroup the table by {tableHeaderText}', { timeout: timeoutAgAction }, function (elementName, filterTableText, callback) {
 		var grid = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		grid.each(function (menuItems) {
-			menuItems.all(by.css(".ag-column-drop-cell")).each(function (orderByElement) {
-				if (filterTableText.toLowerCase() !== "everything") {
-					orderByElement.element(by.cssContainingText('.ag-column-drop-cell-text', filterTableText)).isPresent().then(function (present) {
-						if (present) {
-							clickElement(orderByElement.element(by.css(".ag-column-drop-cell-button"))).then(function () {
-								wrapUp(callback, "removeTableFilterEvent");
-							});
-						}
-					});
-				}
+		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
+			grid.each(function (menuItems) {
+				menuItems.all(by.css(".ag-column-drop-cell")).each(function (orderByElement) {
+					if (filterTableText.toLowerCase() !== "everything") {
+						orderByElement.element(by.cssContainingText('.ag-column-drop-cell-text', filterTableText)).isPresent().then(function (present) {
+							if (present) {
+								clickElement(orderByElement.element(by.css(".ag-column-drop-cell-button"))).then(function () {
+									wrapUp(callback, "removeTableFilterEvent");
+								});
+							}
+						});
+					}
+				});
 			});
 		}).catch(function (error) {
 			console.log(error.message);
@@ -2529,6 +2652,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});				
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	var rowCount = 0;
@@ -2572,6 +2698,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(elem).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2600,7 +2729,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
@@ -2647,6 +2776,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});			
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	
@@ -2664,6 +2796,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					})
 				});
 			});			
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2681,6 +2816,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					})
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END AGGRID COMPONENT
@@ -2739,6 +2877,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.executeScript("arguments[0].scrollIntoView();", elementToScrollTo.getWebElement()).then(function(){
 				wrapUp(callback, "scrollEvent");
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	})
 	//END STANDARD SCROLL EVENTS
@@ -2965,6 +3106,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent")
 				}
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -2988,6 +3132,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true)
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3004,6 +3151,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true)
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END MODEL DIALOG COMPONENT
@@ -3043,6 +3193,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3059,6 +3212,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END SERVOY TABPANEL COMPONENT
@@ -3151,12 +3307,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					break;
 				default:
 					console.log('Only level tabLevel 1 and 2 are supported');
-					tierdown(true);
 					break;
 			}
 		}).catch(function(error){
 			console.log(error.message);
-			tierdown(false);
+			tierdown(true);
 		});
 	});
 
@@ -3321,8 +3476,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message)
 		});
-		
-
 	});
 
 	Then('I expect an element with the name {elementName} to contain the class {className}', {timeout: 30 * 1000}, function(elementName, className, callback){
@@ -3335,7 +3488,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true);
-		})
+		});
 	});
 
 	Then('I expect an element with the name {elementName} to be {visible|hidden|}', {timeout: 15 * 1000}, function(elementName, visibility, callback) {
@@ -3350,6 +3503,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				} 
 			})
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3369,6 +3525,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				})
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END WILDCARD CHECK
@@ -3574,6 +3733,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 					break;
 			}
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3828,6 +3990,9 @@ function groupingGridScrollToTop(elementName, callback) {
 	var tableContainer = table.element(by.xpath("//div[@class='ag-body-container']"));
 	browser.executeScript("arguments[0].scrollIntoView(true);", tableContainer.getWebElement()).then(function () {
 		wrapUp(callback, "tableScrollEvent");
+	}).catch(function (error) {
+		console.log(error.message);
+		tierdown(true);
 	});
 }
 
@@ -3978,6 +4143,9 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 		if(found) {
 			wrapUp(callback, "scrollEvent");
 		}
+	}).catch(function (error) {
+		console.log(error.message);
+		tierdown(true);
 	});
 }
 
