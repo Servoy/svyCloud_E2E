@@ -1158,7 +1158,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//SERVOY COMBOBOX
 	When('servoy combobox component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
 		var combobox = element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName + "']"));
-		borwser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
+		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
 			clickElement(combobox).then(function () {
 				wrapUp(callback, "Click event");
 			})
@@ -1313,6 +1313,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY LABEL
 
 	//BOOTSTRAP COMPONENTS
+	//BOOTSTRAP TEXTBOX
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
 		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"))), 30 * 1000, 'Element not found!').then(function () {
 			sendKeys(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input")), text).then(function () {
@@ -1373,7 +1374,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(false);
 		});
 	});	
-
+	//END BOOTSTRAP TEXTBOX
+	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
 		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
@@ -1391,7 +1393,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (elementName, state, callback) {
 		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+		browser.wait(EC.presenceOf(button), 15 * 1000, 'Button not found!').then(function(){
 			button.isEnabled().then(function(buttonState) {
 				if(!buttonState && state === 'disabled' || buttonState && state === 'enabled') {
 					wrapUp(callback, "validateEvent");
@@ -1449,7 +1451,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP BUTTON
 
+	//BOOTSTRAP SELECT
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
@@ -1510,7 +1514,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP SELECT
 
+	//BOOTSTRAP TEXTAREA
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
 		sendKeys(element(by.xpath("//data-bootstrapcomponents-textarea[@data-svy-name='" + elementName + "']/textarea")), text).then(function () {
 			wrapUp(callback, "insertEvent");
@@ -1519,7 +1525,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP TEXTAREA
 
+	//BOOTSTRAP CHECKBOX
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
 		checkbox.isSelected().then(function (isChecked) {
@@ -1583,7 +1591,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP CHECKBOX
 
+	//BOOTSTRAP BADGE COMPONENT
 	When('bootstrap data-bootstrapextracomponents-badge component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapextracomponents-badge[@data-svy-name='" + elementName + "']")))).then(function () {
 			element(by.xpath("//data-bootstrapextracomponents-badge[@data-svy-name='" + elementName + "']")).click().then(function () {
@@ -1597,7 +1607,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});	
+	//END BOOTSTRAP BADGE COMPONENT
 
+	//BOOTSTRAP BUTTON GROUP
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select button number {number}', {timeout: 30 * 1000}, function(elementName, number, callback){
 		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
@@ -1652,7 +1664,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);			
 		});
 	});
+	//END BOOTSTRAP BUTTON GROUP
 
+	//BOOTSTRAP CHOICEGROUP
 	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want option {optionNumber} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
 		var choiceGroup = element.all(by.xpath("//data-bootstrapcomponents-choicegroup[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(choiceGroup.first()), 30 * 1000, 'Choicegroup not found!').then(function(){
@@ -1682,7 +1696,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want the option with the text {text} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		
 	});
+	//END BOOTSTRAP CHOICEGROUP
 
+	//BOOTSTRAP CALENDAR
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to select {day} {month} {year}', { timeout: 120 * 1000 }, function (elementName, day, month, year, callback) {
 		var calendar = element(by.xpath("//data-bootstrapcomponents-calendar[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(calendar), 30 * 1000, 'Calendar not found!').then(function () {
@@ -1731,7 +1747,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP CALENDAR
 
+	//BOOTSTRAP INPUT GROUP
 	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to insert the text {text} in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, text, fieldNumber, callback){
 		var inputGroup = element.all(by.xpath("//data-bootstrapextracomponents-input-group[@data-svy-name='" + elementName+"']"));
 		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
@@ -1789,7 +1807,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP INPUT GROUP
 
+	//BOOTSTRAP LABEL
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -1850,8 +1870,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP LABEL
 
-
+	//BOOTSTRAP DATA LABEL
 	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -1912,8 +1933,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
-	
+	//END BOOTSTRAP DATA LABEL
 
+	//BOOTSTRAP SWITCH
 	When("bootstrap data-bootstrapextracomponents-switch component with name {elementName} I want to change the state to {switchText}", {timeout: 30 * 1000}, function(elementName, switchText, callback){
 		var servoySwitch = element(by.xpath("//data-bootstrapextracomponents-switch[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(servoySwitch), 20 * 1000, 'Switch not found!').then(function () {
@@ -1964,7 +1986,37 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END BOOTSTRAP SWITCH
 
+	//BOOTSTRAP DROPDOWN
+	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} is clicked', { timeout: 45 * 1000 }, function (elementName, callback) {
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
+			clickElement(selectComponent).then(function(){				
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
+			clickElement(selectComponent).then(function(){
+				var inputField = selectComponent.element(by.xpath("//a[text()[normalize-space() = '" + text + "']]"));
+				clickElement(inputField).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	
+	//END BOOTSTRAP DROPDOWN
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
@@ -2003,10 +2055,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
-			var textField = fComponent.element(by.css("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']")).element(by.css("input"));
+			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
 				textField.getAttribute('value').then(function (textFieldText) {
 					if (text === textFieldText) {
@@ -2022,7 +2074,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});	
 	
-	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
@@ -3694,7 +3746,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY EXTRA SLIDER
 
 	//STORE VALUES
-	When('servoy {componentType} with name {elementName} I want to store the value', {timeout: 30 * 1000}, function(componentType, elementName, callback){		
+	When('servoy {componentType} with name {elementName} I want to store the value and {parse} it to a numeric value', {timeout: 30 * 1000}, function(componentType, elementName, parse, callback){		
 		var wildCard = element(by.xpath("//" + componentType + "[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(wildCard), 15 * 1000, 'Element not found!').then(function(){
 			console.log('Storing the value in position ' + (storedValues.length + 1));
@@ -3702,6 +3754,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				case "data-servoydefault-label":
 				case "data-servoydefault-button":
 					wildCard.element(by.css("span[class='ng-binding']")).getText().then(function(text){
+						if(parse === "parse") {
+							text = text.replace(/[^0-9 \.]/g, '');
+						}
 						storedValues.push(text);
 						wrapUp(callback, "storeValueEvent");
 					});
@@ -3710,6 +3765,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				case "data-bootstrapcomponents-label":
 				case "data-bootstrapcomponents-datalabel":
 					wildCard.element(by.css("span")).getText().then(function(text){
+						if(parse === "parse") {
+							text = text.replace(/[^0-9 \.]/g, '');
+						}
 						storedValues.push(text);
 						wrapUp(callback, "storeValueEvent");
 					});					
@@ -3717,6 +3775,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				
 				case "data-bootstrapcomponents-textbox":
 					wildCard.element(by.css("input")).getAttribute('value').then(function(text) {
+						if(parse === "parse") {
+							text = text.replace(/[^0-9 \.]/g, '');
+						}
 						storedValues.push(text);
 						wrapUp(callback, "storeValueEvent");
 					});					
@@ -3724,6 +3785,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				
 				case "input":
 					wildCard.getAttribute('value').then(function(text){
+						if(parse === "parse") {
+							text = text.replace(/[^0-9 \.]/g, '');
+						}
 						storedValues.push(text);
 						wrapUp(callback, "storeValueEvent");
 					})					
@@ -3740,9 +3804,87 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('I want to store the value {value} in the list', {timeout: 30 * 1000}, function(value, callback){
+		console.log('Storing the value in position ' + (storedValues.length + 1));
+		storedValues.push(value);
+		wrapUp(callback, "storeValueEvent");
+	})
+
 	Then('I want to clear the list of stored values', {timeout: 10 * 1000}, function(callback){
 		storedValues = null;
 		callback();
+	});
+
+	Then('I want to validate that {valueNumber|customValue} {-+/*} {valueNumber|customValue} equals {valueNumber|customValue}', {timeout: 15 * 1000} , function(valOne, operator, valTwo, valThree, callback) {
+		if(valOne.startsWith("(")) {
+			var indexVal = valOne.replace(/[^0-9]+/g, "");
+			valOne = parseFloat(storedValues[parseInt(indexVal) - 1]);
+			if(!valOne) {
+				console.log('List with the given index does not contain a value!');
+			}
+		} else {
+			valOne = parseFloat(valOne);
+		} 
+		if(valTwo.startsWith("(")) {
+			var indexVal = valTwo.replace(/[^0-9]+/g, "");
+			valTwo = parseFloat(storedValues[parseInt(indexVal) - 1]);
+			if(!valTwo) {
+				console.log('List with the given index does not contain a value!');
+			}
+		} else {
+			valTwo = parseFloat(valTwo);
+		} 
+		if(valThree.startsWith("(")) {
+			var indexVal = valThree.replace(/[^0-9]+/g, "");
+			valThree = parseFloat(storedValues[parseInt(indexVal) - 1]);
+			if(!valThree) {
+				console.log('List with the given index does not contain a value!');
+			}
+		} else {
+			valThree = parseFloat(valThree);
+		} 
+		switch(operator) {
+			case '-': 
+				console.log('Calculating ' + valOne + ' - ' + valTwo + '.');
+				if(valOne - valTwo === valThree) {
+					wrapUp(callback, 'validateEvent');
+				} else {
+					console.log('Validation failed. Expected. ' + valThree + '. Got: ' + (valOne - valTwo));
+					tierdown(true);
+				}
+				break;
+			case '+':
+				console.log('Calculating ' + valOne + ' + ' + valTwo + '.');
+				if(valOne + valTwo === valThree) {
+					wrapUp(callback, 'validateEvent');
+				} else {
+					console.log('Validation failed. Expected. ' + valThree + '. Got: ' + (valOne + valTwo));
+					tierdown(true);
+				}
+				break;
+			case '/':
+				console.log('Calculating ' + valOne + ' / ' + valTwo + '.');
+				if(valOne / valTwo === valThree) {
+					wrapUp(callback, 'validateEvent');
+				} else {
+					console.log('Validation failed. Expected. ' + valThree + '. Got: ' + (valOne / valTwo));
+					tierdown(true);
+				}
+				break;
+			case '*':
+				console.log('Calculating ' + valOne + ' * ' + valTwo + '.');
+				if(valOne * valTwo === valThree) {
+					wrapUp(callback, 'validateEvent');
+				} else {
+					console.log('Validation failed. Expected. ' + valThree + '. Got: ' + (valOne * valTwo));
+					tierdown(true);
+				}
+				break;
+			default:
+				console.log("Only operators that area allowed are '-', '+', '/' and '*'");
+				tierdown(true);
+				break;
+		}
 	});
 	//END STORE VALUES
 
@@ -3857,8 +3999,6 @@ function doubleClickElement(elem) {
 function clickElementByLocation(elem) {
 	return browser.wait(EC.presenceOf(elem).call(), 30 * 1000, 'Element not found!').then(function () {
 		return elem.getLocation().then(function (location) {
-			console.log('x: ' + location.x);
-			console.log('y: ' + location.y);
 			return browser.actions().mouseMove(elem, { x: location.x, y: location.y }).click().perform();
 		});
 	});
