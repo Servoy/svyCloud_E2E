@@ -3,9 +3,6 @@ var proc = require('process');
 var { defineSupportCode } = require('../../lib/cucumberLoader').load();
 var EC = protractor.ExpectedConditions;
 var element = browser.element;
-var expect = require('expect');
-var find = require('find');
-var fs = require('fs-extra');
 var startDate = new Date();
 var tempDate;
 

@@ -12,7 +12,6 @@ var hasErrorDuringSuite = false;
 var userAnalytics = require('universal-analytics');
 var universalAnlytics = require('../features/custom_scripts/universal analytics/universal_analytics.js');
 var analytics = userAnalytics(universalAnlytics.getId());
-var find = require('find');
 var fs = require('fs-extra');
 var timeoutAgAction = 60 * 1000;
 var storedValues = [];
