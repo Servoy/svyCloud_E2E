@@ -3507,15 +3507,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END FONT AWESOME
 
 	//Wildcard check
-	Then('I expect an element with the name {elementName} to be present', {timeout: 20 * 1000}, function(elementName, callback){
-		var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function(){
-			wrapUp(callback, "validateEvent");
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true)
-		})
-	});
+	// Then('I expect an element with the name {elementName} to be present', {timeout: 20 * 1000}, function(elementName, callback){
+	// 	var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
+	// 	browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function(){
+	// 		wrapUp(callback, "validateEvent");
+	// 	}).catch(function(error){
+	// 		console.log(error.message);
+	// 		tierdown(true)
+	// 	})
+	// });
 
 	Then('I expect an element with the name {elementName} to not be present', {timeout: 20 * 1000}, function(elementName, callback){
 		element.all(by.xpath("//*[@data-svy-name='" + elementName+"']")).then(function(items){
@@ -3543,22 +3543,35 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('I expect an element with the name {elementName} to be {visible|hidden|}', {timeout: 15 * 1000}, function(elementName, visibility, callback) {
-		var elem = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function(){
-			var parent = elem.element(by.xpath(".."));
-			parent.getCssValue('display').then(function(isHidden){
-				if(isHidden === 'none' && visibility.toLowerCase() === 'hidden' || isHidden != 'none'  && visibility.toLowerCase() === 'visible') {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log('Validation failed! Excepted element to be ' + visibility)
-					tierdown(true);
-				} 
-			})
-		}).catch(function (error) {
-			console.log(error.message);
+	Then('I expect an element with the name {elementName} to be {visible|hidden|present}', { timeout: 15 * 1000 }, function (elementName, visibility, callback) {
+		if (visibility === 'present') {
+			var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function () {
+				wrapUp(callback, "validateEvent");
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true)
+			});
+		} else if (visibility === 'hidden' || visibility === 'visible') {
+			var elem = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function () {
+				var parent = elem.element(by.xpath(".."));
+				parent.getCssValue('display').then(function (isHidden) {
+					if (isHidden === 'none' && visibility.toLowerCase() === 'hidden' || isHidden != 'none' && visibility.toLowerCase() === 'visible') {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log('Validation failed! Excepted element to be ' + visibility)
+						tierdown(true);
+					}
+				})
+			}).catch(function (error) {
+				console.log(error.message);
+				tierdown(true);
+			});
+		} else {
+			console.log("Parameter not supported! End the step with the word 'visible', 'hidden' or 'present'!" );
 			tierdown(true);
-		});
+		}
 	});
 
 	Then('formcomponent with the name {fComponentName} I expect an element with the name {elementName} to be {visible|hidden|}', { timeout: 15 * 1000 }, function (formComponentName, elementName, visibility, callback) {
