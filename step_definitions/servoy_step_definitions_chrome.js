@@ -167,7 +167,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('I want to {activity} for {second} second(s)', {timeout: 120 * 1000}, function (activity, timer, callback) {
 		browser.sleep((parseInt(timer) * 1000)).then(function () {
-			wrapUp(callback, "sleepEvent");
+			wrapUp(callback, null);
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -363,24 +363,30 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				break;
 			case "page up":
 			case "pageup":
-				element(by.xpath("//body")).click().then(function(){
-					browser.actions().sendKeys(protractor.Key.PAGE_UP).perform().then(function () {
-						wrapUp(callback, "keypressEvent");
-					}).catch(function (error) {
-						console.log(error.message);
-						tierdown(true);
-					});
+				// element(by.xpath("//body")).click().then(function(){
+				browser.actions().mouseMove(element(by.xpath("//body")), {x: 0, y: 0}).perform().then(function() {
+					browser.actions().click().perform().then(function(){
+						browser.actions().sendKeys(protractor.Key.PAGE_UP).perform().then(function () {
+							wrapUp(callback, "keypressEvent");
+						}).catch(function (error) {
+							console.log(error.message);
+							tierdown(true);
+						});
+					})
 				});
 				break;
 			case "page down":
 			case "pagedown":
-				element(by.xpath("//body")).click().then(function(){
-					browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform().then(function () {
-						wrapUp(callback, "keypressEvent");
-					}).catch(function (error) {
-						console.log(error.message);
-						tierdown(true);
-					});
+				// element(by.xpath("//body")).click().then(function(){
+				browser.actions().mouseMove(element(by.xpath("//body")), {x: 0, y: 0}).perform().then(function() {
+					browser.actions().click().perform().then(function(){
+						browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform().then(function () {
+							wrapUp(callback, "keypressEvent");
+						}).catch(function (error) {
+							console.log(error.message);
+							tierdown(true);
+						});
+					})
 				});
 				break;
 			case "end":
@@ -2796,10 +2802,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		groupingGridTableScroll(elementName, text, callback, true, className);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className);
-	});	
-
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
@@ -3988,7 +3990,9 @@ function validate(input, inputToCompare) {
 function wrapUp(callback, performanceEvent) {
 	var duration = calcStepDuration(new Date());
 	console.log('Step took ' + duration + ' miliseconds');
-	// analytics.event('Scenario 1', "Performance", performanceEvent, duration).send();
+	if(performanceEvent) {
+		// analytics.event('Scenario 1', "Performance", performanceEvent, duration).send();
+	}
 	callback();
 }
 
