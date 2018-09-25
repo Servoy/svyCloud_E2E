@@ -212,7 +212,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function(error){
 			console.log(error.message);
 			tierdown(true)
-		})	
+		});	
 	});
 
 	When('servoy calendar component I want to select day {day}', { timeout: 15 * 1000 }, function (day, callback) {
@@ -302,209 +302,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY SELECT2TOKENIZER COMPONENT
 
 	//BROWSER ACTION
-	When('I press {browserAction}', { timeout: 15 * 1000 }, function (browserAction, callback) {
-		browserAction = browserAction.toLowerCase();
-		switch (browserAction) {
-			case "enter":
-				browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "control":
-				browser.actions().sendKeys(protractor.Key.CONTROL).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;	
-			case "tab":
-				browser.actions().sendKeys(protractor.Key.TAB).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "escape":
-				browser.actions().sendKeys(protractor.Key.ESCAPE).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "backspace":
-				browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "delete":
-				browser.actions().sendKeys(protractor.Key.DELETE).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "space":
-				browser.actions().sendKeys(protractor.Key.SPACE).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "page up":
-			case "pageup":
-				// element(by.xpath("//body")).click().then(function(){
-				browser.actions().mouseMove(element(by.xpath("//body")), {x: 0, y: 0}).perform().then(function() {
-					browser.actions().click().perform().then(function(){
-						browser.actions().sendKeys(protractor.Key.PAGE_UP).perform().then(function () {
-							wrapUp(callback, "keypressEvent");
-						}).catch(function (error) {
-							console.log(error.message);
-							tierdown(true);
-						});
-					})
-				});
-				break;
-			case "page down":
-			case "pagedown":
-				// element(by.xpath("//body")).click().then(function(){
-				browser.actions().mouseMove(element(by.xpath("//body")), {x: 0, y: 0}).perform().then(function() {
-					browser.actions().click().perform().then(function(){
-						browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform().then(function () {
-							wrapUp(callback, "keypressEvent");
-						}).catch(function (error) {
-							console.log(error.message);
-							tierdown(true);
-						});
-					})
-				});
-				break;
-			case "end":
-				browser.actions().sendKeys(protractor.Key.END).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "home":
-				browser.actions().sendKeys(protractor.Key.HOME).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f1":
-				browser.actions().sendKeys(protractor.Key.F1).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f2":
-				browser.actions().sendKeys(protractor.Key.F2).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f3":
-				browser.actions().sendKeys(protractor.Key.F3).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f4":
-				browser.actions().sendKeys(protractor.Key.F4).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f5":
-				browser.actions().sendKeys(protractor.Key.F5).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f6":
-				browser.actions().sendKeys(protractor.Key.F6).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f7":
-				browser.actions().sendKeys(protractor.Key.f7).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f8":
-				browser.actions().sendKeys(protractor.Key.F8).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f9":
-				browser.actions().sendKeys(protractor.Key.F9).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f10":
-				browser.actions().sendKeys(protractor.Key.F10).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f11":
-				browser.actions().sendKeys(protractor.Key.F11).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			case "f12":
-				browser.actions().sendKeys(protractor.Key.F12).perform().then(function () {
-					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-				break;
-			default:
-				console.log("Unknown browser action");
-				tierdown(true);
-		}
+	When('I press {browserAction}', { timeout: 30 * 1000 }, function (browserAction, callback) {
+		pressKey(browserAction).then(function(retVal) {
+			if(retVal) {
+				wrapUp(callback, "insertEvent");
+			}			
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		})
 	});
 
 	When('I want to press the {browserAction} key with the {key} key', { timeout: 15 * 1000 }, function (browserAction, key, callback) {		
@@ -2875,6 +2681,165 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	//GROUPING GRID INSERT EVENTS
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', {timeout: 10 * 1000}, function(elementName, text, rowNumber, columnNumber, callback) {
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
+			table.each(function(tableItems){
+				agGridIsGrouped(elementName).then(function(isGrouped){
+					if(isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport-wrapper";
+					}
+				}).then(function(containerClass) {
+					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					rowContainer.each(function(rowElements){
+						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
+							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+							doubleClickElement(col).then(function() {
+								browser.actions().sendKeys(text).perform().then(function () {
+									browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {
+										col.getText().then(function (newText) {
+											if (newText === text) {
+												wrapUp(callback, "insertEvent");
+											} else {
+												console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+												console.log("Possibility is that the column is not editable");
+											}
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});			
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
+			table.each(function(tableItems){
+				agGridIsGrouped(elementName).then(function(isGrouped){
+					if(isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport-wrapper";
+					}
+				}).then(function(containerClass) {
+					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					rowContainer.each(function(rowElements){
+						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
+							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+							doubleClickElement(col).then(function () {
+								clickElement(col).then(function(){
+									clickElement(col.element(by.cssContainingText('option', text))).then(function(){
+										clickElement(col).then(function(){
+											browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
+												col.getAttribute('textContent').then(function(newText) {
+													if (newText === text) {
+														wrapUp(callback, "clickEvent");
+													} else {
+														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+														console.log("Possibility is that the column is not editable");
+													}
+												});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
+			table.each(function(tableItems){
+				agGridIsGrouped(elementName).then(function(isGrouped){
+					if(isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport-wrapper";
+					}
+				}).then(function(containerClass) {
+					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					rowContainer.each(function(rowElements){
+						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
+							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+							doubleClickElement(col).then(function () {
+								var comboBoxItem = element.all(by.xpath("//ul[contains(@class, 'dropdown-menu')]"))
+									.all(by.xpath("//a[text()='" + text + "']")).first();
+								browser.wait(EC.visibilityOf(comboBoxItem), 30 * 1000, 'Combobox item not found!').then(function () {
+									browser.wait(EC.elementToBeClickable(comboBoxItem), 30 * 1000, 'Combobox item not clickable!').then(function () {
+										clickElement(comboBoxItem).then(function () {											
+											col.getAttribute('textContent').then(function(newText) {
+												if (newText === text) {
+													wrapUp(callback, 'clickEvent');
+												} else {
+													console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+													console.log("Possibility is that the column is not editable");
+												}
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
+			table.each(function(tableItems){
+				agGridIsGrouped(elementName).then(function(isGrouped){
+					if(isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport-wrapper";
+					}
+				}).then(function(containerClass) {
+					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					rowContainer.each(function(rowElements){
+						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+							var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
+							var selectedColumnToValidate = selectedRow.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+							doubleClickElement(selectedColumnToValidate).then(function () {
+								setCalendar(day, month, year, callback);
+							});
+						});
+					});
+				});
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
+	//END GROUPING GRID INSERT EVENTS
 	//END AGGRID COMPONENT
 
 	//I want to close the community edition popup/
@@ -3913,6 +3878,51 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	})
 	//END SET IGNORESYNCHRONIZATION
 
+
+	//ADMIN LOG
+	Given('I navigate to the admin page {ur} and clean up the warnings', {timeout: 30 * 1000}, function(url, callback) {
+		browser.ignoreSynchronization = true;
+		browser.get(url).then(function () {
+			var button = element(by.css("input[value='Clear Log']"));
+			browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+				clickElement(button).then(function () {
+					browser.ignoreSynchronization = false;
+					wrapUp(callback, "adminPageClearLogEvent");
+				});
+			});
+		});
+	});
+
+	Then('on the servoy admin page {url} I want to count the warnings and the errors in the log file', {timeout: 30 * 1000}, function(url, callback){
+		browser.ignoreSynchronization = true;
+		browser.get(url).then(function () {
+			var button = element(by.css("input[value='Clear Log']"));
+			browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+				element.all(by.xpath("//font[@color='#FC9206']")).count().then(function (warningCount) {
+					console.log('Warnings found: ' + warningCount);
+					element.all(by.xpath("//font[@color='#993300']")).count().then(function (errorCount) {
+						console.log('Errors found: ' + warningCount);
+						if (parseInt(errorCount) > 0) {
+							console.log('Errors have been found during the test! Count: ' + errorCount);
+							element.all(by.xpath("//font[@color='#993300']")).each(function (errorRows) {
+								errorRows.all(by.xpath("..")).all(by.xpath("..")).all(by.css("td[title='Message']")).getText().then(function (text) {
+									console.log(text);
+								});
+							});
+						} else {
+							wrapUp(callback, 'adminPageLogEvent');
+						}
+					});
+				});
+			});
+		}).then(function () {
+			browser.ignoreSynchronization = false;
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+	//END ADMIN LOG
 	After(function () {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
@@ -4373,4 +4383,115 @@ function dataServoyExtraTableScroll(elementName, text, shouldClick, callback){
 		console.log(error.message);
 		tierdown(true);
 	});
+}
+
+function setCalendar(day, month, year, callback) {
+	var calendar = element(by.xpath("//div[contains(@class, 'bootstrap-datetimepicker-widget')]"));
+	var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+	var monthTo = monthList.indexOf(month.toLowerCase());
+	var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	var yearTo = year;
+	var dateHeaderText = calendar.element(by.xpath("//th[@class='picker-switch']"));
+	browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
+		dateHeaderText.getText().then(function (calYear) {
+			var yearFrom = calYear.split(" ")[1];
+			if (yearFrom != yearTo) { //switch years if end dates aint equal
+				clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
+					if (yearFrom < yearTo) {
+						for (var x = 0; x < (yearTo - yearFrom); x++) {
+							clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
+						}
+					} else {
+						for (var x = 0; x < (yearFrom - yearTo); x++) {
+							clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
+						}
+					}
+				}).then(function () {
+					clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
+						return clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+					});
+				});
+			} else {
+				clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
+					return clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
+						return clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+					});
+				});
+			}
+		}).then(function () {
+			clickElement(calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]"))).then(function() {
+				wrapUp(callback, "Calendar event");			
+			});
+		});
+	}).catch(function(error){
+		console.log(error.message);
+		tierdown(true)
+	});	
+}
+
+function pressKey(browserAction) {
+	var deferred = protractor.promise.defer();
+	browserAction = browserAction.toLowerCase();
+	switch (browserAction) {
+		case "enter":
+			return browser.actions().sendKeys(protractor.Key.ENTER).perform();
+		case "control":
+			return browser.actions().sendKeys(protractor.Key.CONTROL).perform()
+		case "tab":
+			return browser.actions().sendKeys(protractor.Key.TAB).perform();
+		case "escape":
+			return browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
+		case "backspace":
+			return browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform()
+		case "delete":
+			return browser.actions().sendKeys(protractor.Key.DELETE).perform();
+		case "space":
+			return browser.actions().sendKeys(protractor.Key.SPACE).perform();
+		case "page up":
+		case "pageup":
+			return browser.actions().mouseMove(element(by.xpath("//body")), { x: 0, y: 0 }).perform().then(function () {
+				return browser.actions().click().perform().then(function () {
+					return browser.actions().sendKeys(protractor.Key.PAGE_UP).perform();
+				})
+			});
+		case "page down":
+		case "pagedown":
+			return browser.actions().mouseMove(element(by.xpath("//body")), { x: 0, y: 0 }).perform().then(function () {
+				return browser.actions().click().perform().then(function () {
+					return browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform();
+				})
+			});
+		case "end":
+			return browser.actions().sendKeys(protractor.Key.END).perform();
+		case "home":
+			return browser.actions().sendKeys(protractor.Key.HOME).perform();;
+		case "f1":
+			return browser.actions().sendKeys(protractor.Key.F1).perform();
+		case "f2":
+			return browser.actions().sendKeys(protractor.Key.F2).perform();
+		case "f3":
+			return browser.actions().sendKeys(protractor.Key.F3).perform();
+		case "f4":
+			return browser.actions().sendKeys(protractor.Key.F4).perform();
+		case "f5":
+			return browser.actions().sendKeys(protractor.Key.F5).perform();
+		case "f6":
+			return browser.actions().sendKeys(protractor.Key.F6).perform();
+		case "f7":
+			return browser.actions().sendKeys(protractor.Key.F7).perform();
+		case "f8":
+			return browser.actions().sendKeys(protractor.Key.F8).perform();
+		case "f9":
+			return browser.actions().sendKeys(protractor.Key.F9).perform();
+		case "f10":
+			return browser.actions().sendKeys(protractor.Key.F10).perform();
+		case "f11":
+			return browser.actions().sendKeys(protractor.Key.F11).perform();
+		case "f12":
+			return browser.actions().sendKeys(protractor.Key.F12).perform();
+		default:
+			console.log("Unknown browser action");
+			tierdown(true);
+			return deferred.promise;
+	}
 }
