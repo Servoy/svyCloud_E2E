@@ -2609,8 +2609,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
 				var rowContainer = tableItems.all(by.xpath("//div[@class='ag-body-viewport-wrapper']"));
@@ -2618,22 +2618,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					//Get all the rows
 					var rows = rowElements.all(by.css("div[role=row]"));
 					//Get the element by text
-					var elementWithText = rows.all(by.xpath("//*[text()='"+text+"']")).first();
-					//Check if the element is present
-					elementWithText.isPresent().then(function(isPresent){
-						if(isPresent) {
-							//The element we want to click is not a child of the element by text. Meaning, the parent row has to be called
-							//.. means the parent of the element
-							var elem = elementWithText.element(by.xpath("..")).element(by.className(className))
-							elem.isPresent().then(function(isElemPresent){
-								if(isElemPresent) {
-									clickElement(elem).then(function(){
-										wrapUp(callback,"clickEvent");
-									});
-								}
-							})
-						}
+					var elementWithText = rows.all(by.xpath("//*[text()='"+text+"']")).first().getWebElement();
+					var parent = elementWithText.getDriver();
+					var child = parent.findElement(by.className(className));
+					child.click().then(function(){
+						wrapUp(callback,"clickEvent");
 					});
+
 				});
 			});			
 		}).catch(function (error) {
