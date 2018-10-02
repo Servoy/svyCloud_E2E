@@ -290,6 +290,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy select2tokenizer component with name {elementName} I want to unselect the item with the text {text}', {timeout: 20 * 1000}, function(elementName, text, callback) {
+		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function() {
+			var elemToDeselect = tokenizer.element(by.css("li[title='" + text + "']"));
+			clickElement(elemToDeselect.element(by.css("span"))).then(function() {
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});
+
 	When('servoy select2tokenizer component with name {elementName} the text {recordText} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
 		var elem = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
 		sendKeys(elem, text).then(function () {
@@ -2610,21 +2623,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
 		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
+		browser.wait(EC.presenceOf(table.first()), 10 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
-				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = tableItems.all(by.xpath("//div[@class='ag-body-viewport-wrapper']"));
-				rowContainer.each(function(rowElements){
-					//Get all the rows
-					var rows = rowElements.all(by.css("div[role=row]"));
-					//Get the element by text
-					var elementWithText = rows.all(by.xpath("//*[text()='"+text+"']")).first().getWebElement();
-					var parent = elementWithText.getDriver();
-					var child = parent.findElement(by.className(className));
-					child.click().then(function(){
-						wrapUp(callback,"clickEvent");
+				agGridIsGrouped(elementName).then(function(isGrouped){
+					if(isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport-wrapper";
+					}
+				}).then(function(containerClass) {
+					//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
+					var rowContainer = tableItems.all(by.css("div[class='" + containerClass + "']"));
+					rowContainer.each(function (rowElements) {
+						var selectedRow = rowElements.all(by.xpath("//div[text()='" + text + "']")).first();
+						browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
+							var parent = selectedRow.element(by.xpath(".."));
+							var child = parent.element(by.className(className));
+							child.click().then(function () {
+								wrapUp(callback, "clickEvent");
+							});
+						});
 					});
-
 				});
 			});			
 		}).catch(function (error) {
@@ -2634,17 +2653,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 45 * 1000}, function(elementName, className, rowNumber, callback){
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table.first()), 10 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = tableItems.all(by.xpath("//div[@class='ag-body-viewport-wrapper']"));
+				var rowContainer = tableItems.all(by.css("div[class='ag-body-viewport-wrapper']"));
 				rowContainer.each(function(rowElements){
-					//Get all the rows
-					var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
-					clickElement(selectedRow.element(by.className(className))).then(function(){
-						wrapUp(callback, "clickEvent");
-					})
+					browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(rowNumber - 2)), 15 * 1000).then(function(){
+						var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2).getWebElement();
+						var child = selectedRow.findElement(by.className(className));
+						child.click().then(function() {
+							wrapUp(callback, "clickEvent");
+						});
+					});					
 				});
 			});			
 		}).catch(function (error) {
@@ -3465,16 +3486,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END FONT AWESOME
 
 	//Wildcard check
-	// Then('I expect an element with the name {elementName} to be present', {timeout: 20 * 1000}, function(elementName, callback){
-	// 	var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
-	// 	browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function(){
-	// 		wrapUp(callback, "validateEvent");
-	// 	}).catch(function(error){
-	// 		console.log(error.message);
-	// 		tierdown(true)
-	// 	})
-	// });
-
 	Then('I expect an element with the name {elementName} to not be present', {timeout: 20 * 1000}, function(elementName, callback){
 		element.all(by.xpath("//*[@data-svy-name='" + elementName+"']")).then(function(items){
 			if(items.length === 0) {
