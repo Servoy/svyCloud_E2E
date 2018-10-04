@@ -1354,16 +1354,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP CHECKBOX
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
-		checkbox.isSelected().then(function (isChecked) {
-			console.log(isChecked);
-			if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-				clickElement(checkbox).then(function () {
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+			checkbox.isSelected().then(function (isChecked) {
+				console.log(isChecked);
+				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+					clickElement(checkbox).then(function () {
+						wrapUp(callback, "checkboxEvent");
+					})
+				} else {
+					console.log('Checkbox did not have to be changed');
 					wrapUp(callback, "checkboxEvent");
-				})
-			} else {
-				console.log('Checkbox did not have to be changed');
-				wrapUp(callback, "checkboxEvent");
-			}
+				}
+			});
 		}).catch(function (error) {
 			console.log(error.message);
 		})
@@ -1396,6 +1398,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			})
 		}).catch(function(error){
+			console.log(error.message);
 			tierdown(true);
 		});
 	});
@@ -3105,7 +3108,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//DIALOG POPUP COMPONENT
 	When('default modal-dialog component the button with the text {text} is pressed', {timeout: 30 * 1000}, function(text, callback){
-		var dialog = element(by.xpath("//div[@class='modal-dialog']")).element(by.xpath("//button[text()='" + text + "']"));
+		var dialog = element(by.xpath("//div[@class='modal-dialog']")).element(by.xpath("//button[text()[normalize-space() = '" + text + "']]"));
 		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog button not found!').then(function(){
 			clickElement(dialog).then(function(){
 				wrapUp(callback, 'clickEvent');
