@@ -2711,19 +2711,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}).then(function(containerClass) {
 					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
 					rowContainer.each(function(rowElements){
-						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]"), 15 * 1000).get(rowNumber - 2))).then(function(){
 							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
 							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-							doubleClickElement(col).then(function() {
-								browser.actions().sendKeys(text).perform().then(function () {
-									browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {
-										col.getText().then(function (newText) {
-											if (newText === text) {
-												wrapUp(callback, "insertEvent");
-											} else {
-												console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-												console.log("Possibility is that the column is not editable");
-											}
+							browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
+								doubleClickElement(col).then(function() {
+									browser.actions().sendKeys(text).perform().then(function () {
+										browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {										
+											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
+												col.getText().then(function (newText) {
+													if (newText === text) {
+														wrapUp(callback, "insertEvent");
+													} else {
+														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+														console.log("Possibility is that the column is not editable");
+													}
+												});
+											});
 										});
 									});
 								});
@@ -2759,13 +2763,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									clickElement(col.element(by.cssContainingText('option', text))).then(function(){
 										clickElement(col).then(function(){
 											browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
-												col.getAttribute('textContent').then(function(newText) {
-													if (newText === text) {
-														wrapUp(callback, "clickEvent");
-													} else {
-														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-														console.log("Possibility is that the column is not editable");
-													}
+												browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
+													col.getAttribute('textContent').then(function(newText) {
+														if (newText === text) {
+															wrapUp(callback, "clickEvent");
+														} else {
+															console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+															console.log("Possibility is that the column is not editable");
+														}
+													});
 												});
 											});
 										});
@@ -2803,14 +2809,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									.all(by.xpath("//a[text()='" + text + "']")).first();
 								browser.wait(EC.visibilityOf(comboBoxItem), 30 * 1000, 'Combobox item not found!').then(function () {
 									browser.wait(EC.elementToBeClickable(comboBoxItem), 30 * 1000, 'Combobox item not clickable!').then(function () {
-										clickElement(comboBoxItem).then(function () {											
-											col.getAttribute('textContent').then(function(newText) {
-												if (newText === text) {
-													wrapUp(callback, 'clickEvent');
-												} else {
-													console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-													console.log("Possibility is that the column is not editable");
-												}
+										clickElement(comboBoxItem).then(function () {	
+											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){										
+												col.getAttribute('textContent').then(function(newText) {
+													if (newText === text) {
+														wrapUp(callback, 'clickEvent');
+													} else {
+														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+														console.log("Possibility is that the column is not editable");
+													}
+												});
 											});
 										});
 									});
