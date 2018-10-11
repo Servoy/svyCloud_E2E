@@ -175,53 +175,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy calendar component I want to select {day} {month} {year}', { timeout: 120 * 1000 }, function (day, month, year, callback) {
-		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-		var monthTo = monthList.indexOf(month.toLowerCase());
-		var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		var yearTo = year;
-		var dateHeaderText = element(by.xpath("//th[@class='picker-switch']"));
-		browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
-			dateHeaderText.getText().then(function (calYear) {
-				var yearFrom = calYear.split(" ")[1];
-				if (yearFrom != yearTo) { //switch years if end dates aint equal
-					clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-						if (yearFrom < yearTo) {
-							for (var x = 0; x < (yearTo - yearFrom); x++) {
-								clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
-							}
-						} else {
-							for (var x = 0; x < (yearFrom - yearTo); x++) {
-								clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
-							}
-						}
-					}).then(function () {
-						clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-							return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
-						});
-					});
-				} else {
-					clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-						return clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-							return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
-						});
-					});
-				}
-			}).then(function () {		
-				wrapUp(callback, "Calendar event");			
-			});
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true)
-		});	
-	});
-
-	When('servoy calendar component I want to select day {day}', { timeout: 15 * 1000 }, function (day, callback) {
-		browser.wait(EC.presenceOf(element(by.cssContainingText("td", day)))).then(function () {
-			browser.wait(EC.elementToBeClickable(element(by.cssContainingText("td", day)))).then(function () {
-				clickElement(element(by.cssContainingText("td.day", day))).then(function () {
-					wrapUp(callback, "Click event");
-				});
-			});
+		var promise = Promise.resolve(setCalendar(day, month, year, null, callback));
+		promise.then(function() {					
+			wrapUp(callback, "calendarEvent");					
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -1342,8 +1298,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP TEXTAREA
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		sendKeys(element(by.xpath("//data-bootstrapcomponents-textarea[@data-svy-name='" + elementName + "']/textarea")), text).then(function () {
-			wrapUp(callback, "insertEvent");
+		var textArea = element(by.xpath("//data-bootstrapcomponents-textarea[@data-svy-name='" + elementName + "']/textarea"));
+		browser.wait(EC.presenceOf(textArea), 15 * 1000, 'Textarea not found!').then(function () {
+			sendKeys(textArea, text).then(function () {
+				wrapUp(callback, "insertEvent");
+			});
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
@@ -1528,52 +1487,199 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP CALENDAR
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to select {day} {month} {year}', { timeout: 120 * 1000 }, function (elementName, day, month, year, callback) {
 		var calendar = element(by.xpath("//data-bootstrapcomponents-calendar[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(calendar), 30 * 1000, 'Calendar not found!').then(function () {
-			clickElement(calendar.element(by.css("span[class='input-group-addon']"))).then(function () {
-				var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-				var monthTo = monthList.indexOf(month.toLowerCase());
-				var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-				var yearTo = year;
-				var dateHeaderText = element(by.xpath("//th[@class='picker-switch']"));
-				browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
-					dateHeaderText.getText().then(function (calYear) {
-						var yearFrom = calYear.split(" ")[1];
-						if (yearFrom != yearTo) { //switch years if end dates aint equal
-							clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-								if (yearFrom < yearTo) {
-									for (var x = 0; x < (yearTo - yearFrom); x++) {
-										clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
-									}
-								} else {
-									for (var x = 0; x < (yearFrom - yearTo); x++) {
-										clickElement(element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
-									}
-								}
-							}).then(function () {
-								clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-									return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
-								});
-							});
-						} else {
-							clickElement(element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-								return clickElement(element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-									return clickElement(element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
-								});
-							});
-						}
-					}).then(function () {
-						wrapUp(callback, "Calendar event");
-					});
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true)
+		browser.wait(EC.presenceOf(calendar), 30 * 1000, 'Calendar not found!').then(function (){
+			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+				var promise = Promise.resolve(setCalendar(day, month, year, 'bootstrap', callback));
+				promise.then(function() {					
+					wrapUp(callback, "calendarEvent");					
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			console.log(error.message);			
+			tierdown(true)
+		});	
+	});
+
+	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today', {timeout: 120 * 1000}, function(elementName, callback) {				
+		var dToday = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var selectedMonth = monthList[dToday.getMonth()];
+		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+				var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
+				promise.then(function() {					
+					wrapUp(callback, "calendarEvent");					
+				});
+			});
 		});
 	});
+
+	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today {+|-} {days} days', {timeout: 120 * 1000}, function(elementName, operator, dayAmount, callback) {
+		var dToday = new Date();		
+		if(operator === '-') {
+			dToday.setDate(dToday.getDate() - parseInt(dayAmount));
+		} else if(operator === '+'){
+			dToday.setDate(dToday.getDate() + parseInt(dayAmount));
+		} else {
+			return callback(new Error("Invalid operator given! Use '+' or '-'"));
+		}
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var selectedMonth = monthList[dToday.getMonth()];
+		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {				
+				var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
+				promise.then(function() {					
+					wrapUp(callback, "calendarEvent");					
+				});
+			});
+		});
+	});
+
+	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to {weekDay} {before|after} today', {timeout: 120 * 1000}, function(elementName, weekDay, direction ,callback){
+		var newDate = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
+		var day = dayList.indexOf(weekDay.toLowerCase());
+		console.log(day);
+		if(day === -1) {
+			return callback(new Error("Invalid weekday given! Use monday, tuesday, wednesday, etc. instead."));
+		}
+		var dayToday = newDate.getDay();
+		var selectedMonth;
+		var difference;
+		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+				switch (direction) {
+					case "before":
+						if(day === dayToday) {
+							newDate.setDate(newDate.getDate() - 7);
+						} else {
+							difference = dayToday - day;
+							if(difference > 0) {
+								newDate.setDate(newDate.getDate() - difference);
+							} else {
+								difference = (7 - (difference * -1));
+								newDate.setDate(newDate.getDate() - difference);
+							}							
+						}
+						selectedMonth = monthList[newDate.getMonth()];
+						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+						promise.then(function() {					
+							wrapUp(callback, "calendarEvent");					
+						});				
+						break;
+					case "after":
+						if(day === dayToday) {
+							newDate.setDate(newDate.getDate() + 7);
+						} else {
+							difference = day - dayToday;
+							if(difference > 0) {
+								newDate.setDate(newDate.getDate() + difference);
+							} else {
+								difference = (7 - (difference * -1));
+								newDate.setDate(newDate.getDate() + difference);
+							}
+						}
+						selectedMonth = monthList[newDate.getMonth()];
+						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+						promise.then(function() {					
+							wrapUp(callback, "calendarEvent");					
+						});	
+						break;
+					default:
+						tierdown(true);	
+						return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));						
+				}
+			});
+		});
+	});
+
+	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to {weekDay} {before|after} today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(elementName, weekDay, direction, operator, days, callback){
+		var newDate = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
+		var day = dayList.indexOf(weekDay.toLowerCase());
+		if(day === -1) {
+			return callback(new Error("Invalid weekday given! Use monday, tuesday, wednesday, etc. instead."));
+		}
+		var dayToday = newDate.getDay();
+		var selectedMonth;
+		var difference;
+		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+				switch (direction) {
+					case "before":
+						if(day === dayToday) {
+							newDate.setDate(newDate.getDate() - 7);
+						} else {
+							difference = dayToday - day;
+							if(difference > 0) {
+								newDate.setDate(newDate.getDate() - difference);
+							} else {
+								difference = (7 - (difference * -1));
+								newDate.setDate(newDate.getDate() - difference);
+							}							
+						}
+
+						switch(operator) {
+							case "+":
+								newDate.setDate(newDate.getDate() + parseInt(days));
+								break;
+							case "-":
+								newDate.setDate(newDate.getDate() - parseInt(days));
+								break;
+							default: 
+								return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+						}
+						selectedMonth = monthList[newDate.getMonth()];	
+						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+						promise.then(function() {					
+							wrapUp(callback, "calendarEvent");					
+						});				
+						break;
+					case "after":
+						if (day === dayToday) {
+							newDate.setDate(newDate.getDate() + 7);
+						} else {
+							difference = day - dayToday;
+							if (difference > 0) {
+								newDate.setDate(newDate.getDate() + difference);
+							} else {
+								difference = (7 - (difference * -1));
+								newDate.setDate(newDate.getDate() + difference);								
+							}
+						}
+
+						switch(operator) {
+							case "+":
+								newDate.setDate(newDate.getDate() + parseInt(days));
+								break;
+							case "-":
+								newDate.setDate(newDate.getDate() - parseInt(days));
+								break;
+							default: 
+								return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+						}
+						selectedMonth = monthList[newDate.getMonth()];
+						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+						promise.then(function() {					
+							wrapUp(callback, "calendarEvent");					
+						});	
+						break;
+					default:
+						tierdown(true);	
+						return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
+				}
+			});
+		}).catch(function(error) {
+			console.log(error.message);
+			tierdown(true);
+		})
+	});	
 	//END BOOTSTRAP CALENDAR
 
 	//BOOTSTRAP INPUT GROUP
@@ -1843,6 +1949,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	
+	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (elementName, rowNumber, callback) {
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
+			clickElement(selectComponent).then(function(){
+				var item = selectComponent.all(by.css('li')).get(rowNumber - 1)
+				browser.wait(EC.presenceOf(item), 15 * 1000, 'No dropdown items have been found!').then(function(){
+					item.element(by.css("a")).getLocation().then(function(loc){
+						clickElementByLocation(loc).then(function(){
+							wrapUp(callback, "clickEvent");
+						});
+					});
+				})
+			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
+		});
+	});
 	//END BOOTSTRAP DROPDOWN
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
@@ -2698,7 +2822,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	//GROUPING GRID INSERT EVENTS
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', {timeout: 10 * 1000}, function(elementName, text, rowNumber, columnNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', {timeout: 30 * 1000}, function(elementName, text, rowNumber, columnNumber, callback) {
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
@@ -2742,36 +2866,43 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {		
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
+				//Required to target the correct row
 				agGridIsGrouped(elementName).then(function(isGrouped){
 					if(isGrouped) {
 						return "ag-full-width-viewport";
 					} else {
 						return "ag-body-viewport-wrapper";
 					}
-				}).then(function(containerClass) {
+				}).then(function(containerClass) {					
 					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
 					rowContainer.each(function(rowElements){
+						//just a check to see if atleast the first row is rendered
 						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
+							//gets the correct row
 							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
+							//gets the correct column
 							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+							//this will make the combobox appear
 							doubleClickElement(col).then(function () {
+								//click again to open the combobox
 								clickElement(col).then(function(){
+									//clicks the option with the given text
 									clickElement(col.element(by.cssContainingText('option', text))).then(function(){
-										clickElement(col).then(function(){
-											browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
-												browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
-													col.getAttribute('textContent').then(function(newText) {
-														if (newText === text) {
-															wrapUp(callback, "clickEvent");
-														} else {
-															console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-															console.log("Possibility is that the column is not editable");
-														}
-													});
+										browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
+											//the enter key triggers an onColumnDataChange - this can refresh the table. Wait until the column is visible again
+											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
+												col.getAttribute('textContent').then(function(newText) {
+													//validate input
+													if (newText === text) {
+														wrapUp(callback, "clickEvent");
+													} else {
+														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+														console.log("Possibility is that the column is not editable");
+													}
 												});
 											});
 										});
@@ -2788,7 +2919,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
@@ -2834,7 +2965,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 10 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
@@ -4398,49 +4529,88 @@ function dataServoyExtraTableScroll(elementName, text, shouldClick, callback){
 	});
 }
 
-function setCalendar(day, month, year, callback) {
+function setCalendar(day, month, year, calType, callback) {
+	if(!day || !month || !year) {
+		tierdown(true);
+		return callback(new Error('Invalid date parameters used. Use the following syntax: \n Months: (january, february, march, april, may, june, july, august, september, october, december. Not case sensitive. \nDays: 1-31. \nYear: e.g. 2012'));
+	}
 	var calendar = element(by.xpath("//div[contains(@class, 'bootstrap-datetimepicker-widget')]"));
 	var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 	var monthTo = monthList.indexOf(month.toLowerCase());
-	var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-	var yearTo = year;
-	var dateHeaderText = calendar.element(by.xpath("//th[@class='picker-switch']"));
-	browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
-		dateHeaderText.getText().then(function (calYear) {
-			var yearFrom = calYear.split(" ")[1];
-			if (yearFrom != yearTo) { //switch years if end dates aint equal
-				clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-					if (yearFrom < yearTo) {
-						for (var x = 0; x < (yearTo - yearFrom); x++) {
-							clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")));
+	if(isValidDate(day, monthTo, year)) {
+		var calMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+		var yearTo = year;
+		var dateHeaderText = calendar.all(by.css("th[class='picker-switch']")).first();
+		return browser.wait(EC.presenceOf(dateHeaderText), 15 * 1000, 'Header text not visible!').then(function () {
+			return dateHeaderText.getText().then(function (calYear) {
+				var yearFrom = calYear.split(" ")[1];
+				if (yearFrom != yearTo) { //switch years if end dates aint equal
+					clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]")).first()).then(function () {
+						if (yearFrom < yearTo) {
+							for (var x = 0; x < (yearTo - yearFrom); x++) {
+								clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[3]")).first());
+							}
+						} else {
+							for (var x = 0; x < (yearFrom - yearTo); x++) {
+								clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")).first());
+							}
 						}
-					} else {
-						for (var x = 0; x < (yearFrom - yearTo); x++) {
-							clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']/table/thead/tr/th[1]")));
-						}
-					}
-				}).then(function () {
-					clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-						return clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+					}).then(function () {
+						clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first()).then(function () {
+							clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+						});
 					});
-				});
-			} else {
-				clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]"))).then(function () {
-					return clickElement(calendar.element(by.xpath("//div[@class='datepicker-months']")).element(by.xpath("//span[.='" + calMonths[monthTo] + "']"))).then(function () {
-						return clickElement(calendar.element(by.xpath("//div[@class='datepicker-days']")).element(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")));
+				} else {
+					return clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]")).first()).then(function () {
+						clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first()).then(function () {
+							clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+						});
 					});
-				});
-			}
-		}).then(function () {
-			clickElement(calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]"))).then(function() {
-				wrapUp(callback, "Calendar event");			
+				}
+			}).then(function () {
+				if(!calType) {
+					clickElement(calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]")));
+					return Promise.resolve();
+				} else {
+					browser.actions().sendKeys(protractor.Key.ENTER).perform();
+					return Promise.resolve();
+				}
 			});
-		});
-	}).catch(function(error){
-		console.log(error.message);
-		tierdown(true)
-	});	
+		});	
+	} else {
+		tierdown(true);
+		return callback(new Error('Invalid date given!'));
+	}
 }
+
+/**
+ * Get the number of days in any particular month
+ * @param  {integer} m The month (valid: 0-11)
+ * @param  {integer} y The year
+ * @return {integer}   The number of days in the month
+ */
+function daysInMonth(m, y) {
+    switch (m) {
+        case 1 :
+            return (y % 4 == 0 && y % 100) || y % 400 == 0 ? 29 : 28;
+        case 8 : case 3 : case 5 : case 10 :
+            return 30;
+        default :
+            return 31
+    }
+};
+
+/**
+ * Check if a date is valid
+ * @param  {[type]}  d The day
+ * @param  {[type]}  m The month
+ * @param  {[type]}  y The year
+ * @return {Boolean}   Returns true if valid
+ */
+function isValidDate (d, m, y) {
+    m = parseInt(m, 10) - 1;
+    return m >= 0 && m < 12 && d > 0 && d <= daysInMonth(m, y);
+};
 
 function pressKey(browserAction) {
 	var deferred = protractor.promise.defer();
