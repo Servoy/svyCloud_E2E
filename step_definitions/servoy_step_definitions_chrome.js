@@ -3089,6 +3089,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	
@@ -3135,6 +3138,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3173,6 +3179,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3185,6 +3194,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'clickEvent');
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 
@@ -3204,6 +3216,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
+		}).catch(function (error) {
+			console.log(error.message);
+			tierdown(true);
 		});
 	});
 	//END SALES DEMO SPECIFIC
@@ -4077,6 +4092,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	Before(function () {
 		hasErrorDuringSuite = false;
 		console.log('Starting scenario');
+		browser.driver.getCapabilities().then(function(caps){
+			browser.browserName = caps.get('browserName');
+		});
 	});
 });
 
