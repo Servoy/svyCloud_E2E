@@ -4389,7 +4389,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
 			//Step 2a - Create the element that has to be found
-			var elementToClick = rowItems.element(by.xpath('//*[text()="' + text + '"]'));
+			var elementToClick = rowItems.all(by.xpath('//*[text()="' + text + '"]')).first();
 
 			//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
 			browser.wait(elementToClick.isPresent()).then(function (isPresent) {
