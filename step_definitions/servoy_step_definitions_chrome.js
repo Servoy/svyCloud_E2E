@@ -3657,15 +3657,50 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('I expect an element with the name {elementName} to contain the class {className}', {timeout: 30 * 1000}, function(elementName, className, callback){
-		var inputGroup = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
-			var elemWithClass = inputGroup.element(by.xpath("//*[contains(@class, '" + className + "')]"));
-			browser.wait(EC.presenceOf(elemWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function(){
-				wrapUp(callback, "validateEvent");
+		var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
+		browser.wait(EC.presenceOf(wildcard), 20 * 1000, 'Element has not been found!').then(function(){
+			wildcard.getAttribute('class').then(function(classes) {
+				if(classes.indexOf(className) != -1) {				
+					wrapUp(callback, "validateEvent");
+				} else {
+					var nestedElem = wildcard.element(by.className(className));
+					nestedElem.isPresent().then(function(isPresent) {
+						if(isPresent) {
+							wrapUp(callback, "validateEvent");
+						} else {
+							tierdown(true);
+							callback(new Error('Validation failed! Element with the given does not class exist!'));							
+						}
+					});
+				}
 			});
 		}).catch(function(error){
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('I expect an element with the name {elementName} to not contain the class {className}', {timeout: 30 * 1000}, function(elementName, className, callback){
+		var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName+"']"));
+		browser.wait(EC.presenceOf(wildcard), 20 * 1000, 'Element has not been found!').then(function(){
+			wildcard.getAttribute('class').then(function(classes) {
+				if(classes.indexOf(className) === -1) {
+					var nestedElem = wildcard.element(by.className(className));
+					nestedElem.isPresent(nestedElem).then(function(isPresent) {
+						if(isPresent) {
+							tierdown(true);
+							callback(new Error('Validation failed! Element with the given class exists!'));
+						} else {
+							wrapUp(callback, "validateEvent");
+						}
+					});
+				} else {
+					callback(new Error('Validation failed! Element with the given class exists!'));
+				}
+			});
+		}).catch(function(error){			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
