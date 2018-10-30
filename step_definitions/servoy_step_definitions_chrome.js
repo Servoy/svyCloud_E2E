@@ -187,18 +187,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY SELECT2TOKENIZER COMPONENT
 	When('servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
-		browser.wait(EC.visibilityOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
+		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"))
+		browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
+			console.log('test');
 			clickElement(tokenizer).then(function () {
 				wrapUp(callback, "Click event");
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {				
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {				
 			tierdown(true);
-		});		
+			callback(new Error(error.message));
+		});	
 	});
 
 	When('servoy select2tokenizer component record number {rowNumber} is clicked', { timeout: 60 * 1000 }, function (rowNumber, callback) {
@@ -2786,13 +2787,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
 				var rowContainer = tableItems.all(by.css("div[class='ag-body-viewport-wrapper']"));
 				rowContainer.each(function(rowElements){
-					browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(rowNumber - 2)), 15 * 1000).then(function(){
-						var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2).getWebElement();
-						var child = selectedRow.findElement(by.className(className));
-						child.click().then(function() {
-							wrapUp(callback, "clickEvent");
+					browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(rowNumber - 1)), 15 * 1000).then(function(){
+						// var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 1).getWebElement();
+						// browser.sleep(1500).then(function() {
+						// 	var child = selectedRow.findElement(by.className(className));
+						// 	child.click().then(function() {
+						// 		wrapUp(callback, "clickEvent");
+						// 	});
+						// });
+						var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 1);
+						var child = selectedRow.element(by.xpath("..")).all(by.className(className)).first();
+						browser.wait(EC.presenceOf(child), 15 * 1000, 'Element with the given class not found!').then(function() {
+							clickElement(child).then(function() {
+								wrapUp(callback, "clickEvent");
+							});
 						});
-					});					
+					});
 				});
 			});			
 		}).catch(function (error) {
@@ -3331,7 +3341,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog not found!').then(function(){
 			var selectField = dialog.element(by.css("select"));
 			clickElement(selectField).then(function(){
-				var optionField = selectField.element(by.cssContainingText("option", text));
+				var optionField = selectField.element(by.css("option[value='"+text+"']"));
 				clickElement(optionField).then(function(){
 					wrapUp(callback, "clickEvent");
 				});
@@ -4434,7 +4444,11 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 					//Step 3b - Element has been found. Conclude the test
 					if(className) {
 						var elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
-						clickElement(elementWithClass);
+						browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with class not found!').then(function() {
+							// clickElement(elementWithClass);
+							var elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+							elementWithClass.click();
+						});						
 					} else if(shouldClick) {
 						clickElement(elementToClick);
 					} else if(rowOption) {
@@ -4470,8 +4484,11 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 												found = true;
 												if(shouldClick) {
 													if(className) {
-														var elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
-														clickElement(elementWithClass);
+														browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with class not found!').then(function() {
+															// clickElement(elementWithClass);
+															var elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+															elementWithClass.click();
+														});		
 													} else if(rowOption) {
 														findRecordByRowLevel(elementName, text, rowOption, level, callback);
 													} else {
