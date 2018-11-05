@@ -1158,7 +1158,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to insert the date {day} {month} {year}', { timeout: 30 * 1000 }, function (elementName, day, month, year, callback) {		
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-		var index = monthList.indexOf(month) + 1;
+		var index = monthList.indexOf(month.toLowerCase()) + 1;
 		if(!index) {
 			callback(new Error('Invalid date inserted!'));
 		}
