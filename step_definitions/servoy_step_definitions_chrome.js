@@ -1155,6 +1155,30 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(false);
 		});
 	});	
+
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to insert the date {day} {month} {year}', { timeout: 30 * 1000 }, function (elementName, day, month, year, callback) {		
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var index = monthList.indexOf(month) + 1;
+		if(!index) {
+			callback(new Error('Invalid date inserted!'));
+		}
+		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css('input'));
+		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
+			clickElement(textField).then(function() {
+				textField.sendKeys(day).then(function() {
+					textField.sendKeys(index).then(function() {
+						textField.sendKeys(year).then(function() {
+							wrapUp(callback, "insertEvent");
+						});
+					});
+				});
+			});
+		}).catch(function(error) {
+			tierdown(true);
+			callback(new Error(error.message));			
+		})
+	});
+
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -4214,11 +4238,15 @@ function wrapUp(callback, performanceEvent) {
 }
 
 function clickElement(elem) {
-	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
-		return browser.wait(EC.elementToBeClickable(elem), 30000, 'Element not clickable').then(function () {
-			return elem.click();
+	if(browser.browserName === 'firefox') {
+		return clickByScript(elem);
+	} else {
+		return browser.wait(EC.presenceOf(elem), 30 * 1000, 'Element not visible').then(function () {
+			return browser.wait(EC.elementToBeClickable(elem), 30 * 1000, 'Element not clickable').then(function () {
+				return elem.click();
+			});
 		});
-	});
+	}
 }
 
 function doubleClickElement(elem) {
