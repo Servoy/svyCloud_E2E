@@ -1179,6 +1179,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		})
 	});
 
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
+		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+			textField.clear().then(function() {
+				wrapUp(callback, "clearEvent");
+			});
+		}).catch(function(error){			
+			tierdown(false);
+			callback(new Error(error.message));
+		});
+	})
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -3100,6 +3111,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
+		});
+	});
+
+	Then('default toast component I want wait until the toast popup is gone', { timeout: 30 * 1000 }, function (callback) {
+		browser.wait(EC.invisibilityOf(element(by.xpath("//div[@id='toast-container']"))), 15 * 1000).then(function () {
+			wrapUp(callback, "toastEvent");
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END TOAST COMPONENT
