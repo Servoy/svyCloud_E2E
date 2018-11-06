@@ -1993,6 +1993,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	//END BOOTSTRAP DROPDOWN
+
+	//DATA-BOOTSTRAPCOMPONENTS-TABPANEL
+	When('bootstrap data-bootstrapcomponents-tabpanel with name {elementName} I want to select the tab with the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback) {
+		var tabpanel = element(by.css("data-bootstrapcomponents-tabpanel[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(tabpanel), 15 * 1000, 'Tabpanel not found!').then(function() {
+			var tabItem = tabpanel.element(by.xpath("//span[text()='" + text + "']"));
+			clickElement(tabItem).then(function() {
+				wrapUp(callback, "clickEvent");
+			})
+		}).catch(function(error) {
+			callback(new Error(error.message));
+		})
+	});
+
+	When('bootstrap data-bootstrapcomponents-tabpanel with name {elementName} I want to select the tab with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback) {
+		var tabpanel = element(by.css("data-bootstrapcomponents-tabpanel[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(tabpanel), 15 * 1000, 'Tabpanel not found!').then(function() {
+			var tabItem = tabpanel.element(by.cssContainingText("span", text));
+			clickElement(tabItem).then(function() {
+				wrapUp(callback, "clickEvent");
+			})
+		}).catch(function(error) {
+			callback(new Error(error.message));
+		})
+	});
+	//END DATA-BOOTSTRAPCOMPONENTS-TABPANEL
+
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
