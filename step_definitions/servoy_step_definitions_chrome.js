@@ -3786,33 +3786,39 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('I expect an element with the name {elementName} to be {visible|hidden|present}', { timeout: 15 * 1000 }, function (elementName, visibility, callback) {
+		var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
 		if (visibility === 'present') {
-			var wildcard = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function () {
 				wrapUp(callback, "validateEvent");
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true)
+				tierdown(true);
+				callback(new Error(error.message));
 			});
-		} else if (visibility === 'hidden' || visibility === 'visible') {
-			var elem = element(by.xpath("//*[@data-svy-name='" + elementName + "']"));
-			browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function () {
-				var parent = elem.element(by.xpath(".."));
+		} else if (visibility === 'visible') {
+			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element not found!').then(function () {
+				var parent = wildcard.element(by.xpath(".."));
 				parent.getCssValue('display').then(function (isHidden) {
-					if (isHidden === 'none' && visibility.toLowerCase() === 'hidden' || isHidden != 'none' && visibility.toLowerCase() === 'visible') {
+					if (isHidden != 'none' && visibility.toLowerCase() === 'visible') {
 						wrapUp(callback, "validateEvent");
 					} else {
-						console.log('Validation failed! Excepted element to be ' + visibility)
 						tierdown(true);
+						callback(new Error('Validation failed! Excepted element to be ' + visibility));
 					}
 				})
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {				
 				tierdown(true);
+				callback(new Error(error.message));
 			});
+		} else if (visibility === 'hidden' ) {
+			browser.wait(EC.invisibilityOf(wildcard), 15 * 1000).then(function() {
+				wrapUp(callback, "invisibleCheck")
+			}).catch(function(error) {
+				tierdown(true);
+				callback(new Error(error.message));
+			})
 		} else {
-			console.log("Parameter not supported! End the step with the word 'visible', 'hidden' or 'present'!" );
 			tierdown(true);
+			callback(new Error("Parameter not supported! End the step with the word 'visible', 'hidden' or 'present'!"));
 		}
 	});
 
