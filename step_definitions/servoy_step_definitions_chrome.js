@@ -2741,21 +2741,28 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){		
-			table.each(function(tableItems){
-				var rowContainer = tableItems.all(by.xpath("//div[@class='ag-body-viewport-wrapper']"));
-				rowContainer.each(function(rowElements){
-					var rows = rowElements.all(by.css("div[role=row]"));
-					clickElement(rows.get(rowNumber - 2)).then(function(){
-						wrapUp(callback, "clickEvent");
-					})
+		rowNumber -= 1;
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
+			agGridIsGrouped(elementName).then(function(isGrouped){
+				if(isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function(containerClass) {
+				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
+				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				console.log('test');
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				clickElement(row).then(function() {
+					wrapUp(callback, "clickEvent");
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function(error) {
 			tierdown(true);
-		});
+			callback(new Error(error.message));
+		})
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the text {text}', {timeout: 60 * 1000}, function(elementName, text, callback){
