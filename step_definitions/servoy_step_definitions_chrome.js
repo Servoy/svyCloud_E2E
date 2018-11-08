@@ -2896,47 +2896,45 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	//GROUPING GRID INSERT EVENTS
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', {timeout: 30 * 1000}, function(elementName, text, rowNumber, columnNumber, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
-			table.each(function(tableItems){
-				agGridIsGrouped(elementName).then(function(isGrouped){
-					if(isGrouped) {
-						return "ag-full-width-viewport";
-					} else {
-						return "ag-body-viewport-wrapper";
-					}
-				}).then(function(containerClass) {
-					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
-					rowContainer.each(function(rowElements){
-						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]"), 15 * 1000).get(rowNumber - 2))).then(function(){
-							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
-							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-							browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
-								doubleClickElement(col).then(function() {
-									browser.actions().sendKeys(text).perform().then(function () {
-										browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {										
-											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
-												col.getText().then(function (newText) {
-													if (newText === text) {
-														wrapUp(callback, "insertEvent");
-													} else {
-														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-														console.log("Possibility is that the column is not editable");
-													}
-												});
-											});
-										});
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', { timeout: 30 * 1000 }, function (elementName, text, rowNumber, columnNumber, callback) {
+		rowNumber -= 1;
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			// table.each(function(tableItems){
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+					doubleClickElement(col).then(function () {
+						browser.actions().sendKeys(text).perform().then(function () {
+							browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {
+								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+									col.getText().then(function (newText) {
+										if (newText === text) {
+											wrapUp(callback, "insertEvent");
+										} else {
+											console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
+											console.log("Possibility is that the column is not editable");
+											callback(new Error());
+										}
 									});
 								});
 							});
 						});
 					});
 				});
-			});			
+			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
