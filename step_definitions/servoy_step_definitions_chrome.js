@@ -2850,33 +2850,28 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 45 * 1000}, function(elementName, className, rowNumber, callback){
-		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(table.first()), 10 * 1000, 'Table not found!').then(function(){
-			table.each(function(tableItems){
+		rowNumber -= 1;
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
+			agGridIsGrouped(elementName).then(function(isGrouped){
+				if(isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function(containerClass) {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = tableItems.all(by.css("div[class='ag-body-viewport-wrapper']"));
-				rowContainer.each(function(rowElements){
-					browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(rowNumber - 1)), 15 * 1000).then(function(){
-						// var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 1).getWebElement();
-						// browser.sleep(1500).then(function() {
-						// 	var child = selectedRow.findElement(by.className(className));
-						// 	child.click().then(function() {
-						// 		wrapUp(callback, "clickEvent");
-						// 	});
-						// });
-						var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 1);
-						var child = selectedRow.element(by.xpath("..")).all(by.className(className)).first();
-						browser.wait(EC.presenceOf(child), 15 * 1000, 'Element with the given class not found!').then(function() {
-							clickElement(child).then(function() {
-								wrapUp(callback, "clickEvent");
-							});
-						});
-					});
+				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				var parent = row.getWebElement();
+				var elementToClick = parent.findElement(by.className(className));
+				elementToClick.click().then(function() {
+					wrapUp(callback, "clickEvent");
 				});
-			});			
+			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
