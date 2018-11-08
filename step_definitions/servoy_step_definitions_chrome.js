@@ -2900,7 +2900,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		rowNumber -= 1;
 		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
-			// table.each(function(tableItems){
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
@@ -2939,43 +2938,38 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {		
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
-			table.each(function(tableItems){
-				//Required to target the correct row
-				agGridIsGrouped(elementName).then(function(isGrouped){
-					if(isGrouped) {
-						return "ag-full-width-viewport";
-					} else {
-						return "ag-body-viewport-wrapper";
-					}
-				}).then(function(containerClass) {					
-					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
-					rowContainer.each(function(rowElements){
-						//just a check to see if atleast the first row is rendered
-						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
-							//gets the correct row
-							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
-							//gets the correct column
-							var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-							//this will make the combobox appear
-							doubleClickElement(col).then(function () {
-								//click again to open the combobox
+		rowNumber -= 1;
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+					doubleClickElement(col).then(function () {
+						//click again to open the combobox
+						clickElement(col).then(function(){
+							//clicks the option with the given text
+							clickElement(col.element(by.css("option[value='"+text+"']"))).then(function(){
 								clickElement(col).then(function(){
-									//clicks the option with the given text
-									clickElement(col.element(by.cssContainingText('option', text))).then(function(){
-										browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
-											//the enter key triggers an onColumnDataChange - this can refresh the table. Wait until the column is visible again
-											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
-												col.getAttribute('textContent').then(function(newText) {
-													//validate input
-													if (newText === text) {
-														wrapUp(callback, "clickEvent");
-													} else {
-														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-														console.log("Possibility is that the column is not editable");
-													}
-												});
+									browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
+										col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+										//the enter key triggers an onColumnDataChange - this can refresh the table. Wait until the column is visible again
+										browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
+											col.getAttribute('textContent').then(function(newText) {
+												// validate input
+												if (newText === text) {
+													wrapUp(callback, "clickEvent");
+												} else {
+													var error = "Validation failed! Expected '" + text + "'. Got '" + newText + "'.\n" + "Possibility is that the column is not editable";
+													callback(new Error(error))
+												}
 											});
 										});
 									});
@@ -2987,7 +2981,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			});
 		}).catch(function (error) {
 			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
