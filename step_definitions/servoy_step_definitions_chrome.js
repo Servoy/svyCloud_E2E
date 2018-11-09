@@ -1716,6 +1716,35 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		})
 	});	
+
+	Then('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I expect it to be {visible|present|hidden}', {timeout: 30 * 1000}, function(elementName, state, callback){
+		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']")).all(by.css("div")).get(0);
+		if (state.toLowerCase() === 'visible') {
+			browser.wait(EC.visibilityOf(calendar), 15 * 1000, 'Calendar not visible!').then(function() {
+				wrapUp(callback, "validateEvent");
+			}).catch(function(error) {
+				tierdown(true);
+				callback(new Error(error.message));
+			});
+		} else if (state.toLowerCase() === 'present') {
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+				wrapUp(callback, "validateEvent");
+			}).catch(function(error) {
+				tierdown(true);
+				callback(new Error(error.message));
+			});
+		} else if (state.toLowerCase() === 'hidden') {
+			browser.wait(EC.invisibilityOf(calendar), 15 * 1000, 'Calendar never disappeared!').then(function() {
+				wrapUp(callback, "validateEvent");
+			}).catch(function(error) {
+				tierdown(true);
+				callback(new Error(error.message));
+			})
+		} else {
+			tierdown(true);
+			callback(new Error("Expected input is 'visible', 'present' or 'hidden'"));
+		}
+	});
 	//END BOOTSTRAP CALENDAR
 
 	//BOOTSTRAP INPUT GROUP
@@ -3787,7 +3816,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				callback(new Error(error.message));
 			});
 		} else if (visibility === 'visible') {
-			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element not found!').then(function () {
+			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element has not been found!').then(function () {
 				var parent = wildcard.element(by.xpath(".."));
 				parent.getCssValue('display').then(function (isHidden) {
 					if (isHidden != 'none' && visibility.toLowerCase() === 'visible') {
@@ -3802,7 +3831,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				callback(new Error(error.message));
 			});
 		} else if (visibility === 'hidden' ) {
-			browser.wait(EC.invisibilityOf(wildcard), 15 * 1000).then(function() {
+			browser.wait(EC.invisibilityOf(wildcard), 15 * 1000, 'Element never disappeared!').then(function() {
 				wrapUp(callback, "invisibleCheck")
 			}).catch(function(error) {
 				tierdown(true);
