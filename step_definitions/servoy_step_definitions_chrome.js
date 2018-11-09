@@ -1558,7 +1558,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		} else if(operator === '+'){
 			dToday.setDate(dToday.getDate() + parseInt(dayAmount));
 		} else {
-			return callback(new Error("Invalid operator given! Use '+' or '-'"));
+			callback(new Error("Invalid operator given! Use '+' or '-'"));
 		}
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var selectedMonth = monthList[dToday.getMonth()];
@@ -4786,7 +4786,7 @@ function daysInMonth(m, y) {
  * @return {Boolean}   Returns true if valid
  */
 function isValidDate (d, m, y) {
-    m = parseInt(m, 10) - 1;
+	m = parseInt(m, 10);
     return m >= 0 && m < 12 && d > 0 && d <= daysInMonth(m, y);
 };
 
