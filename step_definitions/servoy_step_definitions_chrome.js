@@ -1727,6 +1727,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				callback(new Error(error.message));
 			});
 		} else if (state.toLowerCase() === 'present') {
+			
 			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
 				wrapUp(callback, "validateEvent");
 			}).catch(function(error) {
@@ -1734,8 +1735,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				callback(new Error(error.message));
 			});
 		} else if (state.toLowerCase() === 'hidden') {
-			browser.wait(EC.invisibilityOf(calendar), 15 * 1000, 'Calendar never disappeared!').then(function() {
-				wrapUp(callback, "validateEvent");
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not rendered!').then(function(){
+				browser.wait(EC.invisibilityOf(calendar), 15 * 1000, 'Calendar never disappeared!').then(function() {
+					wrapUp(callback, "validateEvent");
+				}).catch(function(error) {
+					tierdown(true);
+					callback(new Error(error.message));
+				});
 			}).catch(function(error) {
 				tierdown(true);
 				callback(new Error(error.message));
