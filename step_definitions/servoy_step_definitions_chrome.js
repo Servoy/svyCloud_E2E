@@ -1959,19 +1959,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP DROPDOWN
 	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} is clicked', { timeout: 45 * 1000 }, function (elementName, callback) {
-		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
 			clickElement(selectComponent).then(function(){				
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
 			clickElement(selectComponent).then(function(){
 				var inputField = selectComponent.element(by.xpath("//a[text()[normalize-space() = '" + text + "']]"));
@@ -1980,27 +1980,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	
 	When('bootstrap data-bootstrapextracomponents-dropdown component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (elementName, rowNumber, callback) {
-		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']")).element(by.css("button"));
+		var selectComponent = element(by.css("data-bootstrapextracomponents-dropdown[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Dropdown component not visible!').then(function(){
 			clickElement(selectComponent).then(function(){
 				var item = selectComponent.all(by.css('li')).get(rowNumber - 1)
 				browser.wait(EC.presenceOf(item), 15 * 1000, 'No dropdown items have been found!').then(function(){
-					item.element(by.css("a")).getLocation().then(function(loc){
-						clickElementByLocation(loc).then(function(){
-							wrapUp(callback, "clickEvent");
-						});
+					clickElement(item).then(function(){
+						wrapUp(callback, "clickEvent");
 					});
 				})
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP DROPDOWN
