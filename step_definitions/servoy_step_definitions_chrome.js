@@ -940,7 +940,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('servoy combobox component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
 		var combobox = element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
-			clickElement(combobox).then(function () {
+			clickElement(combobox.element(by.className("pull-left"))).then(function () {
 				wrapUp(callback, "Click event");
 			})
 		}).catch(function (error) {
