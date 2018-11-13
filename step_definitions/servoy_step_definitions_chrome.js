@@ -4737,21 +4737,46 @@ function setCalendar(day, month, year, calType, callback) {
 							}
 						}
 					}).then(function () {
-						clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first()).then(function () {
-							clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+						var monthoTo = calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first();
+						monthoTo.isPresent().then(function(isPresent) {
+							if(isPresent) {
+								clickElement(monthoTo).then(function () {
+									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+								});
+							} else {
+								monthoTo = calendar.all(by.className("month")).get(monthList.indexOf(month.toLowerCase()));
+								clickElement(monthoTo).then(function () {
+									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+								});
+							}
 						});
 					});
 				} else {
 					return clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']/table/thead/tr/th[2]")).first()).then(function () {
-						clickElement(calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first()).then(function () {
-							clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
-						});
+						var monthoTo = calendar.all(by.xpath("//div[@class='datepicker-months']")).first().all(by.xpath("//span[.='" + calMonths[monthTo] + "']")).first();
+						monthoTo.isPresent().then(function(isPresent) {
+							if(isPresent) {
+								clickElement(monthoTo).then(function () {
+									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+								});
+							} else {
+								monthoTo = calendar.all(by.className("month")).get(monthList.indexOf(monthoTo.toLowerCase()));
+								clickElement(monthoTo).then(function () {
+									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
+								});
+							}
+						});						
 					});
 				}
 			}).then(function () {
 				if(!calType) {
-					clickElement(calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]")));
-					return Promise.resolve();
+					var closeIcon = calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]"));
+					closeIcon.isPresent().then(function(isPresent) {	
+						if(isPresent) {
+							clickElement(calendar.element(by.xpath("//span[contains(@class, 'glyphicon-ok')]")));
+						}
+						return Promise.resolve();
+					});
 				} else {
 					browser.actions().sendKeys(protractor.Key.ENTER).perform();
 					return Promise.resolve();
