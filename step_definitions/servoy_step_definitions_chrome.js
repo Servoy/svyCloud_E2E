@@ -4356,6 +4356,9 @@ function sendKeys(elem, input) {
 		return elem.clear().then(function () {
 			return elem.sendKeys(input).then(function(){
 				return elem.getAttribute('value').then(function(text) {
+					if(browser.browserName === 'firefox') {
+						element(by.css('body')).click();
+					}
 					if(text != input) {
 						sendKeys(elem, input);
 					}
