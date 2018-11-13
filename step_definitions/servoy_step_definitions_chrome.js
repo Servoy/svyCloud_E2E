@@ -56,15 +56,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//URL VALIDATION
 	Then('I expect the url to be {browserUrl}', { timeout: 30 * 1000 }, function (url, callback) {
-		browser.getCurrentUrl().then(function (browserUrl) {
-			if(browserUrl === url) {
-				wrapUp(callback, "validateEvent");
-			} else {
-				console.log('Validation failed. Expected URL: ' + url + '. Current URL: ' + browserUrl)
-			}
+		browser.wait(EC.urlContains(url), 15 * 1000, 'URL has not changed!').then(function () {
+			wrapUp(callback, "validateEvent");
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END URL VALIDATION
