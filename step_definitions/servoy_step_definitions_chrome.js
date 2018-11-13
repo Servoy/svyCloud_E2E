@@ -189,7 +189,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
 		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"))
 		browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
-			console.log('test');
 			clickElement(tokenizer).then(function () {
 				wrapUp(callback, "Click event");
 			}).catch(function (error) {				
@@ -212,14 +211,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.wait(EC.not(EC.textToBePresentInElementValue(searchRow, 'Searching...'))).then(function (hasChanged) {
 					if (hasChanged || text !== 'Searching...') {
 						clickElement(rows.get(rowNumber - 1)).then(function () {
-							wrapUp(callback, "clickEvent");
+							if(browser.browserName === 'firefox') {
+								rows.get(rowNumber - 1).sendKeys(protractor.Key.ENTER).then(function() {
+									wrapUp(callback, "clickEvent");
+								});								
+							} else {
+								wrapUp(callback, "clickEvent");
+							}							
 						});
 					}
 				});
 			})
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -233,7 +238,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.wait(EC.not(EC.textToBePresentInElementValue(searchRow, 'Searching...'))).then(function(hasChanged){
 					if(hasChanged || text !== 'Searching...'){
 						rows.get(recordNumber - 1).getText().then(function (textToCompare) {
-							console.log(textToCompare)
 							if(textToCompare.toLowerCase() === validateText.toLowerCase()) {
 								wrapUp(callback, "validateEvent");
 							};
@@ -242,8 +246,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				})
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -255,8 +259,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function(error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		})
 	});
 
@@ -265,8 +269,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		sendKeys(elem, text).then(function () {
 			wrapUp(callback, "Click event");
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY SELECT2TOKENIZER COMPONENT
