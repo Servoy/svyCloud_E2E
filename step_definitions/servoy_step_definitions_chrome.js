@@ -968,17 +968,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.elementToBeClickable(comboBoxItem), 30 * 1000, 'Combobox item not clickable!').then(function(){
 				clickElement(comboBoxItem).then(function(){
 					wrapUp(callback, 'clickEvent');
-				}).catch(function (error) {
-					console.log(error.message);
+				}).catch(function (error) {					
 					tierdown(true);
+					callback(new Error(error.message));
 				});
 			}).catch(function (error) {
-				console.log(error.message);
 				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3333,17 +3333,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//DEFAULT HTML COMPONENTS
 	When('default textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var txtArea = element(by.xpath("//textarea[@data-svy-name='" + elementName + "']"))
+		var txtArea = element(by.css("textarea[data-svy-name='" + elementName + "']"))
 		browser.wait(EC.visibilityOf(txtArea), 30 * 1000, 'Textarea not found!').then(function(){
 			sendKeys(txtArea, text).then(function () {
 				wrapUp(callback, "Insert value event");
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {				
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -4357,7 +4357,7 @@ function sendKeys(elem, input) {
 			return elem.sendKeys(input).then(function(){
 				return elem.getAttribute('value').then(function(text) {
 					if(browser.browserName === 'firefox') {
-						element(by.css('body')).click();
+						clickElementByLocation(element(by.css('body')));						
 					}
 					if(text != input) {
 						sendKeys(elem, input);
