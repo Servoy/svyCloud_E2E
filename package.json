@@ -7,19 +7,19 @@
   "author": "",
   "version": "1.0.0",
   "dependencies": {
+    "chai": "4.1.2",
     "cucumber": "2.3.1",
     "expect": "23.1.0",
-    "restler": "3.4.0",
-    "universal-analytics": "0.4.16",
-    "cucumber-html-reporter": "4.0.2",
     "find": "0.2.9",
     "fs-extra": "6.0.1",
     "js-base64": "2.4.5",
-    "chai": "4.1.2",
     "jsonfile": "3.0.1",
     "lodash": "4.17.10",
     "open": "0.0.5",
-    "protractor-cucumber-framework": "4.0.8"
+    "protractor-cucumber-framework": "6.1.1",
+    "protractor-multiple-cucumber-html-reporter-plugin": "1.8.0",
+    "restler": "3.4.0",
+    "universal-analytics": "0.4.16"
   },
   "engine": "node >= 7.5.0",
   "devDependencies": {

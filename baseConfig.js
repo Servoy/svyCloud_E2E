@@ -9,7 +9,6 @@ exports.config = {
   params: {
     testDomainURL: '',
     screenshotDirectory: 'reports/screenshots/',
-    htmlDirectory: 'reports/html_reports/',
     jsonDirectory: 'reports/cucumber_reports/'
   },
 
@@ -17,15 +16,26 @@ exports.config = {
 
   cucumberOpts: {
     require: ['step_definitions/servoy_step_definitions_chrome.js',
-      customStepsDirectory,
-      'lib/env.js',
-      'lib/hooks.js'],
-    tags: false,
-    format: ['json:reports/cucumber_reports/report.json', 'pretty'],
-    profile: false,
-    keepAlive: false,
-    'no-source': true
+      './lib/afterScenario.js',
+      customStepsDirectory],
+      format: 'json:./reports/json_reports/results.json',
+      strict: true
   },
+
+  plugins: [{
+    package: require.resolve('protractor-multiple-cucumber-html-reporter-plugin'),
+    options:{
+      automaticallyGenerateReport: true,
+      removeExistingJsonReportFile: true,
+      customMetadata: false,
+      displayDuration: true,
+      durationInMS: true,
+      pageTitle: "E2E Test Results",
+      jsonOutputPath: "./reports/cucumber_reports",
+      pageFooter: "<div style='width:100%; text-align:center'><a href='https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse'; target='_blank'>Github</a></div>",
+      reportName: "E2E-test-results"
+    }
+  }],
 
   beforeLaunch: () => {
     console.log("beforeLaunch");
