@@ -4357,7 +4357,7 @@ function sendKeys(elem, input, type) {
 			return elem.sendKeys(input).then(function(){
 				return elem.getAttribute('value').then(function(text) {
 					if(browser.browserName === 'firefox' && !type) {
-						clickElementByLocation(element(by.css('body')));						
+						$('body').sendKeys(protractor.Key.TAB);
 					}
 					if(text != input) {
 						sendKeys(elem, input);
