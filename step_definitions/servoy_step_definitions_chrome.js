@@ -4340,7 +4340,7 @@ function doubleClickElement(elem) {
 function clickElementByLocation(elem) {
 	return browser.wait(EC.presenceOf(elem).call(), 30 * 1000, 'Element not found!').then(function () {
 		return elem.getLocation().then(function (location) {
-			return browser.actions().mouseMove(elem, { x: location.x, y: location.y }).click().perform();
+			return browser.actions().mouseMove(elem, { x: 0, y: 0 }).click().perform();
 		});
 	});
 }
