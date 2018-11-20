@@ -3495,6 +3495,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-servoydefault-tabpanel component with name {elementName} I want to to slide to the {direction}', {timeout: 60 * 1000}, function(elementName, direction, callback){
+		var tabPanel = element(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(tabPanel), 30 * 1000, 'Tabelpanel not found!').then(function(){
+			var icon;
+			if(direction.toLowerCase() === 'left') {
+				icon = tabPanel.element(by.className('glyphicon-chevron-left'));
+			} else if(direction.toLowerCase() === 'right') {
+				icon = tabPanel.element(by.className('glyphicon-chevron-right'));
+			} else {
+				callback(new Error("The navigation can only slide to the 'left' or 'right'"));
+			}
+			clickElement(icon).then(function() {
+				wrapUp(callback, "clickEvent");
+			})
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy data-servoydefault-tabpanel component with name {elementName} the tab with the exact text {text} is clicked', {timeout: 60 * 1000}, function(elementName, text, callback){
 		var tabPanel = element.all(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"))), 30 * 1000, 'Tabelpanel not found!').then(function(){
