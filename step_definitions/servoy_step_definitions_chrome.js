@@ -206,15 +206,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			searchRow.getText().then(function (text) {
 				browser.wait(EC.not(EC.textToBePresentInElementValue(searchRow, 'Searching...'))).then(function (hasChanged) {
 					if (hasChanged || text !== 'Searching...') {
-						clickElement(rows.get(rowNumber - 1)).then(function () {
-							if(browser.browserName === 'firefox') {
-								rows.get(rowNumber - 1).sendKeys(protractor.Key.ENTER).then(function() {
-									wrapUp(callback, "clickEvent");
-								});								
-							} else {
+						if(browser.browserName === 'firefox') {
+							rows.get(rowNumber - 1).click().then(function () {
 								wrapUp(callback, "clickEvent");
-							}							
-						});
+							});
+						} else {
+							clickElement(rows.get(rowNumber - 1)).then(function () {								
+								wrapUp(callback, "clickEvent");
+							});
+						}
 					}
 				});
 			})
@@ -262,7 +262,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy select2tokenizer component with name {elementName} the text {recordText} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
 		var elem = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
-		sendKeys(elem, text).then(function () {
+		sendKeys(elem, text, 'tokenizer').then(function () {
 			wrapUp(callback, "Click event");
 		}).catch(function (error) {
 			tierdown(true);
@@ -4346,17 +4346,17 @@ function clickElementByLocation(elem) {
 }
 
 function clickByScript(elem) {
-	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
+	return browser.wait(EC.presenceOf(elem), 30000, 'Element not visible').then(function () {
 		return browser.executeScript("arguments[0].click()", elem);
 	});
 }
 
-function sendKeys(elem, input) {
+function sendKeys(elem, input, type) {
 	return browser.wait(EC.visibilityOf(elem).call(), 30000, 'Element not visible').then(function () {
 		return elem.clear().then(function () {
 			return elem.sendKeys(input).then(function(){
 				return elem.getAttribute('value').then(function(text) {
-					if(browser.browserName === 'firefox') {
+					if(browser.browserName === 'firefox' && !type) {
 						clickElementByLocation(element(by.css('body')));						
 					}
 					if(text != input) {
