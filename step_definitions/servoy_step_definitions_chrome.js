@@ -239,10 +239,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 							};
 						})
 					}
-				})
+				});
 			});
 		}).catch(function (error) {
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -273,13 +272,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BROWSER ACTION
 	When('I press {browserAction}', { timeout: 30 * 1000 }, function (browserAction, callback) {
-		pressKey(browserAction).then(function(retVal) {
-			if(retVal) {
-				wrapUp(callback, "insertEvent");
-			}			
+		pressKey(browserAction, callback).then(function() {
+			wrapUp(callback, "insertEvent");
 		}).catch(function(error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		})
 	});
 
@@ -294,7 +290,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						wrapUp(callback, "navigateEvent");
 					})
 				} else {
-					browser.actions().keyDown(protractor.Key.CONTROL).sendKeys(key).perform().then(function () {
+					browser.actions().keyDown(protractor.Key.CONTROL).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 						wrapUp(callback, "keypressEvent");
 					}).catch(function (error) {
 						console.log(error.message);
@@ -303,14 +299,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 				break;
 			case "alt": 
-				browser.actions().keyDown(protractor.Key.ALT).sendKeys(key).perform().then(function () {
+				browser.actions().keyDown(protractor.Key.ALT).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
 				}).catch(function (error) {
 					console.log(error.message);
 					tierdown(true);
 				});
 			case "shift": 
-				browser.actions().keyDown(protractor.Key.SHIFT).sendKeys(key).perform().then(function () {
+				browser.actions().keyDown(protractor.Key.SHIFT).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
 				}).catch(function (error) {
 					console.log(error.message);
@@ -757,17 +753,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy default typeahead component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var typeahead = element(by.xpath("//input[@data-svy-name='" + elementName +"']"));
+		var typeahead = element(by.css("input[data-svy-name='" + elementName +"']"));
 		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function(){
-			clickElement(typeahead).then(function(){
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
-			});
+			if(browser.browserName === 'firefox') {
+				typeahead.click().then(function(){
+					wrapUp(callback, "clickEvent");
+				}).catch(function (error) {
+					callback(new Error(error.message));
+				});
+			} else {
+				clickElement(typeahead).then(function(){
+					wrapUp(callback, "clickEvent");
+				}).catch(function (error) {
+					callback(new Error(error.message));
+				});
+			}
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -868,7 +870,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			inputField.getAttribute('value').then(function(inputText){
 				return inputText.toLowerCase() === text.toLowerCase();
 			}).then(function(isValidated){
-				console.log(isValidated);
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
 				}
@@ -881,7 +882,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
-	
+	//END DEFAULT INPUT FIELD 
+
+	//DEFAULT CHECKBOX FIELD
 	When('servoy data-servoydefault-check component with name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
 		browser.wait(EC.presenceOf(checkbox), 25 * 1000, 'Checkbox not found!').then(function(){
@@ -922,6 +925,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+	//END DEFAULT CHECKBOX FIELD
 
 	//SERVOY PASSWORD FIELD
 	When('servoy data-servoydefault-password component with name {elementName} the text {password} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -1030,6 +1034,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	When('servoy button component with name {elementName} is double clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
+		var button = element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
+			doubleClickElement(button).then(function () {
+				wrapUp(callback, "Click event");
+			})
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	});
 	//END SERVOY BUTTON
 
 	//END DEFAULT INPUT FIELD
@@ -1041,7 +1056,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				clickElement(labelButton).then(function(){
 					wrapUp(callback, "clickEvent");
 				}).catch(function(error){
-					tierdown(error)
+					callback(new Error(error.message));
 				});
 			} else {
 				var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']"));
@@ -1049,14 +1064,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					clickElement(element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']/div"))).then(function(){
 						wrapUp(callback, "clickEvent");
 					}).catch(function(error){
-						tierdown(error)
+						callback(new Error(error.message));
 					});
 				}).catch(function(error){
-					tierdown(error)
+					callback(new Error(error.message));
 				});
 			}
 		}).catch(function(error){
-			tierdown(error)
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1096,53 +1111,48 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP COMPONENTS
 	//BOOTSTRAP TEXTBOX
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"))), 30 * 1000, 'Element not found!').then(function () {
+		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"))), 30 * 1000, 'Textfield not found!').then(function () {
 			sendKeys(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input")), text).then(function () {
 				wrapUp(callback, "insertTextEvent");
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
 		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName+"']/input"));
 		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
-			clickElement(textField).then(function() {
+			textField.click().then(function() {
 				wrapUp(callback, "insertTextEvent");
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
-		var textField = fComponent.element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textbox not found!').then(function () {
+		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
+		browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
 			textField.getAttribute('value').then(function (value) {
 				if (!value) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					console.log("Validation failed. Expected an empty text field. Got " + value);
+					callback(new Error("Validation failed. Expected an empty text field. Got " + value));
 				}
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
 		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
 			textField.getAttribute('value').then(function(textFieldText){
 				if(text === textFieldText) {
 					wrapUp(callback, "validateEvent");
@@ -1174,22 +1184,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function(error) {
-			tierdown(true);
 			callback(new Error(error.message));			
-		})
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
 		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
+		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
 			textField.clear().then(function() {
 				wrapUp(callback, "clearEvent");
 			});
 		}).catch(function(error){			
-			tierdown(false);
 			callback(new Error(error.message));
 		});
-	})
+	});
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -1202,8 +1210,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				tierdown(true);
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
+		});		
+	});
+
+	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is double clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+			doubleClickElement(button).then(function () {
+				wrapUp(callback, "clickEvent");
+			}).catch(function (error) {
+				callback(new Error(error.message));
+			});
+		}).catch(function (error) {
+			callback(new Error(error.message));
 		});		
 	});
 
@@ -1215,18 +1235,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent");
 				} else {
 					if(!buttonState) {
-						console.log('Button is currently disabled. Expected it to be enabled.')
+						callback(new Error('Button is currently disabled. Expected it to be enabled.'));
 					} else {
-						console.log('Button is currently enabled. Expected it to be disabled.')
+						callback(new Error('Button is currently enabled. Expected it to be disabled.'));
 					}
 				}
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1237,15 +1255,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(buttonText.indexOf(text) > -1) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
+					callback(new Error("Partial validation failed. Expected " + text + ". Got " + buttonText));
 				}
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	
@@ -1259,39 +1275,41 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
 				}
 			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP BUTTON
 
 	//BOOTSTRAP SELECT
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
+		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
 		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
-			clickElement(selectComponent).then(function () {
+			selectComponent.click().then(function () {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});	
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
 		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function(){
-			var inputField = selectComponent.element(by.xpath("//option[text()='"+text+"']"));
-			inputField.isPresent().then(function(isPresent){
-				console.log(isPresent);
-				if(isPresent) {
-					clickElement(inputField).then(function(){
-						wrapUp(callback, "clickEvent");
-					});
+		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
+			var inputField = selectComponent.element(by.xpath("//option[text()='" + text + "']"));
+			inputField.isPresent().then(function (isPresent) {
+				if (isPresent) {
+					if (browser.browserName === 'firefox') {
+						inputField.click().then(function () {
+							wrapUp(callback, "clickEvent");
+						});
+					} else {
+						clickElement(inputField).then(function () {
+							wrapUp(callback, "clickEvent");
+						});
+					}
 				}
 			});
 		}).catch(function (error) {
@@ -1301,20 +1319,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (elementName, rowNumber, callback) {
-		var table = element.all(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
-		if (rowNumber) {
-			table.all(by.tagName('option')).then(function (options) {
-				options[rowNumber].click().then(function () {
-					wrapUp(callback, "clickEvent");
-				})
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
-			});
-		}
+		var select = element.all(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
+		var selectItems = select.all(by.xpath('//option[text()!=""]'));
+		selectItems.get(rowNumber - 1).click().then(function() {
+			wrapUp(callback, "clickEvent");
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
 	});
 
-	Then('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, rowNumber, text, callback) {
+	Then('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, text, callback) {
 		var table = element.all(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
 		var row = table.first().element(by.xpath("//option[@selected='selected']"));
 		browser.wait(EC.presenceOf(row), 30 * 1000, 'No row is selected!').then(function(){
@@ -1322,26 +1336,78 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (rowText === text) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + rowText);
+					callback(new Error("Validation failed. Expected " + text + ". Got " + rowText));
 				}
-			})
+			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP SELECT
 
 	//BOOTSTRAP TEXTAREA
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textArea = element(by.xpath("//data-bootstrapcomponents-textarea[@data-svy-name='" + elementName + "']/textarea"));
-		browser.wait(EC.presenceOf(textArea), 15 * 1000, 'Textarea not found!').then(function () {
-			sendKeys(textArea, text).then(function () {
+		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
+		browser.wait(EC.presenceOf(textarea), 15 * 1000, 'Textarea not found!').then(function () {
+			sendKeys(textarea, text).then(function () {
 				wrapUp(callback, "insertEvent");
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
+		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+			textarea.getAttribute('value').then(function(textareaText){
+				if(text === textareaText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error("Validation failed. Expected " + text + ". Got " + textareaText));
+				}
+			})
+		}).catch(function(error){
+			callback(new Error(error.message));
+		});
+	});	
+
+	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
+		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+			textarea.click().then(function() {
+				wrapUp(callback, "insertTextEvent");
+			}).catch(function (error) {
+				callback(new Error(error.message));
+			});
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	});
+
+	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
+		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
+		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+			textarea.clear().then(function() {
+				wrapUp(callback, "clearEvent");
+			});
+		}).catch(function(error){			
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
+		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
+		browser.wait(EC.presenceOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+			textarea.getAttribute('value').then(function (value) {
+				if (!value) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error("Validation failed. Expected an empty text area. Got " + value));
+				}
+			});
+		}).catch(function (error) {
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP TEXTAREA
@@ -3490,8 +3556,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3528,8 +3593,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY TABPANEL COMPONENT
@@ -4779,7 +4843,7 @@ function setCalendar(day, month, year, calType, callback) {
 									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
 								});
 							} else {
-								monthoTo = calendar.all(by.className("month")).get(monthList.indexOf(monthoTo.toLowerCase()));
+								monthoTo = calendar.all(by.className("month")).get(monthList.indexOf(month.toLowerCase()));
 								clickElement(monthoTo).then(function () {
 									clickElement(calendar.all(by.xpath("//div[@class='datepicker-days']")).first().all(by.xpath("//td[.='" + day + "' and not(contains(@class, 'cw')) and not(contains(@class, 'old'))]")).first());
 								});
