@@ -2728,22 +2728,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, sortBy, callback) {
-		var grid = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		var grid = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
-			grid.each(function (menuItems) {
-				menuItems.all(by.css('.ag-table-header')).each(function (sortHeader) {
-					sortHeader.getText().then(function (text) {
-						if (text.toLowerCase().indexOf(sortBy.toLowerCase()) > -1) {
-							clickElement(sortHeader).then(function () {
-								wrapUp(callback, "tableSortingEvent");
-							});
-						}
-					});
-				});
+			var gridHeader = grid.element(by.className("ag-header-row"));
+			var columnHeader = gridHeader.element(by.xpath("//span[text()='" + sortBy + "']"));
+			clickElement(columnHeader).then(function() {
+				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
