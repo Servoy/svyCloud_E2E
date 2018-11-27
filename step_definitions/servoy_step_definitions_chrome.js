@@ -3004,9 +3004,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 										if (newText === text) {
 											wrapUp(callback, "insertEvent");
 										} else {
-											console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-											console.log("Possibility is that the column is not editable");
-											callback(new Error());
+											callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
 										}
 									});
 								});
@@ -3016,7 +3014,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3051,8 +3048,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 												if (newText === text) {
 													wrapUp(callback, "clickEvent");
 												} else {
-													var error = "Validation failed! Expected '" + text + "'. Got '" + newText + "'.\n" + "Possibility is that the column is not editable";
-													callback(new Error(error))
+													callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
 												}
 											});
 										});
@@ -3063,14 +3059,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			callback(new Error(error.message));
 		});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
 				agGridIsGrouped(elementName).then(function(isGrouped){
@@ -3090,15 +3085,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									.all(by.xpath("//a[text()='" + text + "']")).first();
 								browser.wait(EC.visibilityOf(comboBoxItem), 30 * 1000, 'Combobox item not found!').then(function () {
 									browser.wait(EC.elementToBeClickable(comboBoxItem), 30 * 1000, 'Combobox item not clickable!').then(function () {
-										clickElement(comboBoxItem).then(function () {	
-											browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){										
-												col.getAttribute('textContent').then(function(newText) {
-													if (newText === text) {
-														wrapUp(callback, 'clickEvent');
-													} else {
-														console.log("Validation failed! Expected '" + text + "'. Got '" + newText + "'.");
-														console.log("Possibility is that the column is not editable");
-													}
+										clickElement(comboBoxItem).then(function () {
+											col.sendKeys(protractor.Key.TAB).then(function() {
+												browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){										
+													col.getAttribute('textContent').then(function(newText) {
+														if (newText === text) {
+															wrapUp(callback, 'clickEvent');
+														} else {
+															callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
+														}
+													});
 												});
 											});
 										});
@@ -3110,8 +3106,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
