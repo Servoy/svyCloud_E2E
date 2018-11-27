@@ -3111,7 +3111,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
 				agGridIsGrouped(elementName).then(function(isGrouped){
@@ -3121,21 +3121,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return "ag-body-viewport-wrapper";
 					}
 				}).then(function(containerClass) {
-					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					var rowContainer = tableItems.all(by.css("div[class='" + containerClass + "']"));
 					rowContainer.each(function(rowElements){
 						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
 							var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
 							var selectedColumnToValidate = selectedRow.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 							doubleClickElement(selectedColumnToValidate).then(function () {
-								setCalendar(day, month, year, callback);
+								setCalendar(day, month, year, null).then(function() {
+									wrapUp(callback, "calendarEvent");
+								});
 							});
 						});
 					});
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END GROUPING GRID INSERT EVENTS
@@ -4846,7 +4847,9 @@ function setCalendar(day, month, year, calType, callback) {
 						return Promise.resolve();
 					});
 				} else {
-					browser.actions().sendKeys(protractor.Key.ENTER).perform();
+					if(browser.browserName != 'firefox') {
+						browser.actions().sendKeys(protractor.Key.ENTER).perform();
+					}
 					return Promise.resolve();
 				}
 			});
