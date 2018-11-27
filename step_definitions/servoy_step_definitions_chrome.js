@@ -2764,8 +2764,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2786,8 +2785,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2801,9 +2799,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				toElement.getLocation().then(function(toLocation){
 					fromElement.getLocation().then(function(fromLocation){
 						browser.actions()
-							.mouseMove(fromElement.getWebElement(), {x: fromLocation.x, y: fromLocation.y})
+							.mouseMove(fromElement.getWebElement(), {x: 0, y: 0})
 							.mouseDown()
-							.mouseMove(toElement.getWebElement(), {x: toLocation.x, y: toLocation.y})
+							.mouseMove(toElement.getWebElement(), {x: (fromLocation.x - toLocation.x), y: 0})
 							.mouseUp()
 							.perform().then(function(){
 								wrapUp(callback, "aggridGroupMovingEvent")
@@ -2812,8 +2810,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});				
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	var rowCount = 0;
@@ -2852,9 +2849,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function(error) {
-			tierdown(true);
 			callback(new Error(error.message));
-		})
+		});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the text {text}', {timeout: 60 * 1000}, function(elementName, text, callback){
@@ -2865,36 +2861,29 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var found = false;
-		browser.wait(EC.presenceOf( element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='"+elementName+"']"))), 30 * 1000, 'Table not found!').then(function(){
-			var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='"+elementName+"']"));
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
 			table.each(function(tableItems){
 				//wait untill the table is loaded
-				var waitForInputField = tableItems.element(by.xpath("//div[@role='row']"));
+				var waitForInputField = tableItems.element(by.css("div[role=row]"));
 				browser.wait(EC.visibilityOf(waitForInputField)).then(function(){
-					var elem = element(by.xpath("//div[text()='"+text+"']"));
+					var elem = tableItems.element(by.xpath("//div[text()='"+text+"']"));
 					elem.isPresent().then(function(isPresent){
 						if(isPresent) {
-							found = true;
+							wrapUp(callback, 'validateEvent');
+						} else {
+							callback(new Error("Table item with the given text has not been found!"));
 						}
 					});
 				});
-			}).then(function(){
-				if(found) {
-					wrapUp(callback, 'validateEvent');
-				} else {
-					tierdown(true);
-				}
 			});
 		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2936,8 +2925,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});			
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	
@@ -2962,7 +2950,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -2982,8 +2969,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
