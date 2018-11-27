@@ -2892,11 +2892,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the row with text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, false);
+		groupingGridTableScroll(elementName, text, callback);
 	});
-	
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className);
+		groupingGridTableScroll(elementName, text, callback, false, className, false, null);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
@@ -4601,50 +4601,55 @@ function scrollToElementTableComponent(elementName, recordText, shouldClick, cal
 
 // SERVOY GROUPING TABLE
 function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level){
+	var elementWithClass;
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
 	var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-	browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function () {
+	browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
 			//Step 2a - Create the element that has to be found
 			var elementToClick = rowItems.all(by.xpath('//*[text()="' + text + '"]')).first();
 
 			//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
-			browser.wait(elementToClick.isPresent()).then(function (isPresent) {
+			elementToClick.isPresent().then(function (isPresent) {
 				//Step 3a - Check if the element is present
 				if (isPresent) {
 					found = true;
 					//Step 3b - Element has been found. Conclude the test
-					if(className) {
-						var elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
-						browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with class not found!').then(function() {
-							// clickElement(elementWithClass);
-							var elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
-							elementWithClass.click();
-						});						
-					} else if(shouldClick) {
+					if (className) {
+						elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
+						elementWithClass.isPresent().then(function (isPresent) {
+							console.log(isPresent);
+							if (isPresent) {
+								clickElement(elementWithClass).then(function () {
+									wrapUp(callback, "scrollEvent");
+								});
+							} else {
+								elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+								elementWithClass.click();
+							}
+						});
+					} else if (shouldClick) {
 						clickElement(elementToClick);
-					} else if(rowOption) {
+					} else if (rowOption) {
 						findRecordByRowLevel(elementName, text, rowOption, level, callback);
 					}
 				} else {
 					//Rows are sorted underneath a different contrainer when grouped or not
-					var cName;
 					agGridIsGrouped(elementName).then(function(isGrouped){
 						if(isGrouped) {
-							cName = "ag-full-width-viewport";
+							return "ag-full-width-viewport";
 						} else {
-							cName = "ag-body-viewport-wrapper";
+							return "ag-body-viewport-wrapper";
 						}
-					}).then(function(){
-						console.log(cName)
+					}).then(function(cName){
+						console.log(cName);
 						var rowContainer = rowItems.all(by.xpath("//div[@class='"+cName+"']"));
 						rowContainer.each(function(rowElements){
 							//Get all rows 
 							var rows = rowElements.all(by.css("div[role=row]"));
 							// var rows = rowElements.all(by.xpath("//div[@role='row']"));
 							rows.count().then(function(count){
-								console.log(count);
 								//Let the browser catch up with rendering
 								browser.sleep(1).then(function(){
 									//Since the rows are sorted in a very strange way, the new rows are appended on top of the wrapper instead of at the bottom
@@ -4655,27 +4660,29 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 										elementToClick.isPresent().then(function(pres){
 											if(pres) {
 												found = true;
-												if(shouldClick) {
-													if(className) {
-														browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with class not found!').then(function() {
-															// clickElement(elementWithClass);
-															var elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+												if(className) {
+													elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
+													elementWithClass.isPresent().then(function(isPresent) {
+														if(isPresent) {
+															clickElement(elementWithClass).then(function() {
+																x = count + 1;
+															});
+														} else {
+															elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
 															elementWithClass.click();
-														});		
-													} else if(rowOption) {
-														findRecordByRowLevel(elementName, text, rowOption, level, callback);
-													} else {
-														clickElement(elementToClick).then(function(){
-															x = count + 1; //break loop, forcing protractor to finish the promise
-														});
-													}
+														}
+													});	
+												} else if(rowOption) {
+													findRecordByRowLevel(elementName, text, rowOption, level, callback);
 												} else {
-													x = count + 1;
+													clickElement(elementToClick).then(function(){
+														x = count + 1; //break loop, forcing protractor to finish the promise
+													});
 												}
 											} else {
 												browser.executeScript("arguments[0].scrollIntoView(true);", elementToScrollTo.getWebElement()).then(function(){
 													browser.sleep(500);
-												})
+												});
 											}
 										});
 									}
@@ -4690,16 +4697,14 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 				}
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	}).then(function(){
 		if(found) {
 			wrapUp(callback, "scrollEvent");
 		}
 	}).catch(function (error) {
-		console.log(error.message);
-		tierdown(true);
+		callback(new Error(error.message));
 	});
 }
 
@@ -4709,7 +4714,7 @@ function findRecordByRowLevel(elementName, recordText, rowOption, level, callbac
 	browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (row) {
 			var elementToClick = row.all(by.xpath('//*[text()="' + recordText + '"]'));
-			browser.wait(elementToClick.first().isPresent()).then(function (isPresent) {
+			elementToClick.first().isPresent().then(function (isPresent) {
 				if (isPresent) {
 					if (rowOption == 'expand') {
 						clickElement(elementToClick.all(by.xpath("..")).first().element(by.css(".glyphicon.glyphicon-plus.ag-icon"))).then(function () {
