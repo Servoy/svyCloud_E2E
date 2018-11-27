@@ -2954,18 +2954,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {rowNumber} row(s)', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
+	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {count} row(s)', { timeout: 30 * 1000 }, function (elementName, count, callback) {
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){		
-			table.each(function(tableItems){
-				var rowContainer = tableItems.all(by.xpath("//div[@class='ag-body-viewport-wrapper']"));
-				rowContainer.each(function(rowThings){
-					var rows = rowThings.all(by.css("div[role=row]"));
-					rows.count().then(function(rowCount){
-						if(rowCount == rowNumber) {
-							wrapUp(callback, 'validateEvent');
-						}
-					})
+		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){		
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.all(by.css("div[class='" + containerClass + "']"));
+				var rows = rowContainer.all(by.css("div[role=row]"));
+				rows.count().then(function(rowCount){
+					if(rowCount == count) {
+						wrapUp(callback, 'validateEvent');
+					} else {
+						callback(new Error("Validation failed! Expected " + count + " rows. Got " + rowCount));
+					}
 				});
 			});
 		}).catch(function (error) {
@@ -2990,8 +2996,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
 					doubleClickElement(col).then(function () {
-						browser.actions().sendKeys(text).perform().then(function () {
-							browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function () {
+						sendKeys(col.element(by.css("input")), text).then(function () {
+							col.sendKeys(protractor.Key.TAB).then(function () {
 								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
 									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 									col.getText().then(function (newText) {
