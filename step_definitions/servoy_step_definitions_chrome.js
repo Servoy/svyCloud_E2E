@@ -3038,11 +3038,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
 					doubleClickElement(col).then(function () {
 						//click again to open the combobox
-						clickElement(col).then(function(){
+						col.click().then(function(){
 							//clicks the option with the given text
-							clickElement(col.element(by.css("option[value='"+text+"']"))).then(function(){
+							col.element(by.css("option[value='"+text+"']")).click().then(function(){
 								clickElement(col).then(function(){
-									browser.actions().sendKeys(protractor.Key.ENTER).perform().then(function(){
+									col.sendKeys(protractor.Key.TAB).then(function(){
 										col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 										//the enter key triggers an onColumnDataChange - this can refresh the table. Wait until the column is visible again
 										browser.wait(EC.visibilityOf(col), 15 * 1000).then(function(){
