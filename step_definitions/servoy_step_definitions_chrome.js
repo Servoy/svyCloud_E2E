@@ -366,16 +366,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});	
 	});
 
-	When('servoy table component with name {elementName} I want to select element number {number} with name {elemName}',{timeout: 30 * 1000} ,function(elementName, rowNumber, elemName, callback){
-		var table = element.all(by.xpath("//div[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
+	When('servoy table component with name {elementName} I want to select {elementType} number {elementNumber} with the name {elemName}',{timeout: 30 * 1000} ,function(elementName, elementType, rowNumber, elemName, callback){
+		var table = element(by.xpath("//div[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
 			var elem = table.all(by.xpath("//*[@data-svy-name='"+elemName+"']")).get(rowNumber - 1);
-			clickElement(elem).then(function(){
-				wrapUp(callback, "clickEvent");
-			});
-		}).catch(function(error) {
-			console.log(error.message);
-			tierdown(true);
+			switch (elementType) {
+				case "checkbox":
+					clickElement(elem.element(by.css('input'))).then(function () {
+						wrapUp(callback, "clickEvent");
+					});
+					break;
+				case "input":
+					clickElement(elem).then(function () {
+						wrapUp(callback, "clickEvent");
+					});
+				default:
+					tierdown(true);
+					return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
+			}
+
+		}).catch(function (error) {
+			callback(new Error(error.message));
 		});
 	});
 
