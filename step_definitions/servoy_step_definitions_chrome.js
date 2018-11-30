@@ -1079,7 +1079,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']"));
 		var labelButton = element(by.xpath("//data-servoydefault-button[@data-svy-name='"+elementName+"']/button/div/span[2]"));
 		labelButton.isPresent().then(function(isPresent){
-			console.log(isPresent);
 			if(isPresent){
 				labelButton.getText().then(function(labelText){
 					if(labelText.indexOf(text) !== -1) {
@@ -1417,7 +1416,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 			checkbox.isSelected().then(function (isChecked) {
-				console.log(isChecked);
 				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
 					clickElement(checkbox).then(function () {
 						wrapUp(callback, "checkboxEvent");
@@ -2956,7 +2954,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {count} row(s)', { timeout: 30 * 1000 }, function (elementName, count, callback) {
 		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){		
+		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 25 * 1000, 'Table not found!').then(function(){		
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
@@ -3400,7 +3398,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			inputField.getAttribute('value').then(function(inputText){
 				return inputText === text;
 			}).then(function(isValidated){
-				console.log(isValidated);
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
 				}
@@ -3524,17 +3521,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY TABPANEL COMPONENT
 	When('servoy data-servoydefault-tabpanel component with name {elementName} the tab with the text {text} is clicked', {timeout: 60 * 1000}, function(elementName, text, callback){
-		var tabPanel = element.all(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"))), 30 * 1000, 'Tabelpanel not found!').then(function(){
-			tabPanel.each(function(tabRows){
-				var row = tabRows.all(by.cssContainingText("span", text)).last();
-				row.isPresent().then(function(isPresent){
-					if(isPresent) {
-						clickElement(row).then(function(){
-							wrapUp(callback, "clickEvent");
-						});
-					}
-				});
+		var tabPanel = element(by.css("data-servoydefault-tabpanel[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(tabPanel), 30 * 1000, 'Tabelpanel not found!').then(function(){
+			var item = tabPanel.element(by.cssContainingText("span", text));
+			clickElement(item).then(function() {
+				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {
 			callback(new Error(error.message));
@@ -4621,7 +4612,6 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 					if (className) {
 						elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
 						elementWithClass.isPresent().then(function (isPresent) {
-							console.log(isPresent);
 							if (isPresent) {
 								clickElement(elementWithClass).then(function () {
 									wrapUp(callback, "scrollEvent");
@@ -4645,7 +4635,6 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 							return "ag-body-viewport-wrapper";
 						}
 					}).then(function(cName){
-						console.log(cName);
 						var rowContainer = rowItems.all(by.xpath("//div[@class='"+cName+"']"));
 						rowContainer.each(function(rowElements){
 							//Get all rows 
