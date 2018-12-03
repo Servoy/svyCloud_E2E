@@ -883,14 +883,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).then(function(isValidated){
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
+				} else {
+					callback(new Error("Validation failed! Expected the input field to equal the text '" + text + "'. Got '" + inputText + "' instead."))
 				}
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+			})
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('servoy default input component with name {elementName} I want to validate that the input field contains the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var inputField = element(by.css("input[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+			inputField.getAttribute('value').then(function(inputText) {
+				if(inputText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
+				}
 			});
 		}).catch(function (error) {
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END DEFAULT INPUT FIELD 
@@ -982,23 +995,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('servoy combobox component I want to select the combobox item with the text {text}', { timeout: 60 * 1000 }, function (text, callback) {
-		//no looping through the elements due to element not being visible anymore after it's clicked.
-		var comboBoxItem = element.all(by.xpath("//div[contains(@class, 'svy-combobox') and contains(@class, 'ui-select-container')]"))
+		var comboBoxItem = element.all(by.xpath("//div[contains(@class, 'svy-combobox') and contains(@class, 'ui-select-container')]")).first()
 			.all(by.xpath("//div[text()='"+text+"']")).first();
 		browser.wait(EC.visibilityOf(comboBoxItem), 30 * 1000, 'Combobox item not found!').then(function(){
 			browser.wait(EC.elementToBeClickable(comboBoxItem), 30 * 1000, 'Combobox item not clickable!').then(function(){
 				clickElement(comboBoxItem).then(function(){
 					wrapUp(callback, 'clickEvent');
-				}).catch(function (error) {					
-					tierdown(true);
-					callback(new Error(error.message));
 				});
-			}).catch(function (error) {
-				tierdown(true);
-				callback(new Error(error.message));
 			});
 		}).catch(function (error) {
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
