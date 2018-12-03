@@ -1,7 +1,7 @@
 Feature: Testing the Sample Gallery
     Scenario Outline: Doing everything!
 
-Given I go to https://tomcat.demo.servoy-cloud.eu/sampleGallery/solutions/sampleGallery/index.html?f=galleryMain
+Given I go to https://samplegallery-dev.demo.servoy-cloud.eu/solutions/sampleGallery/index.html#galleryMain
 When servoy sidenav component with name galleryMain.nav tab Working with Data is clicked
 When servoy sidenav component with name galleryMain.nav tab Cryptography is clicked
 
