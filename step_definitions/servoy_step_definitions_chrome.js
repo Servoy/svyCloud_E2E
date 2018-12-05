@@ -1312,18 +1312,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']"));
+		var selectComponent = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
 			var inputField = selectComponent.element(by.xpath("//option[text()='" + text + "']"));
 			inputField.isPresent().then(function (isPresent) {
 				if (isPresent) {
-					if (browser.browserName === 'firefox') {
+					if (browser.browserName === 'firefox') {						
 						inputField.click().then(function () {
-							wrapUp(callback, "clickEvent");
+							selectComponent.click().then(function() {
+								wrapUp(callback, "clickEvent");
+							});
 						});
 					} else {
 						clickElement(inputField).then(function () {
-							wrapUp(callback, "clickEvent");
+							clickElement(selectComponent).then(function() {
+								wrapUp(callback, "clickEvent");
+							});							
 						});
 					}
 				}
