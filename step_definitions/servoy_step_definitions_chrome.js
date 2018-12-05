@@ -1301,7 +1301,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP SELECT
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var selectComponent = element(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
+		var selectComponent = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
 			selectComponent.click().then(function () {
 				wrapUp(callback, "clickEvent");
