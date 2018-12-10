@@ -3004,7 +3004,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	//GROUPING GRID INSERT EVENTS
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', { timeout: 30 * 1000 }, function (elementName, text, rowNumber, columnNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', { timeout: 30 * 1000 }, function (elementName, text, rowNumber, columnNumber, callback) {
 		rowNumber -= 1;
 		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
