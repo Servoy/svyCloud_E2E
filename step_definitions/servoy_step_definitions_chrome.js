@@ -2819,19 +2819,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			table.each(function (gridItems) {
 				var fromElement = gridItems.all(by.xpath("//span[text()='" + groupingText + "']")).first().element(by.xpath("../span[@class='ag-column-drag']"));
 				var toElement = gridItems.all(by.xpath("//span[@class='ag-column-drop-cell']/span[@class='ag-column-drag']")).first();
-				
-				toElement.getLocation().then(function(toLocation){
-					fromElement.getLocation().then(function(fromLocation){
-						browser.actions()
-							.mouseMove(fromElement.getWebElement(), {x: 0, y: 0})
-							.mouseDown()
-							.mouseMove(toElement.getWebElement(), {x: (fromLocation.x - toLocation.x), y: 0})
-							.mouseUp()
-							.perform().then(function(){
-								wrapUp(callback, "aggridGroupMovingEvent")
-							});
-					});
-				});				
+				dragAndDropd(fromElement, toElement).then(function () {
+						wrapUp(callback, "aggridGroupMovingEvent")
+					});					
 			});
 		}).catch(function (error) {
 			callback(new Error(error.message));
@@ -4969,4 +4959,12 @@ function pressKey(browserAction) {
 			tierdown(true);
 			return deferred.promise;
 	}
+}
+
+function dragAndDropd(fromElement, toElement) {
+	return browser.actions()
+		.mouseDown(fromElement)
+		.mouseMove(toElement)
+		.mouseUp()
+		.perform()
 }
