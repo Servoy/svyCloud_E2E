@@ -1,6 +1,19 @@
 ## End to end testing
 
 End to end instructions about how to get Cucumber testing to work locally, which test steps are currently supported, a list with examples and per example a short explanation.
+This document is structured as followed:
+
+* NodeJS installation
+* Settting up your workspace
+* Setup E2E environment
+* Starting the webdriver
+* Writing a test
+* Running the tests
+* Supported components
+* QA-PAAS
+* config.json configuration
+* Custom steps
+* Examples (supported steps)
 
 # NodeJS installation 
 NodeJS has to be installed. You can download it from https://nodejs.org/en/download/
@@ -26,7 +39,7 @@ Once this is done, open a command prompt or any similar application and test if 
 
 Local installation guide:
 # Setting up your workspace
-To get the tests to work locally, either the jenkins-repository has to be cloned (https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse), or the zip file has to be downloaded (https://source.servoy.com/rest/archive/latest/projects/SC/repos/qapaas-e2e/archive?at=refs%2Ftags%2Frelease-1.0&format=zip) and extracted.
+To get the tests to work locally, either the jenkins-repository has to be cloned or downloaded as a zip (https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse).
 
 # Setup E2E environment
 Open a bash or command prompt and navigate to the qapaas-e2e folder and execute the following commands: 'npm install'. This will install all node packages that are required for e2e testing (minus Protractor)
@@ -72,20 +85,78 @@ The 'start' command starts the webdriver. The tests cannot run without the webdr
 **Note:** If both commands are not recognized, make sure that the environment variable that is directed towards the global package folder is setup correctly. Execute the following command: 'npm list -g'. This will give you the list of all packages and the installation directory. Make sure the directory matches the environment variable. 
 
 # Writing a test
-To start the test, a .feature file has to be created. An example has been put in the features folder. 
+Feature files are the test files. Each feature file requires the following minimum basic syntax:
 
-Replace the content of the example by any of the steps currently supported.
+    Feature: <here you describe the feature, for example "testing solution X">
+      Scenario Outline: <here you describe what you want to test of solution X>
 
-**Note:** a(n) (empty) data table is required by the HTML reporter. Without a data table, the test will not start.
-Make sure that the following syntax is atleast present in the .feature file that is going to be tested:
-```
-@data_table_servoy
-Examples:
-||
-||
-```
-# Starting the tests
-Once all these steps are finished, the test can start by navigating to the qapaas-e2e folder and executing the 'protractor config_chrome.config' command.
+      <Here you write your test steps>
+      Given I go to https://www.yoursolutionname.com
+      When servoy calendar component I want to select <day> <month > <year>
+      Then I want to sleep for 5 seconds
+      @data_table_servoy
+      Examples:
+      | day     | month   | year  |
+      | 30      | April   | 2016 |
+      | 20      | December| 2020 |
+
+
+This test gets repeated twice now due to having data_tables.
+
+Advanced syntax. To make sure parts of the syntax do not have to be copied every time, the usage of the background syntax is recommended.
+
+    Feature: Testing solution X
+    Background: Login
+        Given I go to https://www.yoursolutionname.com
+        <do login steps>
+
+    Scenario Outline: Testing component A of solution X
+        <Write test steps that test component A>
+        @data_table_servoy
+        Examples:
+        |varA|
+        |abc |
+        |def |
+
+    Scenario Outline: Testing component B of solution X
+            <Write test steps that test component B>
+        @data_table_servoy
+        Examples:
+        ||
+        ||
+
+    
+    Scenario Outline: Testing component C of solution X
+        <Write test steps that test component C>
+        @data_table_servoy
+        Examples:
+        ||
+        ||
+
+The background gets run every time a ‘Scenario outline’ is executed. So the flow will be like this:
+
+    Background syntax gets executed. This will navigate to the solution and will login. 
+    Scenario Outline: Testing component A of solution X will get executed twice (due to data_tables). 
+    Background syntax gets executed. 
+    Scenario Outline: Testing component B of solution X will get executed.
+    Background syntax gets executed.
+    Scenario Outline: Testing component C of solution X will get executed.
+
+This saves having to use the login syntax three times. Do note, that if a loginSolution is used in your solution, you will be required to logout first. Otherwise the background syntax will get redirected to the main solution and it will fail.
+
+Other examples:
+
+Key press examples
+  Skeleton syntax is ‘When I press {browserAction}’
+
+Filled in examples:
+
+    When I press enter
+    When I press escape
+    When I press backspace
+
+# Running the tests
+Once all these steps are finished, the test can start by navigating to the qapaas-e2e folder and executing the 'protractor baseConfig.config' command.
 
 # Supported components
 List of all currently supported steps to test servoy components and to navigate to an URL. Each step will be given one or more examples.
@@ -118,6 +189,133 @@ recognition meaning the word tractor will be found in the word protractor
       browser.ignoreSynchronization = true;
     });
 ```
+
+**QA-PAAS**
+
+In the root of the repository of the main solution, a few folders have to be made:
+* jenkins-custom
+
+Inside jenkins-custom, two folders have to be made:
+
+* data-seeds
+* e2e-test-scripts
+
+Inside the data-seeds folder, SQL files containing insert queries have to be added. These are mandatory due to the E2E tests using an empty database (if the build process uses the pipeline approach) 
+
+Inside the **e2e-test-scripts**, a folder called **features** has to be added. In here, the following files required:
+
+* A file called **config.json**
+* At least 1 or more .feature files. They can of course be structured in sub-folders.
+
+**Config.json** specifies which tests are executed, which browsers are used and which properties are set to each browser.
+
+**config.json configuration**
+    "configurations":{
+      "capabilities":{
+        
+      },
+      "multiCapabilities": [{
+        "browserName": "firefox",
+        "marionette": true,
+        "webdriverClick":false
+        }],
+
+      "specs": [
+        "./features/folderA/*.feature",
+        "./features/folderB/example.feature"
+      ]
+    }
+
+**Capabilities**:
+
+Uses 1 browser. If multicapabilities is used, this property is ignored.
+Can use the same syntax as multiCapabilities, just not with multiple browsers.
+
+**multiCapabilities**:
+
+Overrules capabilities. 
+Property to use multiple browsers.
+
+
+**Specs**:
+
+Path to the tests that have to be executed. Root of the path is where baseConfig.js is located. As shown in the example, multiple specs are allowed if you want to run specific tests.
+
+**Multicapabilities examples**:
+
+    "multiCapabilities": [{
+      "browserName": "firefox",
+      "marionette": true,
+      "webdriverClick":false
+    }]
+
+This will only test firefox.
+
+    "multiCapabilities": [{
+      "browserName": "chrome"
+    }]
+
+This will only test chrome
+
+    "multiCapabilities": [{
+      "browserName": "firefox",
+      "marionette": true,
+      "webdriverClick":false
+    }, {
+      “browserName”: “chrome”
+    }]
+
+This will test both chrome and firefox. 
+
+Count. If required, multiple instances of the same browser can be started. 
+
+    "multiCapabilities": [{
+      "browserName": "chrome",
+      “count”: 3
+    }]
+
+This will start 3 instances of Chrome. 
+
+
+Headless testing
+Headless testing, meaning without a UI is excellent to use during the build. This will save a lot of loading time (since no UI has to be rendered)
+
+    "multiCapabilities": [{
+      "browserName": "chrome",
+      "chromeOptions": { "args": [ "--headless", "--disable-gpu"] }
+      },{ 
+      "browserName": "firefox",
+      "moz:firefoxOptions": {
+        "args": [ "--headless" ]
+      },
+      "marionette": true,
+      "webdriverClick":false
+      }]
+
+This will start both chrome and firefox without a UI. 
+
+
+**Custom steps**
+Finally, in the same folder, a folder called custom_step_definitions has to be created. In here a file called custom_step_definitions.js has to be made. The file **servoy_step_definitions_chrome.js** has a lot of examples that can help creating custom steps.
+
+The file has to at least use the following syntax:
+
+    var { defineSupportCode } = require('../../lib/cucumberLoader').load();
+    var EC = protractor.ExpectedConditions;
+    var element = browser.element;
+
+    defineSupportCode(({ Given, Then, When, Before, After }) => {
+      <write your custom steps here>
+    });
+
+Example custom step:
+
+    Given(‘I want to logout’, {timeout: 30 * 1000}, function(callback) {
+      <do your magic>
+    });
+
+
+
 **Examples**
 ___
 **(URL) navigation**
