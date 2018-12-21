@@ -1221,7 +1221,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css('input'));
 		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
 			clickElement(textField).then(function() {
-				textField.sendKeys(newDate.getDate() + 1).then(function() {
+				textField.sendKeys(newDate.getDate()).then(function() {
 					if((newDate.getDate()) < 4) {
 						browser.actions().sendKeys(protractor.Key.TAB).perform()
 					}
