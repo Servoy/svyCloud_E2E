@@ -1213,15 +1213,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to set the date to today {+|-} {number} day(s)', { timeout: 30 * 1000 }, function (elementName, operator, dayCount, callback) {
 		var newDate;
 		if(operator === '+') {
-			newDate = dateUtils.addDays(new Date(), parseInt(dayCount));
+			newDate = dateUtils.addDays(parseInt(dayCount));
 		} else {
-			newDate = dateUtils.substractDays(new Date(),  parseInt(dayCount));
+			newDate = dateUtils.substractDays(parseInt(dayCount));
 		}
+		
 		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css('input'));
 		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
 			clickElement(textField).then(function() {
-				textField.sendKeys(newDate.getDate()).then(function() {
-					textField.sendKeys(newDate.getMonth() + 1).then(function() {
+				textField.sendKeys(newDate.getDate() + 1).then(function() {
+					if((newDate.getDate() + 1) < 4) {
+						browser.actions().sendKeys(protractor.Key.TAB).perform()
+					}
+					textField.sendKeys(newDate.getMonth()).then(function() {
+						if((newDate.getMonth() + 1) < 2) {
+							browser.actions().sendKeys(protractor.Key.TAB).perform();
+						}
+						
 						textField.sendKeys(newDate.getFullYear()).then(function() {
 							wrapUp(callback, "insertEvent");
 						});
