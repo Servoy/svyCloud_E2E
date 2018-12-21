@@ -1222,10 +1222,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
 			clickElement(textField).then(function() {
 				textField.sendKeys(newDate.getDate() + 1).then(function() {
-					if((newDate.getDate() + 1) < 4) {
+					if((newDate.getDate()) < 4) {
 						browser.actions().sendKeys(protractor.Key.TAB).perform()
 					}
-					textField.sendKeys(newDate.getMonth()).then(function() {
+					textField.sendKeys(newDate.getMonth() + 1).then(function() {
 						if((newDate.getMonth() + 1) < 2) {
 							browser.actions().sendKeys(protractor.Key.TAB).perform();
 						}
