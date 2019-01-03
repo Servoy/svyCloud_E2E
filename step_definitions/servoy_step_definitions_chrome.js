@@ -181,7 +181,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy default calendar component I want to select I want to set the date to today', {timeout: 120 * 1000}, function(callback) {				
+	When('servoy default calendar component I want to set the date to today', {timeout: 120 * 1000}, function(callback) {				
 		var dToday = new Date();
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var selectedMonth = monthList[dToday.getMonth()];
@@ -193,7 +193,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy default calendar component I want to select I want to set the date to today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(operator, dayAmount, callback) {
+	When('servoy default calendar component I want to set the date to today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(operator, dayAmount, callback) {
 		var dToday = new Date();
 		if(operator === '-') {
 			dToday.setDate(dToday.getDate() - parseInt(dayAmount));
@@ -213,7 +213,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	});
 
-	When('servoy default calendar component I want to select I want to set the date to {weekDay} {before|after} today', {timeout: 120 * 1000}, function(weekDay, direction ,callback){
+	When('servoy default calendar component I want to set the date to {weekDay} {before|after} today', {timeout: 120 * 1000}, function(weekDay, direction ,callback){
 		var newDate = new Date();
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
@@ -268,7 +268,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy default calendar component I want to select I want to set the date to {weekDay} {before|after} today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(weekDay, direction, operator, days, callback){
+	When('servoy default calendar component I want to set the date to {weekDay} {before|after} today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(weekDay, direction, operator, days, callback){
 		var newDate = new Date();
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
