@@ -180,6 +180,171 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 		});
 	});
+
+	When('servoy default calendar component I want to select I want to set the date to today', {timeout: 120 * 1000}, function(callback) {				
+		var dToday = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var selectedMonth = monthList[dToday.getMonth()];
+		var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), null, callback));
+		promise.then(function() {					
+			wrapUp(callback, "calendarEvent");					
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	});
+
+	When('servoy default calendar component I want to select I want to set the date to today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(operator, dayAmount, callback) {
+		var dToday = new Date();
+		if(operator === '-') {
+			dToday.setDate(dToday.getDate() - parseInt(dayAmount));
+		} else if(operator === '+'){
+			dToday.setDate(dToday.getDate() + parseInt(dayAmount));
+		} else {
+			callback(new Error("Invalid operator given! Use '+' or '-'"));
+		}
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var selectedMonth = monthList[dToday.getMonth()];			
+		var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), null, callback));
+		promise.then(function() {					
+			wrapUp(callback, "calendarEvent");					
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+
+	});
+
+	When('servoy default calendar component I want to select I want to set the date to {weekDay} {before|after} today', {timeout: 120 * 1000}, function(weekDay, direction ,callback){
+		var newDate = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
+		var day = dayList.indexOf(weekDay.toLowerCase());
+		console.log(day);
+		if(day === -1) {
+			return callback(new Error("Invalid weekday given! Use monday, tuesday, wednesday, etc. instead."));
+		}
+		var dayToday = newDate.getDay();
+		var selectedMonth;
+		var difference;
+		switch (direction) {
+			case "before":
+				if (day === dayToday) {
+					newDate.setDate(newDate.getDate() - 7);
+				} else {
+					difference = dayToday - day;
+					if (difference > 0) {
+						newDate.setDate(newDate.getDate() - difference);
+					} else {
+						difference = (7 - (difference * -1));
+						newDate.setDate(newDate.getDate() - difference);
+					}
+				}
+				selectedMonth = monthList[newDate.getMonth()];
+				var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), null, callback));
+				promise.then(function () {
+					wrapUp(callback, "calendarEvent");
+				});
+				break;
+			case "after":
+				if (day === dayToday) {
+					newDate.setDate(newDate.getDate() + 7);
+				} else {
+					difference = day - dayToday;
+					if (difference > 0) {
+						newDate.setDate(newDate.getDate() + difference);
+					} else {
+						difference = (7 - (difference * -1));
+						newDate.setDate(newDate.getDate() + difference);
+					}
+				}
+				selectedMonth = monthList[newDate.getMonth()];
+				var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), null, callback));
+				promise.then(function () {
+					wrapUp(callback, "calendarEvent");
+				});
+				break;
+			default:
+				tierdown(true);
+				return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
+		}
+	});
+
+	When('servoy default calendar component I want to select I want to set the date to {weekDay} {before|after} today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(weekDay, direction, operator, days, callback){
+		var newDate = new Date();
+		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
+		var day = dayList.indexOf(weekDay.toLowerCase());
+		if (day === -1) {
+			return callback(new Error("Invalid weekday given! Use monday, tuesday, wednesday, etc. instead."));
+		}
+		var dayToday = newDate.getDay();
+		var selectedMonth;
+		var difference;
+		switch (direction) {
+			case "before":
+				if (day === dayToday) {
+					newDate.setDate(newDate.getDate() - 7);
+				} else {
+					difference = dayToday - day;
+					if (difference > 0) {
+						newDate.setDate(newDate.getDate() - difference);
+					} else {
+						difference = (7 - (difference * -1));
+						newDate.setDate(newDate.getDate() - difference);
+					}
+				}
+
+				switch (operator) {
+					case "+":
+						newDate.setDate(newDate.getDate() + parseInt(days));
+						break;
+					case "-":
+						newDate.setDate(newDate.getDate() - parseInt(days));
+						break;
+					default:
+						return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+				}
+				selectedMonth = monthList[newDate.getMonth()];
+				var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+				promise.then(function () {
+					wrapUp(callback, "calendarEvent");
+				});
+				break;
+			case "after":
+				if (day === dayToday) {
+					newDate.setDate(newDate.getDate() + 7);
+				} else {
+					difference = day - dayToday;
+					if (difference > 0) {
+						newDate.setDate(newDate.getDate() + difference);
+					} else {
+						difference = (7 - (difference * -1));
+						newDate.setDate(newDate.getDate() + difference);
+					}
+				}
+
+				switch (operator) {
+					case "+":
+						newDate.setDate(newDate.getDate() + parseInt(days));
+						break;
+					case "-":
+						newDate.setDate(newDate.getDate() - parseInt(days));
+						break;
+					default:
+						return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+				}
+				selectedMonth = monthList[newDate.getMonth()];
+				var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+				promise.then(function () {
+					wrapUp(callback, "calendarEvent");
+				});
+				break;
+			default:
+				tierdown(true);
+				return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
+		}
+	});
+
+
 	//END SERVOY CALENDAR COMPONENT
 
 	//SERVOY SELECT2TOKENIZER COMPONENT
