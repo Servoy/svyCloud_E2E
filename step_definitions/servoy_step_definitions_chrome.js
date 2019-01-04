@@ -3124,9 +3124,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
 					var rowContainer = tableItems.all(by.css("div[class='" + containerClass + "']"));
 					rowContainer.each(function (rowElements) {
-						var selectedRow = rowElements.all(by.xpath("//div[text()='" + text + "']")).first();
+						var selectedRow = rowElements.all(by.xpath("//*[text()='" + text + "']")).first();
 						browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
-							var parent = selectedRow.element(by.xpath(".."));
+							var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
 							var child = parent.element(by.className(className));
 							child.click().then(function () {
 								wrapUp(callback, "clickEvent");
