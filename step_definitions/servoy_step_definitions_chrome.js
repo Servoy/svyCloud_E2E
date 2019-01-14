@@ -3052,7 +3052,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			}).then(function(containerClass) {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				console.log('test');
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				clickElement(row).then(function() {
@@ -3111,30 +3111,26 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
-		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(table.first()), 10 * 1000, 'Table not found!').then(function(){
-			table.each(function(tableItems){
-				agGridIsGrouped(elementName).then(function(isGrouped){
-					if(isGrouped) {
-						return "ag-full-width-viewport";
-					} else {
-						return "ag-body-viewport-wrapper";
-					}
-				}).then(function(containerClass) {
-					//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-					var rowContainer = tableItems.all(by.css("div[class='" + containerClass + "']"));
-					rowContainer.each(function (rowElements) {
-						var selectedRow = rowElements.all(by.xpath("//*[text()='" + text + "']")).first();
-						browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
-							var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
-							var child = parent.element(by.className(className));
-							child.click().then(function () {
-								wrapUp(callback, "clickEvent");
-							});
-						});
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
+			agGridIsGrouped(elementName).then(function(isGrouped){
+				if(isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function(containerClass) {
+				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var selectedRow = rowContainer.all(by.xpath("//*[text()='" + text + "']")).first();
+				browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
+					var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
+					var child = parent.element(by.className(className));
+					child.click().then(function () {
+						wrapUp(callback, "clickEvent");
 					});
 				});
-			});			
+			});
 		}).catch(function (error) {
 			callback(new Error(error.message));
 		});
@@ -3152,7 +3148,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			}).then(function(containerClass) {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var parent = row.getWebElement();
 				var elementToClick = parent.findElement(by.className(className));
@@ -3175,7 +3171,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function (containerClass) {
-				var rowContainer = table.all(by.css("div[class='" + containerClass + "']"));
+				var rowContainer = table.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				var rows = rowContainer.all(by.css("div[role=row]"));
 				rows.count().then(function(rowCount){
 					if(rowCount == count) {
@@ -3244,7 +3240,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function (containerClass) {
-				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
@@ -3290,7 +3286,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return "ag-body-viewport-wrapper";
 					}
 				}).then(function(containerClass) {
-					var rowContainer = tableItems.all(by.xpath("//div[@class='" + containerClass + "']"));
+					var rowContainer = tableItems.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 					rowContainer.each(function(rowElements){
 						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
 							var row = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
@@ -3336,7 +3332,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return "ag-body-viewport-wrapper";
 					}
 				}).then(function(containerClass) {
-					var rowContainer = tableItems.all(by.css("div[class='" + containerClass + "']"));
+					var rowContainer = tableItems.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 					rowContainer.each(function(rowElements){
 						browser.wait(EC.presenceOf(rowElements.all(by.css("div[role=row]")).get(0))).then(function(){
 							var selectedRow = rowElements.all(by.css("div[role=row]")).get(rowNumber - 2);
@@ -3858,7 +3854,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 					break;
 				case 2:
-					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					tabElement = tab.element(by.xpath("//*[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
 					browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
 						clickElement(tabElement).then(function(){
 							wrapUp(callback, "clickEvent");
@@ -3866,7 +3862,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 					break;
 				case 3:
-					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
+					tabElement = tab.element(by.xpath("//*[text()[normalize-space() = '" + tabText + "'] and not(contains(@class, 'svy-navbar-dropdown'))]"));
 					browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
 						clickElement(tabElement).then(function(){
 							wrapUp(callback, "clickEvent");
@@ -3878,8 +3874,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					break;
 			}
 		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -4737,7 +4732,7 @@ function scrollToElement(elementName, recordText, callback) {
 
 function agGridIsGrouped(elementName) {
 	var table = element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='"+elementName+"']"));
-	return table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).isPresent().then(function(isPresent){
+	return table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).isDisplayed().then(function(isPresent){
 		return isPresent;
 	});
 }
