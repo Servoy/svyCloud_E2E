@@ -3840,11 +3840,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var tabElement;			
 			switch(parseInt(tabLevel)){				
 				case 1: 
-					tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-dropdown')]"));
+					tabElement = tab.element(by.xpath("//*[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-dropdown')]"));
 					browser.sleep(3000);
 					tabElement.isPresent().then(function(isPresent){
 						if(!isPresent) {
-							tabElement = tab.element(by.xpath("//a[text()[normalize-space() = '" + tabText + "'] and contains(@class, 'svy-navbar-item')]"));
+							tabElement = tab.element(by.xpath("//*[text()[normalize-space() = '" + tabText + "'] and (contains(@class, 'svy-navbar-item') or contains(@class, 'svy-navbar-item-text'))]"));
 						}
 						browser.wait(EC.elementToBeClickable(tabElement), 30 * 1000, 'Tab item not found!').then(function(){
 							clickElement(tabElement).then(function(){
