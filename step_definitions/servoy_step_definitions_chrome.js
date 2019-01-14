@@ -3202,21 +3202,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function (containerClass) {
-				var rowContainer = table.element(by.css("div[class='" + containerClass + "']"));
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-				browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+				browser.wait(EC.presenceOf(col), 15 * 1000).then(function () {					
 					doubleClickElement(col).then(function () {
-						sendKeys(col.element(by.css("input")), text).then(function () {
-							col.sendKeys(protractor.Key.TAB).then(function () {
-								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
-									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-									col.getText().then(function (newText) {
-										if (newText === text) {
-											wrapUp(callback, "insertEvent");
-										} else {
-											callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
-										}
+						//certain versions of the grid uses an input field. Others a div.
+						var inputField = col.element(by.css("input[class='ag-cell-edit-input']"))
+						inputField.isPresent().then(function(fieldPresent) {
+							inputField.sendKeys(text).then(function () {								
+								col.sendKeys(protractor.Key.TAB).then(function () {
+									browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+										col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+										col.getText().then(function (newText) {
+											if (newText === text) {
+												wrapUp(callback, "insertEvent");
+											} else {
+												callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
+											}
+										});
 									});
 								});
 							});
