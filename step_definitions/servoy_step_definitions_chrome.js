@@ -3140,7 +3140,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		rowNumber -= 1;
 		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
+			return agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
@@ -3205,7 +3205,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					doubleClickElement(col).then(function () {
 						//certain versions of the grid uses an input field. Others a div.
 						var inputField = col.element(by.css("input[class='ag-cell-edit-input']"))
-						inputField.isPresent().then(function(fieldPresent) {
+						inputField.isPresent().then(function(fieldPresent) { 
 							inputField.sendKeys(text).then(function () {								
 								col.sendKeys(protractor.Key.TAB).then(function () {
 									browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
@@ -3834,7 +3834,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END HTMLVIEW COMPONENT
 
 	//DATA-BOOTSTRAPEXTRACOMPONENTS-NAVBAR
-	When('bootstrap data-bootstrapextracomponents-navbar component with the name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 30 * 1000}, function(elementName, tabText, tabLevel, callback){
+	When('bootstrap data-bootstrapextracomponents-navbar component with the name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, tabText, tabLevel, callback){
 		var tab = element(by.xpath("//data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(tab), 30 * 1000, 'Navbar not found!').then(function(){
 			var tabElement;			
@@ -4732,8 +4732,19 @@ function scrollToElement(elementName, recordText, callback) {
 
 function agGridIsGrouped(elementName) {
 	var table = element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='"+elementName+"']"));
-	return table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).isDisplayed().then(function(isPresent){
-		return isPresent;
+	var groupedElement = table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]"));
+	return groupedElement.isPresent().then(function(ret_val) {
+		if(ret_val) {
+			return table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).isDisplayed().then(function(isDisplayed){
+				if(isDisplayed) {
+					return true;
+				} else {
+					return false;
+				}
+			});
+		} else {
+			return false;
+		}
 	});
 }
 
