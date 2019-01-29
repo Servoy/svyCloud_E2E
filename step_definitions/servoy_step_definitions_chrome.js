@@ -3148,16 +3148,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			}).then(function(containerClass) {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var rowContainer = table.element(by.className(containerClass));
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
-				var parent = row.getWebElement();
-				var elementToClick = parent.findElement(by.className(className));
-				elementToClick.click().then(function() {
-					wrapUp(callback, "clickEvent");
+				var elementWithClass = row.element(by.className(className));
+				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
+					console.log('found');
+					elementWithClass.click().then(function() {
+						wrapUp(callback, "clickEvent");
+					});
 				});
 			});
 		}).catch(function (error) {
-			callback(new Error(error.message));
+			// callback(new Error(error.message));
 		});
 	});
 
