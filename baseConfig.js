@@ -19,7 +19,10 @@ exports.config = {
       './lib/afterScenario.js',
       customStepsDirectory],
       format: 'json:./reports/json_reports/results.json',
-      strict: true
+      strict: true,
+      tags: [
+
+      ]
   },
 
   plugins: [{
@@ -71,5 +74,13 @@ exports.config = {
 };
 
 for (var x in conf.configurations) {
-  exports.config[x] = conf.configurations[x];
+  if(Object.keys(conf.configurations[x]) == 'tags') {
+    for(var key in conf.configurations[x]) {
+      for(var tag in conf.configurations[x][key]) {
+        exports.config.cucumberOpts.tags.push(conf.configurations[x][key][tag]);
+      }
+    }
+  } else {
+    exports.config[x] = conf.configurations[x];  
+  }  
 }
