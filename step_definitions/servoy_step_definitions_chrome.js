@@ -2166,7 +2166,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('bootstrap data-bootstrapcomponents-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
 		var label = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(label), 15 * 1000, 'Datalabel not found!').then(function(){
-			clickElement(label).then(function(){
+			clickElement(label.element(by.css('span'))).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function(error) {
