@@ -2813,8 +2813,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				})
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2826,15 +2827,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
 					wrapUp(callback, "checkboxEvent");
 				} else {
-					console.log('Validation failed. State of the checkbox does not match the expected state!');
+					callback(new Error('Validation failed. State of the checkbox does not match the expected state!'));
 					tierdown(true);
 				}
-			}).catch(function (error) {
-				console.log(error.message);
-			})
-		}).catch(function (error) {
-			console.log(error.message);
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
+			});
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2850,12 +2852,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						console.log("Validation failed. Expected " + text + ". Got " + inputText);
 					}
 				})
-			}).catch(function(error){
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2868,16 +2871,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if(inputText.indexOf(text) > -1) {
 						wrapUp(callback, "validateEvent")
 					} else {
-						console.log("Validation failed. Expected " + text + ". Got " + inputText);
+						callback(new Error("Validation failed. Expected " + text + ". Got " + inputText));
 					}
 				})
-			}).catch(function(error){
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END CHECKBOX
@@ -2893,9 +2896,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "insertEvent");
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2909,9 +2912,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "insertEvent");
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2927,9 +2930,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2947,9 +2950,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				})
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END INPUT GROUP
@@ -2963,14 +2966,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function () {
 				clickElement(inputField).then(function () {
 					wrapUp(callback, 'insertEvent');
-				}).catch(function (error) {
-					console.log(error.message);
+				}).catch(function (error) {			
 					tierdown(true);
+					callback(new Error(error.message));
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END DEFAULT COMPONENTS INSIDE FORM COMPONENTS
@@ -2983,9 +2986,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element not found!').then(function(){
 				wrapUp(callback, "validateEvent");
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2997,9 +3000,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END WILDCARD ELEMENT EXISTANCE VALIDATION
@@ -3022,7 +3025,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(columnHeader).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3050,7 +3054,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3071,7 +3076,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3086,7 +3092,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						wrapUp(callback, "aggridGroupMovingEvent")
 					});					
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3125,7 +3132,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "clickEvent");
 				});
 			});
-		}).catch(function(error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3137,7 +3145,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(elem).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3159,7 +3168,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function(error){
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3197,7 +3207,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3224,8 +3235,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
-			// callback(new Error(error.message));
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3292,7 +3304,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3339,6 +3352,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3384,7 +3398,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3414,7 +3429,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3432,9 +3448,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			} else {
 				callback();
 			}
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3446,9 +3462,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "toastValidateEvent");
 				}
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3461,9 +3477,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			}
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3484,9 +3500,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.executeScript("arguments[0].scrollIntoView();", elementToScrollTo.getWebElement()).then(function(){
 				wrapUp(callback, "scrollEvent");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	})
 	//END STANDARD SCROLL EVENTS
@@ -3519,13 +3535,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return;
 					}
 				});
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	
@@ -3568,13 +3584,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return;
 					}
 				});
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3613,9 +3629,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3628,9 +3644,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'clickEvent');
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3650,9 +3666,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SALES DEMO SPECIFIC
@@ -3682,13 +3698,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
 				}
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END DEFAULT HTML COMPONENTS
@@ -3699,13 +3715,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog button not found!').then(function(){
 			clickElement(dialog).then(function(){
 				wrapUp(callback, 'clickEvent');
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3713,9 +3729,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dialog = element(by.xpath("//div[contains(@class, 'modal-backdrop')]"));
 		waitUntillElementIsGone(dialog).then(function(){
 			wrapUp(callback, 'dialogEvent');
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3727,9 +3743,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent")
 				}
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -3737,9 +3753,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dialog = element(by.xpath("//div[@class='modal-content']"));
 		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
 			wrapUp(callback, "modalDialogEvent");			
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true)
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
