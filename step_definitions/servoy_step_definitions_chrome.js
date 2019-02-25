@@ -23,9 +23,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		console.log("Opening browser URL: " + url);
 		browser.get(url).then(function () {
 			wrapUp(callback, "navigateURLEvent");
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -38,8 +38,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});				
 			});
 		}).catch(function (error) {
-			console.log(error.message);
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -49,9 +49,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.switchTo().window(newTabHandle).then(function () {
 				wrapUp(callback, "navigateEvent");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -79,9 +79,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		console.log("Opening testdomain URL: " + browser.params.testDomainURL);
 		browser.get(browser.params.testDomainURL).then(function () {
 			wrapUp(callback, "navigateURLEvent")
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BASIC NAVIGATION
@@ -103,9 +103,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -117,18 +117,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
 					clickElement(item).then(function(){
 						wrapUp(callback, "Click event");
-					}).catch(function (error) {
-						console.log(error.message);
+					}).catch(function (error) {			
 						tierdown(true);
-					});	
-				}).catch(function (error) {
-					console.log(error.message);
+						callback(new Error(error.message));
+					});
+				}).catch(function (error) {			
 					tierdown(true);
+					callback(new Error(error.message));
 				});
 			}
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 		});
 	});
 
@@ -139,9 +141,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(sideNavTab), 20 * 1000, 'Tab with the given text not found!').then(function(){
 				wrapUp(callback, "validateEvent");
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	})
 	//END SERVOY SIDENAV COMPONENT
@@ -152,13 +154,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function () {
 			clickElement(calendar).then(function () {
 				wrapUp(callback, "Click event");
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
-			})
-		}).catch(function (error) {
-			console.log(error.message);
+				callback(new Error(error.message));
+			});
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -175,9 +177,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var promise = Promise.resolve(setCalendar(day, month, year, null, callback));
 		promise.then(function() {					
 			wrapUp(callback, "calendarEvent");					
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -188,7 +190,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), null, callback));
 		promise.then(function() {					
 			wrapUp(callback, "calendarEvent");					
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -200,6 +203,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		} else if(operator === '+'){
 			dToday.setDate(dToday.getDate() + parseInt(dayAmount));
 		} else {
+			tierdown(true);
 			callback(new Error("Invalid operator given! Use '+' or '-'"));
 		}
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
@@ -207,7 +211,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), null, callback));
 		promise.then(function() {					
 			wrapUp(callback, "calendarEvent");					
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 
@@ -274,6 +279,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dayList = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];		
 		var day = dayList.indexOf(weekDay.toLowerCase());
 		if (day === -1) {
+			tierdown(true);
 			return callback(new Error("Invalid weekday given! Use monday, tuesday, wednesday, etc. instead."));
 		}
 		var dayToday = newDate.getDay();
@@ -301,6 +307,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						newDate.setDate(newDate.getDate() - parseInt(days));
 						break;
 					default:
+						tierdown(true);
 						return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
 				}
 				selectedMonth = monthList[newDate.getMonth()];
@@ -330,6 +337,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						newDate.setDate(newDate.getDate() - parseInt(days));
 						break;
 					default:
+						tierdown(true);
 						return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
 				}
 				selectedMonth = monthList[newDate.getMonth()];
@@ -642,9 +650,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -656,9 +664,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.executeScript("arguments[0].scrollIntoView(true);", tableHeader.getWebElement()).then(function(){
 				wrapUp(callback, "scrollEvent");
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY TABLE COMPONENT
@@ -675,9 +683,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(elemCell).call(), 30000, 'Element not visible').then(function () {
 				wrapUp(callback, "render extra table");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -687,13 +695,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				clickElement(rowItems.all(by.xpath("div/table/tbody/tr")).get(rowNumber - 1)).then(function () {
 					wrapUp(callback, "clickEvent");
 				});
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -703,13 +711,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.actions().doubleClick(rowItems.all(by.xpath("div/table/tbody/tr")).get(rowNumber - 1)).perform().then(function () {
 					wrapUp(callback, "clickEvent");
 				});
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -718,9 +726,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='timesheetPage.table" + weekDay.toLowerCase().charAt(0).toUpperCase() + weekDay.slice(1) + "']"));
 		clickElement(table.$$("tbody").$$("tr").get(rowNumber - 1).$$("td").get(5)).then(function () {
 			wrapUp(callback, "clickEvent");
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -731,9 +739,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(table.$$("tbody").$$("tr").get(rowNumber - 1).$$("td").get(6)).then(function () {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -749,19 +757,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'validateEvent');
 					if(isPresent) {
 						wrapUp(callback, 'validateEvent');
-						console.log(found);
-					// 	found = true;
 					}
 				})
 			});
-		}).then(function(){
-			// if(found) {
-			// 	wrapUp(callback, 'validateEvent');
-			// }
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
-		})
+			callback(new Error(error.message));
+		});
 	});
 
 	//NOTE: this test step only works for the timesheet application
