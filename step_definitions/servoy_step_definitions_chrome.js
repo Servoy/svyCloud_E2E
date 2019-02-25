@@ -131,6 +131,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	When('servoy sidenav component with name {elementName} I want to click tab number {tabNumber}', {timeout: 15 * 1000}, function(elementName, tabNumber, callback) {
+		var sideNav = element(by.css("data-servoyextra-sidenav[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(sideNav), 10 * 1000, 'Sidenavigation component not found!').then(function() {
+			var navMenu = sideNav.all(by.xpath("//ul[contains(@class, 'svy-sidenav-menu')]")).first();
+			var navMenuItem = navMenu.all(by.css("li")).get(tabNumber - 1);
+			clickElement(navMenuItem).then(function() {
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
