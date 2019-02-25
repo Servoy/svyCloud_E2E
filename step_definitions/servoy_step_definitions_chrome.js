@@ -415,7 +415,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -448,9 +449,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('I press {browserAction}', { timeout: 30 * 1000 }, function (browserAction, callback) {
 		pressKey(browserAction, callback).then(function() {
 			wrapUp(callback, "insertEvent");
-		}).catch(function(error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
-		})
+		});
 	});
 
 	When('I want to press the {browserAction} key with the {key} key', { timeout: 15 * 1000 }, function (browserAction, key, callback) {		
@@ -466,25 +468,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					browser.actions().keyDown(protractor.Key.CONTROL).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 						wrapUp(callback, "keypressEvent");
-					}).catch(function (error) {
-						console.log(error.message);
+					}).catch(function (error) {			
 						tierdown(true);
+						callback(new Error(error.message));
 					});
 				}
 				break;
 			case "alt": 
 				browser.actions().keyDown(protractor.Key.ALT).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
+				}).catch(function (error) {			
 					tierdown(true);
+					callback(new Error(error.message));
 				});
 			case "shift": 
 				browser.actions().keyDown(protractor.Key.SHIFT).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
-				}).catch(function (error) {
-					console.log(error.message);
+				}).catch(function (error) {			
 					tierdown(true);
+					callback(new Error(error.message));
 				});
 		}		
 	});
@@ -494,9 +496,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	Then('I want to zoom the page out to {percentage} percent', {timeout: 10*1000}, function(percentage, callback){
 		browser.executeScript("document.body.style.zoom='"+percentage+"%'").then(function(){
 			wrapUp(callback, 'browserZoomEvent');
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -534,10 +536,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				}
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
-		});	
+			callback(new Error(error.message));
+		});
 	});
 
 	When('servoy table component with name {elementName} I want to select {elementType} number {elementNumber} with the name {elemName}',{timeout: 30 * 1000} ,function(elementName, elementType, rowNumber, elemName, callback){
@@ -559,7 +561,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
 			}
 
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -599,13 +602,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (found) {
 					wrapUp(callback, 'validationEvent');
 				} else {
-					console.log('Element with the given attribute has not been found!');
+					callback(new Error('Element with the given attribute has not been found!'));
 					tierdown(true);
 				}
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -616,13 +619,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(count === parseInt(rowCount)) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					console.log('Invalid amount of rows found. Found: ' + count + ". Expected: " + rowCount);
+					callback(new Error('Invalid amount of rows found. Found: ' + count + ". Expected: " + rowCount));
 					tierdown(true);
 				}
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -635,9 +638,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			doubleClickElement(elementToClick).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -784,6 +787,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent");
 				}
 			}
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -797,9 +803,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "validateEvent");
 				}
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -818,9 +824,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				}
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -836,9 +842,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -851,9 +857,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(row.element(by.className(className))).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function(error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
-		});		
+		});	
 	});
 	//END SERVOY EXTRA TABLE COMPONENT
 
@@ -870,9 +877,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -938,9 +945,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			sendKeys(typeahead, text).then(function () {
 				wrapUp(callback, "Insert value event");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -960,7 +967,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error(error.message));
 				});
 			}
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -974,9 +982,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -986,9 +994,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(typeaheadSelectOptions.all(by.xpath("//li[contains(@class, 'uib-typeahead-match') and contains(@class, 'ng-scope')]/a")).get(rowNumber - 1)).then(function () {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1003,9 +1011,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log('Actual value: ' + value);
 				}
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY TYPEAHEAD
@@ -1035,9 +1043,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1050,25 +1058,28 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
 	Then('servoy default input component with name {elementName} I want to validate that the input field equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var val;
 		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
 			inputField.getAttribute('value').then(function(inputText){
+				val = inputText;
 				return inputText.toLowerCase() === text.toLowerCase();
 			}).then(function(isValidated){
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
 				} else {
-					callback(new Error("Validation failed! Expected the input field to equal the text '" + text + "'. Got '" + inputText + "' instead."))
+					callback(new Error("Validation failed! Expected the input field to equal the text '" + text + "'. Got '" + val + "' instead."))
 				}
 			})
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1104,9 +1115,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "checkboxEvent");
 				}
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1121,13 +1132,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					tierdown(true);
 				}
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
 				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END DEFAULT CHECKBOX FIELD
@@ -1139,15 +1150,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			sendKeys(inputField, text).then(function () {
 				wrapUp(callback, 'insertEvent');
 			});
-		}).catch(function (error) {
-			tierdown(error)
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY PASSWORD FIELD
 
 	//SERVOY COMBOBOX
 	When('servoy combobox component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var combobox = element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName + "']"));
+		var combobox = element(by.css("data-servoydefault-combobox[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
 			if(browser.browserName = 'firefox') {
 				clickElement(combobox.element(by.className("pull-left"))).then(function () {
@@ -1169,9 +1181,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			comboItems.all(by.xpath("//div[contains(@class, 'ui-select-choices-row')]")).get(comboboxNumber - 1).click().then(function () {
 				wrapUp(callback, "comboboxSelectEvent");
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1184,7 +1196,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'clickEvent');
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1203,9 +1216,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1218,9 +1231,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END SERVOY COMBOBOX
@@ -1232,9 +1245,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(button).then(function () {
 				wrapUp(callback, "Click event");
 			})
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1244,7 +1257,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			doubleClickElement(button).then(function () {
 				wrapUp(callback, "Click event");
 			})
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1258,7 +1272,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			if(isPresent){
 				clickElement(labelButton).then(function(){
 					wrapUp(callback, "clickEvent");
-				}).catch(function(error){
+				}).catch(function (error) {			
+					tierdown(true);
 					callback(new Error(error.message));
 				});
 			} else {
@@ -1266,14 +1281,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
 					clickElement(element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']/div"))).then(function(){
 						wrapUp(callback, "clickEvent");
-					}).catch(function(error){
+					}).catch(function (error) {			
+						tierdown(true);
 						callback(new Error(error.message));
 					});
-				}).catch(function(error){
+				}).catch(function (error) {			
+					tierdown(true);
 					callback(new Error(error.message));
 				});
 			}
-		}).catch(function(error){
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1304,8 +1322,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 			}
-		}).catch(function(error){
-			tierdown(error)
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	})
 	//END SERVOY LABEL
@@ -1319,7 +1338,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1329,10 +1349,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
 			textField.click().then(function() {
 				wrapUp(callback, "insertTextEvent");
-			}).catch(function (error) {
+			}).catch(function (error) {			
+				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1347,7 +1369,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed. Expected an empty text field. Got " + value));
 				}
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1362,9 +1385,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
 				}
 			})
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(false);
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});	
 
@@ -1385,8 +1408,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function(error) {
-			callback(new Error(error.message));			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1416,8 +1440,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).catch(function(error) {
-			callback(new Error(error.message));			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1427,7 +1452,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			textField.clear().then(function() {
 				wrapUp(callback, "clearEvent");
 			});
-		}).catch(function(error){			
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1442,9 +1468,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
-		});		
+		});	
 	});
 
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is double clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
@@ -1455,9 +1482,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
-		});		
+		});	
 	});
 
 	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (elementName, state, callback) {
@@ -1473,10 +1501,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						callback(new Error('Button is currently enabled. Expected it to be disabled.'));
 					}
 				}
-			}).catch(function (error) {
+			}).catch(function (error) {			
+				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1490,10 +1520,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					callback(new Error("Partial validation failed. Expected " + text + ". Got " + buttonText));
 				}
-			}).catch(function (error) {
+			}).catch(function (error) {			
+				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1507,10 +1539,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				} else {
 					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
 				}
-			}).catch(function (error) {
+			}).catch(function (error) {			
+				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1523,9 +1557,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			selectComponent.click().then(function () {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
-		});	
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
@@ -1549,9 +1584,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				}
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1560,7 +1595,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var selectItems = select.all(by.xpath('//option[text()!=""]'));
 		selectItems.get(rowNumber - 1).click().then(function() {
 			wrapUp(callback, "clickEvent");
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1576,7 +1612,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed. Expected " + text + ". Got " + rowText));
 				}
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1589,7 +1626,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			sendKeys(textarea, text).then(function () {
 				wrapUp(callback, "insertEvent");
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1604,7 +1642,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed. Expected " + text + ". Got " + textareaText));
 				}
 			})
-		}).catch(function(error){
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});	
@@ -1617,7 +1656,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1628,7 +1668,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			textarea.clear().then(function() {
 				wrapUp(callback, "clearEvent");
 			});
-		}).catch(function(error){			
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1643,7 +1684,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed. Expected an empty text area. Got " + value));
 				}
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1663,9 +1705,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "checkboxEvent");
 				}
 			});
-		}).catch(function (error) {
-			console.log(error.message);
-		})
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
@@ -1678,8 +1721,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log('Validation failed. State of the checkbox does not match the expected state!');
 					tierdown(true);
 				}
-			}).catch(function (error) {
-				console.log(error.message);
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
 			});
 		});
 	});
@@ -1694,9 +1738,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + inputText);
 				}
 			})
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1710,9 +1754,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + inputText);
 				}
 			})
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP CHECKBOX
@@ -1726,9 +1770,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});	
 	//END BOOTSTRAP BADGE COMPONENT
@@ -1743,9 +1787,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "clickEvent");
 				});
 			});
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1761,9 +1805,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				})
 			})
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1783,9 +1827,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				})
 			})
-		}).catch(function(error){
-			console.log(error.message);
-			tierdown(true);			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP BUTTON GROUP
@@ -1811,9 +1855,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1832,10 +1876,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "calendarEvent");					
 				});
 			});
-		}).catch(function (error) {
-			console.log(error.message);			
-			tierdown(true)
-		});	
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today', {timeout: 120 * 1000}, function(elementName, callback) {				
@@ -1850,6 +1894,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "calendarEvent");					
 				});
 			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1872,6 +1919,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "calendarEvent");					
 				});
 			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -1971,6 +2021,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 								newDate.setDate(newDate.getDate() - parseInt(days));
 								break;
 							default: 
+								tierdown(true);
 								return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
 						}
 						selectedMonth = monthList[newDate.getMonth()];	
@@ -2013,10 +2064,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
 				}
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
-		})
+			callback(new Error(error.message));
+		});
 	});	
 
 	Then('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I expect it to be {visible|present|hidden}', {timeout: 30 * 1000}, function(elementName, state, callback){
@@ -2063,9 +2114,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			sendKeys(inputField, text).then(function(){
 				wrapUp(callback, "insertEvent");
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2076,9 +2127,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			inputField.clear().then(function(){
 				wrapUp(callback, "insertEvent");
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2091,9 +2142,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, "insertEvent");
 				});
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2108,9 +2159,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected " + text + ". Got " + fieldText);
 				}
 			})
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP INPUT GROUP
@@ -2126,9 +2177,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2143,9 +2194,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2159,9 +2210,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2171,9 +2222,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(label.element(by.css('span'))).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP LABEL
@@ -2189,9 +2240,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2206,9 +2257,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 
@@ -2222,9 +2273,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
 				}
 			});
-		}).catch(function(error){
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	}); 
 
@@ -2234,9 +2285,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(dataLabel).then(function(){
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function(error) {
-			console.log(error.message);
+		}).catch(function (error) {			
 			tierdown(true);
+			callback(new Error(error.message));
 		});
 	});
 	//END BOOTSTRAP DATA LABEL
