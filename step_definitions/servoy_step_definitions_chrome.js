@@ -860,7 +860,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('extra table component with name component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, className, rowNumber, callback) {
+	When('servoy extra table component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, className, rowNumber, callback) {
 		rowNumber -= 1;
 		var table = element(by.css("data-servoyextra-table[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function() {
