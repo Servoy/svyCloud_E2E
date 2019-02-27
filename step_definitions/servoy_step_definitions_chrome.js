@@ -1472,7 +1472,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
+		var button = element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css('button'));
 		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
 			clickElement(button).then(function () {
 				wrapUp(callback, "clickEvent");
