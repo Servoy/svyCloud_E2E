@@ -3,6 +3,7 @@ var conf = require('./features/config.json');
 var jsonDirectory = 'reports/cucumber_reports/';
 var customStepsDirectory = 'features/custom_step_definitions/custom_step_definitions.js';
 exports.config = {
+  directConnect: true,
   seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
   framework: 'custom',
 
