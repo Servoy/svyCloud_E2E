@@ -50,14 +50,19 @@ exports.config = {
 
   onPrepare: () => {
     console.log('onPrepare');
-    browser.driver.executeScript(function () {
-      return {
-        width: window.screen.availWidth,
-        height: window.screen.availHeight
-      };
-    }).then(function (result) {
-      browser.driver.manage().window().setSize(result.width, result.height);
-    });
+    try {
+      browser.driver.executeScript(function () {
+        return {
+          width: window.screen.availWidth,
+          height: window.screen.availHeight
+        };
+      }).then(function (result) {
+        browser.driver.manage().window().setSize(result.width, result.height);
+      });
+    } catch(error) {
+      console.log('Starting tests failed!'); 
+      console.log(error.message);
+    }
   },
 
   onComplete: () => {
