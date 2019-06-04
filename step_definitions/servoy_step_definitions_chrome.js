@@ -109,11 +109,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy sidenav component with name {elementName} tab {tabName} is clicked', { timeout: 30 * 1000 }, function (elementName, tabName, callback) {
-		var sideNav = element(by.xpath("//data-servoyextra-sidenav[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.presenceOf(sideNav)).then(function(isPresent){
+	When('servoy sidenav component with name {elementName} tab {tabName} is clicked', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		text = text.toLowerCase();
+		var sideNav = element(by.css("data-servoyextra-sidenav[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(isPresent){
 			if(isPresent) {
-				var item = sideNav.element(by.xpath('//*[text()=\"' + tabName + '\" and contains(@class, "svy-sidenav-item-text")]'));
+				var item = sideNav.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text + "')] and contains(@class, 'svy-sidenav-item-text')]")).first();
 				browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
 					clickElement(item).then(function(){
 						wrapUp(callback, "Click event");
@@ -454,6 +455,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 			callback(new Error(error.message));
 		});
+	});
+
+	When('servoy select2tokenizer component I want to select the record with the exact text {text}', { timeout: 60 * 1000 }, function (text, callback) {
+		var tokenizerList = element(by.css("ul[class='select2-results__options'"));
+		browser.wait(EC.presenceOf(tokenizerList), 15 * 1000, 'Tokenizer list not found!').then(function() {
+			var tokenizerItem = tokenizerList.all(by.xpath("//li[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text + "')]]")).first();
+			clickElement(tokenizerItem).then(function() {
+				wrapUp(callback, "clickEvent");
+			})
+		}).catch(function(error) {
+			tierdown(false);
+			callback(new Error(error.message))
+		});
+	});
+
+	When('servoy select2tokenizer component with name {elementName} I want to select the record with the partial text {text}', { timeout: 60 * 1000 }, function (elementName, text, callback) {
+		
 	});
 	//END SERVOY SELECT2TOKENIZER COMPONENT
 
@@ -1344,8 +1362,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP COMPONENTS
 	//BOOTSTRAP TEXTBOX
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"))), 30 * 1000, 'Textfield not found!').then(function () {
-			sendKeys(element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input")), text).then(function () {
+		var textbox = element.all(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input")).first()
+		browser.wait(EC.visibilityOf(textbox), 30 * 1000, 'Textfield not found!').then(function () {
+			sendKeys(textbox, text).then(function () {
 				wrapUp(callback, "insertTextEvent");
 			}).catch(function (error) {
 				callback(new Error(error.message));
@@ -2458,7 +2477,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		var fComponent = element(by.css("data-bootstrapcomponents-formcomponent[data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 				var tField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
@@ -2529,8 +2548,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
-
-
 	//END TEXT FIELDS
 	//DATA LABELS	
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
@@ -2740,7 +2757,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
-				var button = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
+				var button = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).element(by.css('select'));
 				clickElement(button).then(function(){
 					wrapUp(callback, "clickEvent");
 				});
@@ -2842,7 +2859,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 				checkbox.isSelected().then(function (isChecked) {
 					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-						checkbox.click().then(function () {
+						checkbox.element(by.css('label')).click().then(function () {
 							wrapUp(callback, "checkboxEvent");
 						})
 					} else {
@@ -3044,6 +3061,55 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	//END WILDCARD ELEMENT EXISTANCE VALIDATION
+
+	//SERVOY EXTRA COMPONENTS INSIDE FORMCOMPONENTS
+	When('formcomponent with the name {formComponentName} with a servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (fComponentName, elementName, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + fComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var tokenizer = fComponent.element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function () {
+				clickElement(tokenizer).then(function () {
+					wrapUp(callback, "clickEvent");
+				}).catch(function (error) {
+					tierdown(true);
+					callback(new Error(error.message));
+				});
+			})
+		}).catch(function (error) {
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	When('formcomponent with the name {formComponentName} with a servoy select2tokenizer component with name {elementName} I want to unselect the item with the text {text}', { timeout: 20 * 1000 }, function (fComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var tokenizer = fComponent.element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"));
+			browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function () {
+				var elemToDeselect = tokenizer.element(by.css("li[title='" + text + "']"));
+				clickElement(elemToDeselect.element(by.css("span"))).then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {
+			tierdown(true);
+			callback(new Error(error.message));
+		})
+	});
+
+	When('formcomponent with the name {formComponentName} with a servoy select2tokenizer component with name {elementName} the text {recordText} is inserted', { timeout: 60 * 1000 }, function (fComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var elem = fComponent.element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
+			sendKeys(elem, text, 'tokenizer').then(function () {
+				wrapUp(callback, "Click event");
+			})
+		}).catch(function (error) {
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+	//END SERVOY EXTRA COMPONENTS INSIDE FORMCOMPONENTS
 	//END FORMCOMPONENTS
 
 	//SERVOY GROUPING GRID COMPONENT
@@ -3228,13 +3294,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
+		text = text.toLowerCase();
 		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
 			table.each(function(tableItems){
 				//wait untill the table is loaded
 				var waitForInputField = tableItems.element(by.css("div[role=row]"));
 				browser.wait(EC.visibilityOf(waitForInputField)).then(function(){
-					var elem = tableItems.element(by.xpath("//div[text()='"+text+"']"));
+					var elem = tableItems.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text.toLowerCase() + "')]]")).first();
 					elem.isPresent().then(function(isPresent){
 						if(isPresent) {
 							wrapUp(callback, 'validateEvent');
@@ -3400,7 +3467,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3630,6 +3698,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	Then('I want to wait for maximum 5 minutes for a toast message with the text {text} to appear', {timeout: 300 * 1000}, function(toastMessage, callback) {
+		var toast = element(by.xpath("//div[@id='toast-container']")).element(by.xpath("//div[@class='toast-message']"));
+		browser.wait(EC.visibilityOf(toast), 299 * 1000, 'Toast message not displayed after 5 minutes!').then(function () {
+			toast.element(by.xpath("//div[@class='toast-message']")).getText().then(function (text) {
+				if (text.toLowerCase() === toastMessage.toLowerCase()) {
+					wrapUp(callback, "toastValidateTextEvent");
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+
+		// Are you sure you want to run the dataseeds
+	})
 	//END TOAST COMPONENT
 
 	//STANDARD SCROLL EVENTS
