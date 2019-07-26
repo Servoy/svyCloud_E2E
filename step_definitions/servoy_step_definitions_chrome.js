@@ -4704,17 +4704,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.driver.getCapabilities().then(function(caps){
 			browser.browserName = caps.get('browserName');
 		});
-		browser.driver.executeScript(function () {
-			return {
-			  width: window.screen.availWidth,
-			  height: window.screen.availHeight
-			};
-		  }).then(function (result) {
-			browser.driver.manage().window().setSize(result.width, result.height);
-		  }).catch(function(error) {
-			  console.log('Unable to set browser size!');
-			  console.log('Error: ' + error.message);
-		  })
+		browser.driver.manage().window().setSize(1360, 1020);
 	});
 });
 

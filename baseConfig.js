@@ -50,7 +50,6 @@ exports.config = {
 
   onPrepare: () => {
     console.log('onPrepare');
-    browser.driver.manage().window().setSize(1360, 1020);
   },
 
   onComplete: () => {
