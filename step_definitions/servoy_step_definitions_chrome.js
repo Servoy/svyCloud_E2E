@@ -4704,7 +4704,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.driver.getCapabilities().then(function(caps){
 			browser.browserName = caps.get('browserName');
 		});
-		browser.driver.manage().window().setSize(1360, 1020);
 	});
 });
 
