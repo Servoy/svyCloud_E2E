@@ -196,11 +196,8 @@ In the root of the repository of the main solution, a few folders have to be mad
 * jenkins-custom
 
 Inside jenkins-custom, two folders have to be made:
-
-* data-seeds
 * e2e-test-scripts
 
-Inside the data-seeds folder, SQL files containing insert queries have to be added. These are mandatory due to the E2E tests using an empty database (if the build process uses the pipeline approach) 
 
 Inside the **e2e-test-scripts**, a folder called **features** has to be added. In here, the following files required:
 
@@ -225,6 +222,10 @@ Inside the **e2e-test-scripts**, a folder called **features** has to be added. I
         "./features/folderB/example.feature"
       ]
     }
+
+**svyQAPAAS** 
+
+To be able to test on the same dataset each time the E2E test starts, the module called svyQAPAAS has to be used. svyQAPAAS is a module that can be used to import/export data from/to the database. One of the crucial E2E test steps that eventually has to be used for proper E2E testing is called 'Give I navigate to the test domain'. Once the E2E test spins up, a new environment with an empty copy of the database will be created just for the E2E test. svyQAPAAS will fill this empty database with data resulting in a proper E2E test with a predictable result. 
 
 **Capabilities**:
 
