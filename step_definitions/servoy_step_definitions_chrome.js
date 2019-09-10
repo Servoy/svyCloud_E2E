@@ -158,7 +158,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			tierdown(true);
 			callback(new Error(error.message));
 		});
-	})
+	});
+
+	When('data-servoyextra-sidenav component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, text, tabLevel, callback){
+		const sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
+			const elementToClick = sideNav.all(by.className(`sn-level-${tabLevel}`)).first().all(by.className(`svy-sidenav-item-text`)).first();
+			browser.wait(EC.presenceOf(elementToClick), 30 * 1000, 'Element not found!').then(function() {
+				clickElement(elementToClick).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 	//END SERVOY SIDENAV COMPONENT
 
 	//SERVOY CALENDAR COMPONENT
@@ -1031,7 +1046,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('servoy default typeahead component with name {elementName} I want to validate that the typeahead equals the text {text}', {timeout: 15 * 1000}, function(elementName, text, callback){
-		var typeahead = element(by.xpath("//input[@data-svy-name='" + elementName +"']"));
+		var typeahead = element(by.css(`input[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function(){
 			typeahead.getAttribute('value').then(function(value){
 				if (value.toLowerCase() === text.toLowerCase()) {
@@ -1327,7 +1342,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('servoy data-servoydefault-label component with name {elementName} I want to validate that the label equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']"));
+		var label = element(by.css(`data-servoydefault-label[data-svy-name='${elementName}']`));
 		var labelButton = element(by.xpath("//data-servoydefault-button[@data-svy-name='"+elementName+"']/button/div/span[2]"));
 		labelButton.isPresent().then(function(isPresent){
 			if(isPresent){
@@ -5336,7 +5351,7 @@ function pressKey(browserAction) {
 		case "escape":
 			return browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 		case "backspace":
-			return browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform()
+			return browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform();
 		case "delete":
 			return browser.actions().sendKeys(protractor.Key.DELETE).perform();
 		case "space":
@@ -5346,19 +5361,27 @@ function pressKey(browserAction) {
 			return browser.actions().mouseMove(element(by.xpath("//body")), { x: 0, y: 0 }).perform().then(function () {
 				return browser.actions().click().perform().then(function () {
 					return browser.actions().sendKeys(protractor.Key.PAGE_UP).perform();
-				})
+				});
 			});
 		case "page down":
 		case "pagedown":
 			return browser.actions().mouseMove(element(by.xpath("//body")), { x: 0, y: 0 }).perform().then(function () {
 				return browser.actions().click().perform().then(function () {
 					return browser.actions().sendKeys(protractor.Key.PAGE_DOWN).perform();
-				})
+				});
 			});
+		case "arrow right":
+			return $('body').sendKeys(protractor.Key.ARROW_RIGHT);
+		case "arrow left":
+			return $('body').sendKeys(protractor.Key.ARROW_LEFT);
+		case "arrow down":
+			return $('body').sendKeys(protractor.Key.ARROW_DOWN);
+		case "arrow up":
+			return $('body').sendKeys(protractor.Key.ARROW_UP);
 		case "end":
 			return browser.actions().sendKeys(protractor.Key.END).perform();
 		case "home":
-			return browser.actions().sendKeys(protractor.Key.HOME).perform();;
+			return browser.actions().sendKeys(protractor.Key.HOME).perform();
 		case "f1":
 			return browser.actions().sendKeys(protractor.Key.F1).perform();
 		case "f2":
