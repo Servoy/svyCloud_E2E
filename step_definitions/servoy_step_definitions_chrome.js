@@ -161,14 +161,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('data-servoyextra-sidenav component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, text, tabLevel, callback){
-		const sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
+		const sideNav = element.all(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
-			const elementToClick = sideNav.all(by.className(`sn-level-${tabLevel}`)).first().all(by.className(`svy-sidenav-item-text`)).first();
-			browser.wait(EC.presenceOf(elementToClick), 30 * 1000, 'Element not found!').then(function() {
-				clickElement(elementToClick).then(function() {
-					wrapUp(callback, "clickEvent");
-				});
+			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
+				var menuItem = menuItems.element(by.css('span'));
+				browser.wait(EC.presenceOf(menuItem), 15 * 1000, 'bla').then(function() {
+					menuItem.getText().then(function(menuItemText) {
+						if(menuItemText === text) {
+							clickElement(menuItem).then(function() {
+								wrapUp(callback, "clickEvent");
+							});
+						}
+					})
+				});			
 			});
+			
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
@@ -1248,12 +1255,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy combobox component with name {elementName} I want to validate that the combobox item with text {text} is selected', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var combobox = element.all(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName +"']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoydefault-combobox[@data-svy-name='" + elementName +"']"))), 30 * 1000, 'Combobox not found!').then(function(){
-			var selectedItem = combobox.all(by.xpath("//span[text()='"+text+"']"));
+		var combobox = element(by.css(`data-servoydefault-combobox[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
+			var selectedItem = combobox.element(by.xpath(`//span[contains(@class, 'ui-select-match-text') and text()='${text}']`));
 			selectedItem.isPresent().then(function(isPresent){
-				return isPresent;
-			}).then(function(isPresent){
 				if(isPresent) {
 					wrapUp(callback, 'validateEvent');
 				}
@@ -1312,7 +1317,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END DEFAULT INPUT FIELD
 	//SERVOY LABEL 
 	When('servoy data-servoydefault-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback) {
-		var labelButton = element(by.xpath("//data-servoydefault-button[@data-svy-name='"+elementName+"']/button"));
+		var labelButton = element(by.xpath(`//data-servoydefault-button[@data-svy-name='${elementName}']/button`));
 		labelButton.isPresent().then(function(isPresent){
 			if(isPresent){
 				clickElement(labelButton).then(function(){
@@ -1322,9 +1327,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error(error.message));
 				});
 			} else {
-				var label = element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']"));
+				var label = element(by.xpath(`//data-servoydefault-label[@data-svy-name='${elementName}']`));
 				browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
-					clickElement(element(by.xpath("//data-servoydefault-label[@data-svy-name='"+elementName+"']/div"))).then(function(){
+					clickElement(element(by.xpath(`//data-servoydefault-label[@data-svy-name='${elementName}']/div`))).then(function(){
 						wrapUp(callback, "clickEvent");
 					}).catch(function (error) {			
 						tierdown(true);
@@ -3332,6 +3337,29 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} does not exist', {timeout: 30 * 1000}, function(elementName, text, callback){
+		text = text.toLowerCase();
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
+			table.each(function(tableItems){
+				//wait untill the table is loaded
+				var waitForInputField = tableItems.element(by.css("div[role=row]"));
+				browser.wait(EC.visibilityOf(waitForInputField)).then(function(){
+					var elem = tableItems.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text.toLowerCase() + "')]]")).first();
+					elem.isPresent().then(function(isPresent){
+						if(isPresent) {
+							callback(new Error("Table item with the given text has been found!"));
+						} else {
+							wrapUp(callback, 'validateEvent');
+						}
+					});
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true);
 	});
@@ -3422,7 +3450,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var elementWithClass = row.element(by.className(className));
 				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
-					console.log('found');
 					elementWithClass.click().then(function() {
 						wrapUp(callback, "clickEvent");
 					});
@@ -3450,7 +3477,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var elementWithClass = row.element(by.className(className));
 				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
-					console.log('found');
 					elementWithClass.doubleClick().then(function() {
 						wrapUp(callback, "clickEvent");
 					});
@@ -3896,7 +3922,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			clickElement(item).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -3979,7 +4006,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			htmlView.each(function(htmlViewColumns){
 				htmlViewColumns.element(by.cssContainingText("*", text)).isPresent().then(function(isPresent){
 					if(isPresent) {
-						console.log('Found!');
 						wrapUp(callback, "validateEvent");
 					}
 				});
@@ -4939,11 +4965,11 @@ function scrollToElement(elementName, recordText, callback) {
 }
 
 function agGridIsGrouped(elementName) {
-	var table = element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='"+elementName+"']"));
-	var groupedElement = table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]"));
+	var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+	var groupedElement = table.all(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).first();
 	return groupedElement.isPresent().then(function(ret_val) {
 		if(ret_val) {
-			return table.element(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).isDisplayed().then(function(isDisplayed){
+			return table.all(by.xpath("//div[contains(@class,'ag-column-drop-row-group') and not(contains(@class,'ag-hidden'))]")).first().isDisplayed().then(function(isDisplayed){
 				if(isDisplayed) {
 					return true;
 				} else {
@@ -5028,12 +5054,11 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	var elementWithClass;
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
-	var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+	var table = element.all(by.xpath(`//data-aggrid-groupingtable[@data-svy-name='${elementName}']`));
 	browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
 			//Step 2a - Create the element that has to be found
-			var elementToClick = rowItems.all(by.xpath('//*[text()="' + text + '"]')).first();
-
+			var elementToClick = rowItems.all(by.xpath(`//*[text()="${text}"]`)).first();
 			//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
 			elementToClick.isPresent().then(function (isPresent) {
 				//Step 3a - Check if the element is present
@@ -5083,66 +5108,62 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 							return "ag-body-viewport-wrapper";
 						}
 					}).then(function(cName){
-						var rowContainer = rowItems.all(by.xpath("//div[@class='"+cName+"']"));
-						rowContainer.each(function(rowElements){
-							//Get all rows 
-							var rows = rowElements.all(by.css("div[role=row]"));
-							// var rows = rowElements.all(by.xpath("//div[@role='row']"));
-							rows.count().then(function(count){
-								//Let the browser catch up with rendering
-								browser.sleep(1).then(function(){
-									//Since the rows are sorted in a very strange way, the new rows are appended on top of the wrapper instead of at the bottom
-									for(var x = Math.round((count / 3)); x < Math.round(count / 2); x++) {
-									// for(var x = 0; x < count; x++) {
-										//ineficient, but it works - after each scroll, check if the element can be found
-										var elementToScrollTo = rows.get(x);
-										elementToClick.isPresent().then(function(pres){
-											if(pres) {
-												found = true;
-												if(className) {
-													elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
-													elementWithClass.isPresent().then(function(isPresent) {
-														if(isPresent) {
-															if(doubleClickElement) {
-																doubleClickElement(elementWithClass).then(function() {
-																	x = count + 1;
-																});
-															} else {
-																clickElement(elementWithClass).then(function() {
-																	x = count + 1;
-																});
-															}
-															
+						var rowContainer = rowItems.element(by.className(cName));
+						//Get all rows 
+						var rows = rowContainer.all(by.css("div[role=row]"));
+						rows.count().then(function(count){
+							//Let the browser catch up with rendering
+							browser.sleep(1).then(function(){
+								//Since the rows are sorted in a very strange way, the new rows are appended on top of the wrapper instead of at the bottom
+								for(var x = Math.round((count / 3)); x < Math.round(count / 2); x++) {
+									//ineficient, but it works - after each scroll, check if the element can be found
+									var elementToScrollTo = rows.get(x);
+									elementToClick.isPresent().then(function(pres){
+										if(pres) {
+											found = true;
+											if(className) {
+												elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
+												elementWithClass.isPresent().then(function(isPresent) {
+													if(isPresent) {
+														if(doubleClickElement) {
+															doubleClickElement(elementWithClass).then(function() {
+																x = count + 1;
+															});
 														} else {
-															elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
-															if(doubleClickElement) {
-																elementWithClass.doubleClick();
-															} else {
-																elementWithClass.click();
-															}
-															
+															clickElement(elementWithClass).then(function() {
+																x = count + 1;
+															});
 														}
-													});	
-												} else if(rowOption) {
-													findRecordByRowLevel(elementName, text, rowOption, level, callback);
-												} else {
-													clickElement(elementToClick).then(function(){
-														x = count + 1; //break loop, forcing protractor to finish the promise
-													});
-												}
+														
+													} else {
+														elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+														if(doubleClickElement) {
+															elementWithClass.doubleClick();
+														} else {
+															elementWithClass.click();
+														}
+														
+													}
+												});	
+											} else if(rowOption) {
+												findRecordByRowLevel(elementName, text, rowOption, level, callback);
 											} else {
-												browser.executeScript("arguments[0].scrollIntoView(true);", elementToScrollTo.getWebElement()).then(function(){
-													browser.sleep(500);
+												clickElement(elementToClick).then(function(){
+													x = count + 1; //break loop, forcing protractor to finish the promise
 												});
 											}
-										});
-									}
-								});
-							}).then(function(){
-								if(!found){
-									groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level);
+										} else {
+											browser.executeScript("arguments[0].scrollIntoView(true);", elementToScrollTo.getWebElement()).then(function(){
+												browser.sleep(500);
+											});
+										}
+									});
 								}
-							})
+							});
+						}).then(function(){
+							if(!found){
+								groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick);
+							}
 						});
 					});
 				}
@@ -5343,7 +5364,7 @@ function pressKey(browserAction) {
 	browserAction = browserAction.toLowerCase();
 	switch (browserAction) {
 		case "enter":
-			return browser.actions().sendKeys(protractor.Key.ENTER).perform();
+			return $('body').sendKeys(protractor.Key.ENTER);
 		case "control":
 			return browser.actions().sendKeys(protractor.Key.CONTROL).perform()
 		case "tab":
