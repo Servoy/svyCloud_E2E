@@ -43,7 +43,7 @@ To get the tests to work locally, either the jenkins-repository has to be cloned
 
 # Setup E2E environment
 Open a bash or command prompt and navigate to the qapaas-e2e folder and execute the following commands: 'npm install'. This will install all node packages that are required for e2e testing (minus Protractor)
-After this is done, execute the following command: 'npm install -g protractor@5.4.1'. This will enable the usage of the webdriver (see next step) and allow you to start the tests from any directory. Make sure the -g is also part of the command!
+After this is done, execute the following command: 'npm install -g protractor@5.4.2'. This will enable the usage of the webdriver (see next step) and allow you to start the tests from any directory. Make sure the -g is also part of the command!
 
 From the same directory, execute the following commands:
 - npm list 
