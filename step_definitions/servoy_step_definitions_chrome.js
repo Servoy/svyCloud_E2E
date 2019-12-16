@@ -165,7 +165,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
 			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
 				var menuItem = menuItems.element(by.css('span'));
-				browser.wait(EC.presenceOf(menuItem), 15 * 1000, 'bla').then(function() {
+				browser.wait(EC.presenceOf(menuItem), 15 * 1000, 'menuItem not found!').then(function() {
 					menuItem.getText().then(function(menuItemText) {
 						if(menuItemText === text) {
 							clickElement(menuItem).then(function() {
@@ -1072,7 +1072,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		
 	//DEFAULT INPUT FIELD
 	When('servoy default input component with name {elementName} the text {input} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
+		var inputField = element(by.xpath(`//input[@data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
 			sendKeys(inputField, text).then(function(){
 				wrapUp(callback, 'insertEvent');
@@ -3134,7 +3134,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY GROUPING GRID COMPONENT
 	When('servoy data-aggrid-groupingtable component with name {elementName} I scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
-		groupingGridTableScroll(elementName, recordText, callback);
+		groupingGridTableScroll(elementName, recordText, callback, false, false, false, false, false, false);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to {rowOption} row level {rowLevel} with {rowText} as text', { timeout: timeoutAgAction }, function (elementName, rowOption, rowLevel, rowText, callback) {
