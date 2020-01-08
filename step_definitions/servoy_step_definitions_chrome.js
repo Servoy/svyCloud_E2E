@@ -1273,8 +1273,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy combobox component the text {text} is inserted', { timeout: 60 * 1000 }, function (text, callback) {
-		var comboBox = element.all(by.xpath("//div[contains(@class, 'ui-select-container') and contains(@class, 'ui-select-bootstrap') and contains(@class, 'ng-touched')]/input")).last();
-		browser.wait(EC.visibilityOf(comboBox), 15 * 1000, 'Combobox not found!').then(function(){
+		var container = element(by.css('.ui-select-container.dropdown.open'));	
+		browser.wait(EC.visibilityOf(container), 15 * 1000, 'Combobox not found!').then(function(){
+			var comboBox = container.all(by.css("input[type='search']")).last();
 			sendComboboxKeys(comboBox, text).then(function () {
 				wrapUp(callback, "Insert value event");
 			}).catch(function (error) {
@@ -2497,7 +2498,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 				var tField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
@@ -2514,7 +2515,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-textbox component with name {cElementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 			browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textbox not found!').then(function(){
@@ -2533,7 +2534,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Element not found!').then(function () {
@@ -2552,7 +2553,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});	
 	
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var textField = fComponent.element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
@@ -2571,7 +2572,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END TEXT FIELDS
 	//DATA LABELS	
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
 			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -2593,7 +2594,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
 			browser.wait(EC.presenceOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -2616,7 +2617,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='"+elementName+"']"));
 			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
@@ -2638,7 +2639,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	}); 
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-datalabel component with name {elementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var dataLabel = fComponent.element(by.css("data-bootstrapcomponents-datalabel[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(dataLabel), 15 * 1000, 'Datalabel not found!').then(function(){
@@ -2657,7 +2658,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END DATA LABELS
 	//LABELS
 	When('formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var label = fComponent.element(by.css("data-bootstrapcomponents-label[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
@@ -2672,7 +2673,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var label = fComponent.element(by.css("data-bootstrapcomponents-label[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
@@ -2680,7 +2681,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if(labelText.indexOf(text) > -1) {
 						wrapUp(callback, "validateEvent");
 					} else {
-						console.log("'" + text + "' not found in the text '" + labelText + "'");
+						console.log(`'${text} + "' not found in the text '${labelText}'`);
 					}
 				})
 			});
@@ -2690,16 +2691,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+	Then('formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} I want to validate that the label equals the exact text {text}', {timeout: 40 * 1000}, function(formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
-			var label = fComponent.element(by.css(`data-bootstrapcomponents-label[data-svy-name='${elementName}']`));
+			var label = element(by.xpath(`//data-bootstrapcomponents-label[@data-svy-name='${elementName}']`));
 			browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
 				label.getText().then(function(labelText) {
 					if(labelText === text) {
 						wrapUp(callback, "validateEvent");
 					} else {
-						console.log(`Validation failed. Expected '${text}'. Got '${labelText}' instead!`);
+						callback(new Error(`Validation failed. Expected '${text}'. Got '${labelText}' instead!`));
 					}
 				});
 			});
@@ -2710,7 +2711,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {elementName} with a bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label has no text', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var bootstrapLabel = fComponent.element(by.css("data-bootstrapcomponents-label[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function () {
@@ -2734,7 +2735,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BUTTONS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 				var button = fComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css("button"));
@@ -2749,7 +2750,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (formComponentName, elementName, state, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var formComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(formComponent), 15 * 1000, 'Form component not found!').then(function(){
 			var button = formComponent.element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css("button"));
 			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
@@ -2774,7 +2775,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//COMBOBOX
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			browser.wait(EC.presenceOf(fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
 				var button = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).element(by.css('select'));
@@ -2789,7 +2790,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-select component with name {elementName} I want to validate that a row with the text {text} does not exist', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var combobox = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
@@ -2809,7 +2810,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-select component with name {elementName} I want to select the combobox item with the exact text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var combobox = fComponent.element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
@@ -2831,7 +2832,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (formComponentName, elementName, rowNumber, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent.first()), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var selectTable = fComponent.all(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).all(by.css("select"));
 			if (rowNumber) {
@@ -2848,7 +2849,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent.first()), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var table = fComponent.all(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).all(by.css("select"));
 			var row = table.first().element(by.css("option[selected='selected']"));
@@ -2873,7 +2874,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//CHECKBOX
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
@@ -2895,7 +2896,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
 			checkbox.isSelected().then(function (isChecked) {			
@@ -2916,7 +2917,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("span"));
 			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
@@ -2938,7 +2939,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label partially equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
 			var checkbox = fComponent.element(by.css("data-bootstrapcomponents-checkbox[data-svy-name='" + elementName + "']")).element(by.css("span"));
 			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
@@ -2960,9 +2961,98 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END CHECKBOX
 
+	//RADIOBUTTONS
+	When('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-choicegroup component with name {elementName} I want select item {radioNumber}', { timeout: 40 * 1000 }, function (formComponentName, elementName, radioNumber, callback) {
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var choiceGroup = fComponent.element(by.xpath(`//data-bootstrapcomponents-choicegroup[@data-svy-name='${elementName}']`));
+			var radio = choiceGroup.all(by.xpath(`//input[@type='radio']`)).get(radioNumber -1);
+			browser.wait(EC.presenceOf(radio), 15 * 1000, 'Radio not found!').then(function() {
+				clickElement(radio.element(by.xpath(".."))).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			});			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-choicegroup component with name {elementName} I want to validate that item {radioNumber} is {checkBoxState}', { timeout: 30 * 1000 }, function (formComponentName, elementName, radioNumber, checkboxOption, callback) {
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var choiceGroup = fComponent.element(by.xpath(`//data-bootstrapcomponents-choicegroup[@data-svy-name='${elementName}']`));
+			var radio = choiceGroup.all(by.css(`input[type='radio']`)).get(radioNumber -1);
+			radio.getAttribute('class').then(function(classes) {
+				switch(checkboxOption.toLowerCase()){				
+					case "checked": 
+					case "selected":
+						if(classes.indexOf('ng-not-empty') > -1) {
+							wrapUp(callback, "validateEvent");
+						} else {
+							callback(new Error("Given radio button is not checked!"));
+						}
+						break;
+					case "unchecked": 
+					case "not selected":
+						if(classes.indexOf('ng-not-empty') == -1) {
+							wrapUp(callback, "validateEvent");
+						} else {
+							callback(new Error("Given radio button is not checked!"));
+						}
+						break;
+					default:
+						callback(new Error("Only the keywords 'checked/selected' and 'unchecked/not selected' are supported!"))
+						break;
+				}
+			})
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-choicegroup component with name {elementName} I want to validate that item {radioNumber} its text equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var choiceGroup = fComponent.element(by.css(`data-bootstrapcomponents-choicegroup[data-svy-name='${elementName}']`));
+			var radio = choiceGroup.all(by.css(`label`)).get(radioNumber -1);
+			radio.getText().then(function(radioText) {
+				if(radioText.indexOf(text) > -1) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error(`Validation failed! Expected: '${text}'. Got '${radioText}' instead!`))
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('formcomponent with the name {formComponentName} with a data-bootstrapcomponents-choicegroup component with name {elementName} I want to validate that item {radioNumber} partially equals the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var choiceGroup = fComponent.element(by.css(`data-bootstrapcomponents-choicegroup[data-svy-name='${elementName}']`));
+			var radio = choiceGroup.all(by.css(`label`)).get(radioNumber -1);
+			radio.getText().then(function(radioText) {
+				if(radioText == text) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error(`Validation failed! Expected: '${text}'. Got '${radioText}' instead!`))
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+	//END RADIOBUTTONS
+
+
 	//INPUT GROUP
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to insert the text {text} in field number {fieldNumber}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, fieldNumber, callback) {
-		var fComponent = element.all(by.xpath("//data-bootstrapcomponents-formcomponent[@data-svy-name='" + formComponentName + "']"));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
@@ -2978,7 +3068,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
@@ -2994,7 +3084,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
@@ -3012,7 +3102,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, fieldNumber, text, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var inputGroup = fComponent.all(by.css("data-bootstrapextracomponents-input-group[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function () {
@@ -3021,7 +3111,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if (fieldText === text) {
 						wrapUp(callback, "validateEvent");
 					} else {
-						console.log("Validation failed. Expected " + text + ". Got " + fieldText);
+						callback(new Error("Validation failed. Expected " + text + ". Got " + fieldText));
 					}
 				})
 			})
@@ -3035,7 +3125,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP COMPONENTS
 	//DEFAULT COMPONENTS INSIDE FORM COMPONENTS
 	When('Formcomponent with the name {formComponentName} with a servoy default input component with name {elementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 15 * 1000, 'Formcomponent not found!').then(function () {
 			var inputField = fComponent.element(by.css("input[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function () {
@@ -3055,7 +3145,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//FORM COMPONENTS
 	//WILDCARD ELEMENT EXISTANCE VALIDATION
 	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
 			var wildcard = fComponent.element(by.css("*[data-svy-name='" + elementName + "']"));
 			browser.wait(EC.presenceOf(wildcard), 15 * 1000, 'Element not found!').then(function(){
@@ -3068,7 +3158,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('formcomponent with the name {formComponentName} I expect an element with the name {elementName} to not be present', {timeout: 30 * 1000}, function(formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-bootstrapcomponents-formcomponent[data-svy-name='${formComponentName}']`));
+		var fComponent = element(by.xpath(`//data-bootstrapcomponents-formcomponent[@data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent.first()), 30 * 1000, 'Formcomponent not found!').then(function(){
 			fComponent.all(by.css("*[data-svy-name='" + elementName + "']")).then(function(items) {
 				if(items.length === 0) {
@@ -3977,7 +4067,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-servoydefault-tabpanel component with name {elementName} I want to to slide to the {direction}', {timeout: 60 * 1000}, function(elementName, direction, callback){
+	When('servoy data-servoydefault-tabpanel component with name {elementName} I want to slide to the {direction}', {timeout: 60 * 1000}, function(elementName, direction, callback){
 		var tabPanel = element(by.xpath("//data-servoydefault-tabpanel[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(tabPanel), 30 * 1000, 'Tabelpanel not found!').then(function(){
 			var icon;
@@ -4128,10 +4218,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapextracomponents-navbar component with the name {elementName} I want to click on the element with the exact text {text} in the drop down menu', {timeout: 40 * 1000}, function(elementName, text, callback){
-		var tab = element(by.css("data-bootstrapextracomponents-navbar[@data-svy-name='"+elementName+"']"));
+		var tab = element(by.css("data-bootstrapextracomponents-navbar[data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(tab), 30 * 1000, 'Navbar not found!').then(function(){
 			var dropDown = tab.element(by.css("ul[@class='dropdown-menu ng-scope']"));
 			var dropDownItem = dropDown.element()
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	When('bootstrap data-bootstrapextracomponents-navbar component with the name {elementName} I want to click on the element with the class {className}', {timeout: 40 * 1000}, function(elementName, className, callback){
+		var menu = element(by.css(`data-bootstrapextracomponents-navbar[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(menu), 30 * 1000, 'Navbar not found!').then(function(){
+			var elementToClick = menu.element(by.className(`${className}`));
+			browser.wait(EC.presenceOf(elementToClick), 15 * 1000, 'Element with the given class has not been found!').then(function() {
+				clickElement(elementToClick).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			});
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
@@ -4733,6 +4838,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	})
 	//END SET IGNORESYNCHRONIZATION
 
+	//SERVOY LISTVIEW ITEMS
+	//TODO: input click/insert/validate
+	//		button click/validate/double click
+	//		
+	//END SERVOY LISTVIEW ITEMS
 
 	//ADMIN LOG
 	Given('I navigate to the admin page {ur} and clean up the warnings', {timeout: 30 * 1000}, function(url, callback) {
