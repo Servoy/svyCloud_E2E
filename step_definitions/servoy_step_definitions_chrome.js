@@ -1306,6 +1306,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy combobox component with name {elementName} I want to validate that the selected combobox item is empty', {timeout: 30 * 1000}, function(elementName, callback){
+		var combobox = element(by.css(`data-servoydefault-combobox[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
+			combobox.element(by.className(`ui-select-match-text`)).getText().then(function(selectedItemText){
+				if(!selectedItemText) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error(`Validation failed! The selected combobox item is not empty. The selected item is: ${selectedItemText}`));
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy combobox component the text {text} is inserted', { timeout: 60 * 1000 }, function (text, callback) {
 		var container = element(by.css('.ui-select-container.dropdown.open'));	
 		browser.wait(EC.visibilityOf(container), 15 * 1000, 'Combobox not found!').then(function(){
