@@ -174,7 +174,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						}
 					})
 				});			
-			});
+			});			
 			
 		}).catch(function (error) {			
 			tierdown(true);
@@ -1080,7 +1080,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
 			console.log(error.message);
 			tierdown(true);
 		});
@@ -1146,7 +1146,41 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
 				}
 			});
-		}).catch(function (error) {
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('servoy default input component with name {elementName} I want to validate that the input field is empty', {timeout: 30 * 1000}, function(elementName, callback){
+		var val;
+		var inputField = element(by.css(`input[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+			inputField.getAttribute('value').then(function(inputText){
+				if(!inputText) {
+					wrapUp(callback, 'validateEvent');
+				} else {
+					callback(new Error(`Validation failed! Expected the input field to be empty. Got '${inputText}' instead.`))
+				}
+			})
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+	
+	Then('servoy default input component I want to validate that the input field contains the text {text} in element number {elementNumber} with name {elementName}', {timeout: 30 * 1000}, function(text, elementNumber, elementName, callback){
+		var inputField = element.all(by.css("input[data-svy-name='"+elementName+"']")).get(elementNumber - 1);
+		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+			inputField.getAttribute('value').then(function(inputText) {
+				if(inputText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+					wrapUp(callback, "validateEvent");
+				} else {
+					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1223,7 +1257,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				})
 			}
 			
-		}).catch(function (error) {
+		}).catch(function (error) {			
 			callback(new Error(error.message));
 		});
 	});
@@ -1621,21 +1655,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var inputField = selectComponent.element(by.xpath("//option[text()='" + text + "']"));
 			inputField.isPresent().then(function (isPresent) {
 				if (isPresent) {
-					if (browser.browserName === 'firefox') {						
-						inputField.click().then(function () {
-							selectComponent.click().then(function() {
-								wrapUp(callback, "clickEvent");
-							});
-						});
-					} else {
+			if (browser.browserName === 'firefox') {
+				inputField.click().then(function () {
+					selectComponent.click().then(function() {
+						wrapUp(callback, "clickEvent");
+					});
+				});
+			} else {
 						clickElement(inputField).then(function () {
-							clickElement(selectComponent).then(function() {
+				clickElement(selectComponent).then(function() {
 								wrapUp(callback, "clickEvent");
-							});							
 						});
+					});
 					}
 				}
-			});
+				});				
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
@@ -3342,9 +3376,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				console.log('test');
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
-				clickElement(row).then(function() {
-					wrapUp(callback, "clickEvent");
-				});
+						clickElement(row).then(function() {
+							wrapUp(callback, "clickEvent");
+						});
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -3367,9 +3401,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
 				console.log('test');
 				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
-				doubleClickElement(row).then(function() {
-					wrapUp(callback, "clickEvent");
-				});
+						doubleClickElement(row).then(function() {
+							wrapUp(callback, "clickEvent");
+						});
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -3396,11 +3430,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var elem = table.all(by.xpath("//div[text()='"+text+"']")).first();
 			doubleClickElement(elem).then(function(){
 				wrapUp(callback, "clickEvent");
-			});
+	});
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
-		});
+	});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -3429,7 +3463,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} does not exist', {timeout: 30 * 1000}, function(elementName, text, callback){
 		text = text.toLowerCase();
-		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
 			table.each(function(tableItems){
 				//wait untill the table is loaded
@@ -3514,8 +3548,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
 					var child = parent.element(by.className(className));
 					child.doubleClick().then(function () {
-						wrapUp(callback, "clickEvent");
-					});
+							wrapUp(callback, "clickEvent");
+						});
 				});
 			});
 		}).catch(function (error) {			
@@ -3523,7 +3557,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
-	
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 45 * 1000}, function(elementName, className, rowNumber, callback){
 		rowNumber -= 1;
 		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
@@ -3541,8 +3575,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var elementWithClass = row.element(by.className(className));
 				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
 					elementWithClass.click().then(function() {
-						wrapUp(callback, "clickEvent");
-					});
+							wrapUp(callback, "clickEvent");
+						});
 				});
 			});
 		}).catch(function (error) {			
@@ -3568,8 +3602,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var elementWithClass = row.element(by.className(className));
 				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
 					elementWithClass.doubleClick().then(function() {
-						wrapUp(callback, "clickEvent");
-					});
+							wrapUp(callback, "clickEvent");
+						});
 				});
 			});
 		}).catch(function (error) {			
@@ -3624,23 +3658,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						//certain versions of the grid uses an input field. Others a div.
 						var inputField = col.element(by.css("input[class='ag-cell-edit-input']"))
 						inputField.isPresent().then(function(fieldPresent) { 
-							inputField.sendKeys(text).then(function () {								
-								col.sendKeys(protractor.Key.TAB).then(function () {
-									browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
-										col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-										col.getText().then(function (newText) {
-											if (newText === text) {
-												wrapUp(callback, "insertEvent");
-											} else {
+						inputField.sendKeys(text).then(function () {								
+							col.sendKeys(protractor.Key.TAB).then(function () {
+								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+									col.getText().then(function (newText) {
+										if (newText === text) {
+											wrapUp(callback, "insertEvent");
+										} else {
 												callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
-											}
-										});
+										}
 									});
 								});
 							});
 						});
 					});
 				});
+			});
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -5167,57 +5201,57 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	var table = element.all(by.xpath(`//data-aggrid-groupingtable[@data-svy-name='${elementName}']`));
 	browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
-			//Step 2a - Create the element that has to be found
+				//Step 2a - Create the element that has to be found
 			var elementToClick = rowItems.all(by.xpath(`//*[text()="${text}"]`)).first();
-			//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
+				//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
 			elementToClick.isPresent().then(function (isPresent) {
-				//Step 3a - Check if the element is present
-				if (isPresent) {
-					found = true;
-					//Step 3b - Element has been found. Conclude the test
-					if (className) {
+					//Step 3a - Check if the element is present
+					if (isPresent) {
+						found = true;
+						//Step 3b - Element has been found. Conclude the test
+						if (className) {
 						elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
-						elementWithClass.isPresent().then(function (isPresent) {
-							if (isPresent) {
-								if(shouldDoubleClick) {
-									doubleClickElement(elementWithClass).then(function () {
-										wrapUp(callback, "scrollEvent");
-									});
-								} else {
-									clickElement(elementWithClass).then(function () {
-										wrapUp(callback, "scrollEvent");
-									});
-								}
+							elementWithClass.isPresent().then(function (isPresent) {
+								if (isPresent) {
+									if (shouldDoubleClick) {
+										doubleClickElement(elementWithClass).then(function () {
+											wrapUp(callback, "scrollEvent");
+										});
+									} else {
+										clickElement(elementWithClass).then(function () {
+											wrapUp(callback, "scrollEvent");
+										});
+									}
 								
-							} else {
+								} else {
 								elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
 								if(doubleClickElement) {
 									elementWithClass.click();
-								} else {
+									} else {
 									elementWithClass.doubleClick();
+									}
+									
 								}
-								
-							}
-						});
-					} else if (shouldClick) {
+							});
+						} else if (shouldClick) {
 						if(doubleClickElement) {
 							doubleClickElement(elementToClick);
-						} else {
+							} else {
 							clickElement(elementToClick);
-						}
+							}
 						
-					} else if (rowOption) {
-						findRecordByRowLevel(elementName, text, rowOption, level, callback);
-					}
-				} else {
-					//Rows are sorted underneath a different contrainer when grouped or not
-					agGridIsGrouped(elementName).then(function(isGrouped){
-						if(isGrouped) {
-							return "ag-full-width-viewport";
-						} else {
-							return "ag-body-viewport-wrapper";
+						} else if (rowOption) {
+							findRecordByRowLevel(elementName, text, rowOption, level, callback);
 						}
-					}).then(function(cName){
+					} else {
+						//Rows are sorted underneath a different contrainer when grouped or not
+						agGridIsGrouped(elementName).then(function (isGrouped) {
+							if (isGrouped) {
+								return "ag-full-width-viewport";
+							} else {
+								return "ag-body-viewport-wrapper";
+							}
+						}).then(function (cName) {
 						var rowContainer = rowItems.element(by.className(cName));
 						//Get all rows 
 						var rows = rowContainer.all(by.css("div[role=row]"));
@@ -5265,17 +5299,17 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 										} else {
 											browser.executeScript("arguments[0].scrollIntoView(true);", elementToScrollTo.getWebElement()).then(function(){
 												browser.sleep(500);
-											});
-										}
 									});
-								}
+										}
 							});
+								}
+						});
 						}).then(function(){
 							if(!found){
 								groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick);
-							}
-						});
-					});
+					}
+				});
+			});
 				}
 			});
 		}).catch(function (error) {
