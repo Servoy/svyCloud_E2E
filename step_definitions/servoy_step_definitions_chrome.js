@@ -174,7 +174,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 						}
 					})
 				});			
-			});			
+			});
 			
 		}).catch(function (error) {			
 			tierdown(true);
@@ -1080,7 +1080,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				console.log(error.message);
 				tierdown(true);
 			});
-		}).catch(function (error) {			
+		}).catch(function (error) {
 			console.log(error.message);
 			tierdown(true);
 		});
@@ -1146,7 +1146,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
 				}
 			});
-		}).catch(function (error) {			
+		}).catch(function (error) {
 			callback(new Error(error.message));
 		});
 	});
@@ -1223,7 +1223,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				})
 			}
 			
-		}).catch(function (error) {			
+		}).catch(function (error) {
 			callback(new Error(error.message));
 		});
 	});
@@ -3224,7 +3224,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY GROUPING GRID COMPONENT
 	When('servoy data-aggrid-groupingtable component with name {elementName} I scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
-		groupingGridTableScroll(elementName, recordText, callback, false, false, false, false, false, null);
+		groupingGridTableScroll(elementName, recordText, callback, false, false, false, false, false, false);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to {rowOption} row level {rowLevel} with {rowText} as text', { timeout: timeoutAgAction }, function (elementName, rowOption, rowLevel, rowText, callback) {
@@ -3234,8 +3234,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, sortBy, callback) {
 		var grid = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
-			var gridHeader = grid.all(by.className("ag-header-row")).first();
-			var columnHeader = gridHeader.all(by.xpath(`//span[text()='${sortBy}']`)).first();
+			var gridHeader = grid.element(by.className("ag-header-row"));
+			var columnHeader = gridHeader.element(by.xpath("//span[text()='" + sortBy + "']"));
 			clickElement(columnHeader).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
@@ -3323,13 +3323,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the top', { timeout: 120 * 1000 }, function (elementName, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the top', { timeout: 60 * 1000 }, function (elementName, callback) {
 		groupingGridScrollToTop(elementName, callback);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select row number {rowNumber}', { timeout: 120 * 1000 }, function (elementName, rowNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
 		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
 			agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
@@ -3338,18 +3338,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						clickElement(row).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, null, null, null, false, false, locator);
-					}
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				console.log('test');
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				clickElement(row).then(function() {
+					wrapUp(callback, "clickEvent");
 				});
 			});
 		}).catch(function (error) {			
@@ -3358,9 +3352,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click row number {rowNumber}', { timeout: 120 * 1000 }, function (elementName, rowNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
 		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
 			agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
@@ -3369,18 +3363,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						doubleClickElement(row).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
-					}
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				console.log('test');
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				doubleClickElement(row).then(function() {
+					wrapUp(callback, "clickEvent");
 				});
 			});
 		}).catch(function (error) {			
@@ -3389,16 +3377,54 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the text {text}', {timeout: 60 * 1000}, function(elementName, text, callback){
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
+			var elem = table.all(by.xpath("//div[text()='"+text+"']")).first();
+			clickElement(elem).then(function(){
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click the record with the text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, null, false, true, false, null);
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select double click the record with the text {text}', {timeout: 60 * 1000}, function(elementName, text, callback){
+		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
+		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
+			var elem = table.all(by.xpath("//div[text()='"+text+"']")).first();
+			doubleClickElement(elem).then(function(){
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, false, null, false, false, false, null);
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
+		text = text.toLowerCase();
+		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
+		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
+			table.each(function(tableItems){
+				//wait untill the table is loaded
+				var waitForInputField = tableItems.element(by.css("div[role=row]"));
+				browser.wait(EC.visibilityOf(waitForInputField)).then(function(){
+					var elem = tableItems.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text.toLowerCase() + "')]]")).first();
+					elem.isPresent().then(function(isPresent){
+						if(isPresent) {
+							wrapUp(callback, 'validateEvent');
+						} else {
+							callback(new Error("Table item with the given text has not been found!"));
+						}
+					});
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} does not exist', {timeout: 30 * 1000}, function(elementName, text, callback){
@@ -3424,90 +3450,29 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
-
-
-
-
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record on row number {rowNumber} with the text {text} exists', {timeout: 30 * 1000}, function(elementName, rowNumber, text, callback){
-		rowNumber -= 1;
-		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
-				if(isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport-wrapper";
-				}
-			}).then(function(containerClass) {
-				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.all(by.className(`${containerClass}`));
-				// var row = rowContainer.element(by.css(`div[row-index='${rowNumber}']`));
-				rowContainer.all(by.css(`div[row-index='${rowNumber}']`)).each(function(row) {
-					var elem = row.element(by.xpath(`//*[text()[contains(translate(., '${text.toLowerCase()}', '${text.toLowerCase()}'), '${text.toLowerCase()}')]]`));
-					elem.isPresent().then(function(isPresent){
-						if(isPresent) {
-							wrapUp(callback, 'validateEvent');
-						} else {
-							callback(new Error("Table item with the given text has not been found!"));
-						}
-					});
-				});
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record on row number {rowNumber} with the text {text} does not exist', {timeout: 30 * 1000}, function(elementName, rowNumber, text, callback){
-		rowNumber -= 1;
-		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
-				if(isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport-wrapper";
-				}
-			}).then(function(containerClass) {
-				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.all(by.className(`${containerClass}`));
-				// var row = rowContainer.element(by.css(`div[row-index='${rowNumber}']`));
-				rowContainer.all(by.css(`div[row-index='${rowNumber}']`)).each(function(row) {
-					var elem = row.element(by.xpath(`//*[text()[contains(translate(., '${text.toLowerCase()}', '${text.toLowerCase()}'), '${text.toLowerCase()}')]]`));
-					elem.isPresent().then(function(isPresent){
-						if(isPresent) {
-							callback(new Error("Table item with the given text has been found!"));
-						} else {
-							wrapUp(callback, 'validateEvent');
-						}
-					});
-				});
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-
-
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
+		groupingGridTableScroll(elementName, text, callback, true);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and double click the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, null, false, true, false, null);
+		groupingGridTableScroll(elementName, text, callback, true, null, null, null, null);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the row with text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, false, null, false, false, false, null);
+		groupingGridTableScroll(elementName, text, callback);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to row number {rowNumber}', {timeout: 120 * 1000}, function(elementName, rowNumber, callback){
-		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
+		groupingGridTableScroll(elementName, text, callback, false, className, false, null);
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and double click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
+		groupingGridTableScroll(elementName, text, callback, false, className, false, null, true);
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
 			agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
 					return "ag-full-width-viewport";
@@ -3515,18 +3480,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						clickElement(row).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, null, null, null, false, false, locator);
-					}
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var selectedRow = rowContainer.all(by.xpath("//*[text()='" + text + "']")).first();
+				browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
+					var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
+					var child = parent.element(by.className(className));
+					child.click().then(function () {
+						wrapUp(callback, "clickEvent");
+					});
 				});
 			});
 		}).catch(function (error) {			
@@ -3535,45 +3497,52 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className, null, null, false, null, null);
-	});
-
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with text {rowText} and double click the element which contains the class {className}', {timeout: 120 * 1000}, function(elementName, text, className, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className, null, null, true, null, null);
-	});
-
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className, null, null, false, null, null);
-	});
-
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the element which contains the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, className, null, null, true, null, null);
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
+			agGridIsGrouped(elementName).then(function(isGrouped){
+				if(isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport-wrapper";
+				}
+			}).then(function(containerClass) {
+				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var selectedRow = rowContainer.all(by.xpath("//*[text()='" + text + "']")).first();
+				browser.wait(EC.presenceOf(selectedRow), 15 * 1000, 'Element with the given text not found!').then(function () {
+					var parent = selectedRow.element(by.xpath("..")).element(by.xpath(".."));
+					var child = parent.element(by.className(className));
+					child.doubleClick().then(function () {
+						wrapUp(callback, "clickEvent");
+					});
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
 	});
 	
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 45 * 1000}, function(elementName, className, rowNumber, callback){
 		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
+			return agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						clickElement(row.element(by.className(className))).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, className, null, null, false, false, locator);
-					}
+				var rowContainer = table.element(by.className(containerClass));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				var elementWithClass = row.element(by.className(className));
+				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
+					elementWithClass.click().then(function() {
+						wrapUp(callback, "clickEvent");
+					});
 				});
 			});
 		}).catch(function (error) {			
@@ -3584,27 +3553,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the element which contains the class {className} in row number {rowNumber}', {timeout: 45 * 1000}, function(elementName, className, rowNumber, callback){
 		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+		browser.wait(EC.presenceOf(table), 10 * 1000, 'Table not found!').then(function(){
+			return agGridIsGrouped(elementName).then(function(isGrouped){
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						doubleClickElement(row.element(by.className(className))).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, className, null, null, true, false, locator);
-					}
+				var rowContainer = table.element(by.className(containerClass));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
+				var elementWithClass = row.element(by.className(className));
+				browser.wait(EC.presenceOf(elementWithClass), 15 * 1000, 'Element with the given class has not been found!').then(function() {
+					elementWithClass.doubleClick().then(function() {
+						wrapUp(callback, "clickEvent");
+					});
 				});
 			});
 		}).catch(function (error) {			
@@ -3642,7 +3607,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//GROUPING GRID INSERT EVENTS
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', { timeout: 30 * 1000 }, function (elementName, text, rowNumber, columnNumber, callback) {
 		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
@@ -3651,23 +3616,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function (containerClass) {
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(`div[row-index='${rowNumber}']`));
+				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var row = rowContainer.element(by.css("div[row-index='" + rowNumber + "']"));
 				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
 				browser.wait(EC.presenceOf(col), 15 * 1000).then(function () {					
 					doubleClickElement(col).then(function () {
 						//certain versions of the grid uses an input field. Others a div.
 						var inputField = col.element(by.css("input[class='ag-cell-edit-input']"))
-						inputField.sendKeys(text).then(function () {								
-							col.sendKeys(protractor.Key.TAB).then(function () {
-								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
-									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-									col.getText().then(function (newText) {
-										if (newText === text) {
-											wrapUp(callback, "insertEvent");
-										} else {
-											callback(new Error(`Validation failed! Expected '${text}'. Got '${newText}'. Possibility is that the column is not editable`))
-										}
+						inputField.isPresent().then(function(fieldPresent) { 
+							inputField.sendKeys(text).then(function () {								
+								col.sendKeys(protractor.Key.TAB).then(function () {
+									browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
+										col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
+										col.getText().then(function (newText) {
+											if (newText === text) {
+												wrapUp(callback, "insertEvent");
+											} else {
+												callback(new Error("Validation failed! Expected '" + text + "'. Got '" + newText + "'. Possibility is that the column is not editable"))
+											}
+										});
 									});
 								});
 							});
@@ -3903,22 +3870,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {				
 				tierdown(true);
 				callback(new Error(error.message));
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	Then('default textarea component with name {elementName} I want to validate that the input field is empty', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.css(`textarea[data-svy-name='${elementName}']`))
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textarea not found!').then(function(){
-			inputField.getAttribute('value').then(function(inputText){
-				if(!inputText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Text area with the given name is not empty! It contains the text ${inputText}`));
-				}
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -5143,7 +5094,7 @@ function agGridIsGrouped(elementName) {
 
 function groupingGridScrollToTop(elementName, callback) {
 	var table = element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-	var tableContainer = table.element(by.xpath("//div[contains(@class, 'ag-body-container')]"));
+	var tableContainer = table.element(by.xpath("//div[@class='ag-body-container']"));
 	browser.executeScript("arguments[0].scrollIntoView(true);", tableContainer.getWebElement()).then(function () {
 		wrapUp(callback, "tableScrollEvent");
 	}).catch(function (error) {
@@ -5209,117 +5160,128 @@ function scrollToElementTableComponent(elementName, recordText, shouldClick, cal
 }
 
 // SERVOY GROUPING TABLE
-function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator, insertInField){
+function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick){
 	var elementWithClass;
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
 	var table = element.all(by.xpath(`//data-aggrid-groupingtable[@data-svy-name='${elementName}']`));
 	browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
-			agGridIsGrouped(elementName).then(function (isGrouped) {
-				if (isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport-wrapper";
-				}
-			}).then(function (cName) {
-				var rowContainer = rowItems.all(by.className(cName));
-				var elementToScroll = null;
-				//Step 2a - Create the element that has to be found
-				if (locator) {
-					elementToScroll = rowContainer.all(by.css(`${locator}`)).first();
-				} else {
-					elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();
-				}
-				//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
-				elementToScroll.isPresent().then(function (isPresent) {
-					//Step 3a - Check if the element is present
-					if (isPresent) {
-						found = true;
-						//Step 3b - Element has been found. Conclude the test
-						if (className) {
-							if(locator) {
-								elementWithClass = elementToScroll.all(by.className(className)).first();
-							} else {
-								elementWithClass = elementToScroll.all(by.xpath("..")).all(by.className(className)).first();
-							}
-							
-							elementWithClass.isPresent().then(function (isPresent) {
-								if (isPresent) {
-									if (shouldDoubleClick) {
-										doubleClickElement(elementWithClass).then(function () {
-											wrapUp(callback, "scrollEvent");
-										});
-									} else {
-										clickElement(elementWithClass).then(function () {
-											wrapUp(callback, "scrollEvent");
-										});
-									}
+			//Step 2a - Create the element that has to be found
+			var elementToClick = rowItems.all(by.xpath(`//*[text()="${text}"]`)).first();
+			//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
+			elementToClick.isPresent().then(function (isPresent) {
+				//Step 3a - Check if the element is present
+				if (isPresent) {
+					found = true;
+					//Step 3b - Element has been found. Conclude the test
+					if (className) {
+						elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
+						elementWithClass.isPresent().then(function (isPresent) {
+							if (isPresent) {
+								if(shouldDoubleClick) {
+									doubleClickElement(elementWithClass).then(function () {
+										wrapUp(callback, "scrollEvent");
+									});
 								} else {
-									if(locator) {
-										elementWithClass = elementToScroll.findElement(by.className(className));
-									} else {
-										elementWithClass = elementToScroll.getWebElement().findElement(by.className(className));
-									}
-									
-									if (shouldDoubleClick) {
-										elementWithClass.doubleClick();
-									} else {
-										elementWithClass.click();
-									}
+									clickElement(elementWithClass).then(function () {
+										wrapUp(callback, "scrollEvent");
+									});
+								}
+								
+							} else {
+								elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+								if(doubleClickElement) {
+									elementWithClass.click();
+								} else {
+									elementWithClass.doubleClick();
+								}
+								
+							}
+						});
+					} else if (shouldClick) {
+						if(doubleClickElement) {
+							doubleClickElement(elementToClick);
+						} else {
+							clickElement(elementToClick);
+						}
+						
+					} else if (rowOption) {
+						findRecordByRowLevel(elementName, text, rowOption, level, callback);
+					}
+				} else {
+					//Rows are sorted underneath a different contrainer when grouped or not
+					agGridIsGrouped(elementName).then(function(isGrouped){
+						if(isGrouped) {
+							return "ag-full-width-viewport";
+						} else {
+							return "ag-body-viewport-wrapper";
+						}
+					}).then(function(cName){
+						var rowContainer = rowItems.element(by.className(cName));
+						//Get all rows 
+						var rows = rowContainer.all(by.css("div[role=row]"));
+						rows.count().then(function(count){
+							//Let the browser catch up with rendering
+							browser.sleep(1).then(function(){
+								//Since the rows are sorted in a very strange way, the new rows are appended on top of the wrapper instead of at the bottom
+								for(var x = Math.round((count / 3)); x < Math.round(count / 2); x++) {
+									//ineficient, but it works - after each scroll, check if the element can be found
+									var elementToScrollTo = rows.get(x);
+									elementToClick.isPresent().then(function(pres){
+										if(pres) {
+											found = true;
+											if(className) {
+												elementWithClass = elementToClick.element(by.xpath("..")).element(by.className(className));
+												elementWithClass.isPresent().then(function(isPresent) {
+													if(isPresent) {
+														if(doubleClickElement) {
+															doubleClickElement(elementWithClass).then(function() {
+																x = count + 1;
+															});
+														} else {
+															clickElement(elementWithClass).then(function() {
+																x = count + 1;
+															});
+														}
+														
+													} else {
+														elementWithClass = elementToClick.getWebElement().findElement(by.className(className));
+														if(doubleClickElement) {
+															elementWithClass.doubleClick();
+														} else {
+															elementWithClass.click();
+														}
+														
+													}
+												});	
+											} else if(rowOption) {
+												findRecordByRowLevel(elementName, text, rowOption, level, callback);
+											} else {
+												clickElement(elementToClick).then(function(){
+													x = count + 1; //break loop, forcing protractor to finish the promise
+												});
+											}
+										} else {
+											browser.executeScript("arguments[0].scrollIntoView(true);", elementToScrollTo.getWebElement()).then(function(){
+												browser.sleep(500);
+											});
+										}
+									});
 								}
 							});
-						} else if (shouldClick) {
-							if (shouldDoubleClick) {
-								browser.actions().doubleClick(elementToScroll).perform().then(function () {
-									wrapUp(callback, "scrollEvent");
-								});
-							} else {
-								clickElement(elementToScroll).then(function () {
-									wrapUp(callback, "scrollEvent");
-								});
+						}).then(function(){
+							if(!found){
+								groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick);
 							}
-						} else if (rowOption) {
-							findRecordByRowLevel(elementName, text, rowOption, level, callback);
-						}
-					} else {
-						//Rows are sorted underneath a different contrainer when grouped or not
-						agGridIsGrouped(elementName).then(function (isGrouped) {
-							if (isGrouped) {
-								return "ag-full-width-viewport";
-							} else {
-								return "ag-body-viewport-wrapper";
-							}
-						}).then(function (cName) {
-							var rowContainer = rowItems.all(by.className(cName));
-							var grid = rowContainer.$$("div[role=row]");
-							var maxIndex = 0;
-							grid.each(function (row) {
-								row.getAttribute('row-index').then(function (index) {
-									maxIndex = (parseInt(index)) > maxIndex ? parseInt(index) : maxIndex;
-								})
-							}).then(function () {
-								var lastElement = rowContainer.all(by.css(`div[row-index='${(maxIndex - 1).toString()}']`)).first();
-								browser.wait(EC.presenceOf(lastElement), 10 * 1000, 'Unable to scroll to last element').then(function () {
-									browser.executeScript("arguments[0].scrollIntoView(true);", lastElement.getWebElement()).then(function () {
-										groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator);
-									});
-								}).catch(function (error) {
-									callback(new Error(error.message));
-									tierdown(true);
-								})
-							});
 						});
-					}
-				});
+					});
+				}
 			});
 		}).catch(function (error) {
 			callback(new Error(error.message));
 		});
 	}).then(function(){
-		if(insertInField && found) {
-			return true;
-		}
 		if(found) {
 			wrapUp(callback, "scrollEvent");
 		}
@@ -5346,19 +5308,12 @@ function findRecordByRowLevel(elementName, recordText, rowOption, level, callbac
 							found = true;
 							wrapUp(callback, "gridCollapse");
 						});
-					} else {
-						callback(new Error('Only expand or collapse is supported'))
 					}
 				}
 			});
 		}).then(function () {
 			if (!found) {
-				if(rowOption == 'expand') {
-					groupingGridTableScroll(elementName, recordText, callback, true, 'glyphicon-plus', rowOption, level);
-				} else {
-					groupingGridTableScroll(elementName, recordText, callback, true, 'glyphicon-minus', rowOption, level);
-				}
-				
+				groupingGridTableScroll(elementName, recordText, callback, true, null, rowOption, level);
 			}
 		});
 	});
