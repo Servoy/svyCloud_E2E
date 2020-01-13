@@ -1147,40 +1147,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			});
 		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	Then('servoy default input component with name {elementName} I want to validate that the input field is empty', {timeout: 30 * 1000}, function(elementName, callback){
-		var val;
-		var inputField = element(by.css(`input[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
-			inputField.getAttribute('value').then(function(inputText){
-				if(!inputText) {
-					wrapUp(callback, 'validateEvent');
-				} else {
-					callback(new Error(`Validation failed! Expected the input field to be empty. Got '${inputText}' instead.`))
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-	
-	Then('servoy default input component I want to validate that the input field contains the text {text} in element number {elementNumber} with name {elementName}', {timeout: 30 * 1000}, function(text, elementNumber, elementName, callback){
-		var inputField = element.all(by.css("input[data-svy-name='"+elementName+"']")).get(elementNumber - 1);
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
-			inputField.getAttribute('value').then(function(inputText) {
-				if(inputText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
-				}
-			});
-		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1299,22 +1265,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			}).catch(function (error) {
 				console.log(error.message);
 				tierdown(true);
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('servoy combobox component with name {elementName} I want to validate that the selected combobox item is empty', {timeout: 30 * 1000}, function(elementName, callback){
-		var combobox = element(by.css(`data-servoydefault-combobox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
-			combobox.element(by.className(`ui-select-match-text`)).getText().then(function(selectedItemText){
-				if(!selectedItemText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Validation failed! The selected combobox item is not empty. The selected item is: ${selectedItemText}`));
-				}
 			});
 		}).catch(function (error) {			
 			tierdown(true);
