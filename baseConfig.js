@@ -12,7 +12,7 @@ exports.config = {
     screenshotDirectory: 'reports/screenshots/',
     jsonDirectory: 'reports/cucumber_reports/'
   },
-
+  allScriptsTimeout: 360 * 1000,
   frameworkPath: require.resolve('protractor-cucumber-framework'),
 
   cucumberOpts: {
