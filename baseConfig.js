@@ -56,8 +56,11 @@ exports.config = {
     console.log('onComplete');
   },
 
-  onCleanUp: () => {
+  onCleanUp: (exitCode) => {
     console.log('onCleanUp');
+    if(exitCode != 0) {
+      process.exit(exitCode);
+    }
   },
 
   afterLaunch: () => {
