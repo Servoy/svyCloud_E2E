@@ -50,6 +50,10 @@ exports.config = {
 
   onPrepare: () => {
     console.log('onPrepare');
+    if(browser.params.E2E_VAR_FULLSCREEN) {
+      browser.driver.manage().window().maximize();
+    }
+    
   },
 
   onComplete: () => {
