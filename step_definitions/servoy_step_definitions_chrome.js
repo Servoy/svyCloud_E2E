@@ -1666,27 +1666,29 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var selectComponent = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
+		var selectComponent = element(by.css(`data-bootstrapcomponents-select[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
-			var inputField = selectComponent.element(by.xpath("//option[text()='" + text + "']"));
+			var inputField = selectComponent.element(by.cssContainingText(`option`,`${text}`));
+			//by.cssContainingText('option', text)
 			inputField.isPresent().then(function (isPresent) {
+				// console.log()
 				if (isPresent) {
-			if (browser.browserName === 'firefox') {
-				inputField.click().then(function () {
-					selectComponent.click().then(function() {
-						wrapUp(callback, "clickEvent");
-					});
-				});
-			} else {
-						clickElement(inputField).then(function () {
-				clickElement(selectComponent).then(function() {
+					if (browser.browserName === 'firefox') {
+						inputField.click().then(function () {
+							selectComponent.click().then(function () {
 								wrapUp(callback, "clickEvent");
+							});
 						});
-					});
+					} else {
+						clickElement(inputField).then(function () {
+							clickElement(selectComponent).then(function () {
+								wrapUp(callback, "clickEvent");
+							});
+						});
 					}
 				}
-				});				
-		}).catch(function (error) {			
+			});
+		}).catch(function (error) {
 			tierdown(true);
 			callback(new Error(error.message));
 		});
@@ -3390,18 +3392,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			}).then(function(containerClass) {
 				var locator = `div[row-index='${(rowNumber).toString()}']`;
-				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
+			//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
 				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
 				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-						clickElement(row).then(function() {
-							wrapUp(callback, "clickEvent");
-						});
-					} else {
+			row.isPresent().then(function(isPresent) {
+				if(isPresent) {					
+					clickElement(row).then(function() {
+						wrapUp(callback, "clickEvent");
+					});				
+				} else {
 						groupingGridTableScroll(elementName, null, callback, true, null, null, null, false, false, locator);
-					}
-				});
+				}
+			});
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -3424,15 +3426,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
 				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
 				var row = rowContainer.element(by.css(locator));
-				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
+			row.isPresent().then(function(isPresent) {
+				if(isPresent) {
 						doubleClickElement(row).then(function() {
 							wrapUp(callback, "clickEvent");
-						});
-					} else {
-						groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
-					}
-				});
+						});	
+				} else {
+					groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
+				}
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -3614,19 +3615,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
+				var locator = `div[row-index='${rowNumber}']`;
 				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
+				var rowContainer = table.all(by.className(containerClass));
+				var row = rowContainer.all(by.css(locator)).last();
 				row.isPresent().then(function(isPresent) {
+					console.log(isPresent);
 					if(isPresent) {
-						clickElement(row.element(by.className(className))).then(function() {
-							wrapUp(callback, "clickEvent");
+						var elemWithClass = row.element(by.className(className));
+						browser.wait(EC.presenceOf(elemWithClass), 15 * 1000, 'Row with the given class has not been found!').then(function() {
+							clickElement(elemWithClass).then(function() {
+								wrapUp(callback, "clickEvent");
+							});
 						});
-					} else {
+						
+					 } else {
 						groupingGridTableScroll(elementName, null, callback, true, className, null, null, false, false, locator);
 					}
 				});
@@ -4114,6 +4120,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	//END MODEL DIALOG COMPONENT
+
+	//DEFAULT POPUP
+	When('default default popup menu I want to select the menu item with the text {text}', {timeout: 30 * 1000}, function(text, callback) {
+		var menu = element(by.className('yui-module'));
+		browser.wait(EC.presenceOf(menu), 15 * 1000, 'Popup menu has not been found!').then(function() {
+			console.log('found menu')
+			clickElement(menu.element(by.xpath(`//span[text()='${text}']`))).then(function() {
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function(error) {
+			tierdown(false);
+			callback(new Error(error.message));
+		})
+	})
+	//END DEFAULT POPUP
 
 	//SERVOY WINDOW COMPONENT 
 	When('servoy window component I want to wait untill the window disappears', {timeout: 45 * 1000}, function(callback){
@@ -5334,7 +5355,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 				if (isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function (cName) {
 				var rowContainer = rowItems.all(by.className(cName));
@@ -5345,9 +5366,12 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 				} else {	
 					if(partialTextMatch) {
 						elementToScroll = rowContainer.all(by.cssContainingText(`*`, `${text}`)).first();
-					} else {
+					} else if(text) {
 						elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();	 
 					} 
+				}
+				if(className) {
+					elementToScroll = rowContainer.all(by.css(`${className}`)).first();				
 				}
 				//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
 				elementToScroll.isPresent().then(function (isPresent) {
@@ -5408,7 +5432,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 							if (isGrouped) {
 								return "ag-full-width-viewport";
 							} else {
-								return "ag-body-viewport-wrapper";
+								return "ag-body-viewport";
 							}
 						}).then(function (cName) {
 							var rowContainer = rowItems.all(by.className(cName));
