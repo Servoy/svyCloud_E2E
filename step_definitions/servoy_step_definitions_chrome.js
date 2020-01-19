@@ -1940,7 +1940,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP CHOICEGROUP
 	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want option {optionNumber} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
-		var choiceGroup = element.all(by.xpath("//data-bootstrapcomponents-choicegroup[@data-svy-name='" + elementName + "']"));
+		var choiceGroup = element.all(by.css(`data-bootstrapcomponents-choicegroup[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(choiceGroup.first()), 30 * 1000, 'Choicegroup not found!').then(function(){
 			var option = choiceGroup.all(by.css("input")).get(optionNumber - 1);
 			browser.wait(EC.presenceOf(option), 15 * 1000, 'Option not found!').then(function(){
@@ -1948,7 +1948,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
 				}).then(function(isChecked){
 					if(isChecked) {
-						clickElement(option).then(function () {
+						clickElement(option.element(by.xpath(".."))).then(function () {
 							wrapUp(callback, "checkboxEvent");
 						})
 					} else {
