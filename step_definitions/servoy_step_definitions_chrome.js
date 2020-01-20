@@ -3406,17 +3406,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		rowNumber -= 1;
 		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
-			agGridIsGrouped(elementName).then(function(isGrouped){
-				if(isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport-wrapper";
-				}
-			}).then(function(containerClass) {
-				var locator = `div[row-index='${(rowNumber).toString()}']`;
-				//Rows are generated multiple times in the aggrid structure. The displayed rows are in the following wrapper
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(locator));
+			var locator = `div[row-index='${rowNumber}']`;
+			var row = table.all(by.css(locator)).first();
 			row.isPresent().then(function(isPresent) {
 				if(isPresent) {
 						doubleClickElement(row).then(function() {
