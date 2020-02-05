@@ -156,7 +156,41 @@ Filled in examples:
     When I press backspace
 
 # Running the tests
-Once all these steps are finished, the test can start by navigating to the qapaas-e2e folder and executing the 'protractor baseConfig.config' command.
+Once all these steps are finished, the test can start by navigating to the qapaas-e2e folder with a command prompt/bash.
+After this, start the test by executing the 'protractor baseConfig.config' command.
+
+**Protractor parameters**
+The above command to start the tests can be expanded by adding parameters. Parameters added in the command line will overrule any property set in baseConfig.js. A few common examples:
+
+Using a parameter to set which feature files are tested:
+- protractor baseConfig.js --specs=%PROTRACTOR_FEATURES%/mySolution/testSetOne/*.feature
+In this case an environment variable is used which is set to a specific folder. Inside this folder/mySolution/testSetOne all tests will be executed.
+
+The above example can also be modified like this:
+- protractor baseConfig.js --specs=%PROTRACTOR_FEATURES%/mySolution/testSetOne/test_one.feature,%PROTRACTOR_FEATURES%/mySolution/testSetOne/test_two.feature
+
+Using a parameter to set specific variables:
+Inside baseConfig.js is an object called 'params'. Inside this object, there are a few variables defined. One which is 'testDomainURL'. This variable is used in the 'Given I navigate to the test domain' test step. If you want to create a specific login step, this is a useful variable since you define it once and can re-use it in all the login steps.
+
+To define this variable, the command has to be expanded like this:
+protractor baseConfig.js --params.testDomainURL=myURL
+
+
+**Jenkins Parameters**
+For security reasons, once the tests are ready to be exported and ran during the automated build, it is highly advised to create 2 Jenkins Parameters.
+Protractor logs all steps in a log file and if one of the steps is:
+*When bootstrap data-bootstrapcomponents-textbox component with name myFormName.myPasswordField the text myNotSoHiddenPassword is inserted*
+It will display your password in the logs. 
+
+One way to prevent this is by adding a password variable in the config of the Jenkins job. Every Jenkins variable that is used in the E2E tests should have the following prefix:
+*E2E_VAR_*
+
+A few complete example would be:
+*E2E_VAR_PASSWORD*
+*E2E_VAR_USERNAME*
+*E2E_VAR_TENANT*
+
+Once these are defined in the build, these can be used to login the solution using a custom defined step. See the *custom_step_definition* section for an example on how to use the above variables in a complete step.
 
 # Supported components
 List of all currently supported steps to test servoy components and to navigate to an URL. Each step will be given one or more examples.
@@ -191,19 +225,28 @@ recognition meaning the word tractor will be found in the word protractor
 ```
 
 **QA-PAAS**
-
+In order to run the tests during the automated build, the steps below have to be done.
 In the root of the repository of the main solution, a few folders have to be made:
 * jenkins-custom
 
 Inside jenkins-custom, two folders have to be made:
 * e2e-test-scripts
 
-
 Inside the **e2e-test-scripts**, a folder called **features** has to be added. In here, the following files required:
 
 * A file called **config.json**
 * At least 1 or more .feature files. They can of course be structured in sub-folders.
 
+Once this is done, the structure should look like this:
+Root of the Repository
+    - Jenkins Custom
+        - Features
+            - Config.json
+            - all your tests (these can be split into sub directories)
+                - custom_step_definitions
+                    - custom_step_definitions.js
+                - custom_scripts (optional)
+                    - custom JS scripts
 **Config.json** specifies which tests are executed, which browsers are used and which properties are set to each browser.
 
 **config.json configuration**
@@ -220,12 +263,35 @@ Inside the **e2e-test-scripts**, a folder called **features** has to be added. I
       "specs": [
         "./features/folderA/*.feature",
         "./features/folderB/example.feature"
-      ]
+      ],
+       "cucumberOpts" : {
+            "tags": [
+                "~@skip", "@do-not-skip"
+            ]
+        }
     }
 
+**Tags**
+
+Inside config.json you can define tags. Tags defined in here can be placed in a .feature file. In the above example, every feature file that starts with '@skip', will NOT be run. This can be used to structure your feature files to make sure
+Below of a feature that will always be skipped:
+
+    @do-not-skip
+    Feature: Testing my tags
+        Scenario Outline: This test will not run
+
+        Given I go to https://salesdemo-dev.sandbox.servoy-cloud.eu/solutions/SalesDemo/index.html
+        Then I want to sleep for 3 seconds
+
+
+        @data_table_servoy
+        Examples:
+        ||
+        || 
 **svyQAPAAS** 
 
-To be able to test on the same dataset each time the E2E test starts, the module called svyQAPAAS has to be used. svyQAPAAS is a module that can be used to import/export data from/to the database. One of the crucial E2E test steps that eventually has to be used for proper E2E testing is called 'Give I navigate to the test domain'. Once the E2E test spins up, a new environment with an empty copy of the database will be created just for the E2E test. svyQAPAAS will fill this empty database with data resulting in a proper E2E test with a predictable result. 
+To be able to test on the same dataset each time the E2E test starts, the module called svyQAPAAS has to be used. svyQAPAAS is a module that can be used to import/export data from/to the database. One of the crucial E2E test steps that eventually has to be used for proper E2E testing is called 'Given I navigate to the test domain'. Once the E2E test spins up, a new environment with an empty copy of the database will be created just for the E2E test. svyQAPAAS will fill this empty database with data resulting in a proper E2E test with a predictable result. 
+One way to handle data importing is by adding a button on the landing page that fills the database with data. This step only has to be executed once! 
 
 **Capabilities**:
 
@@ -297,24 +363,69 @@ This will start both chrome and firefox without a UI.
 
 
 **Custom steps**
-Finally, in the same folder, a folder called custom_step_definitions has to be created. In here a file called custom_step_definitions.js has to be made. The file **servoy_step_definitions_chrome.js** has a lot of examples that can help creating custom steps.
+Finally, in the features folder, a folder called custom_step_definitions has to be created. In here a file called custom_step_definitions.js has to be made. The file **servoy_step_definitions_chrome.js** has a lot of examples that can help creating custom steps.
 
-The file has to at least use the following syntax:
+The step below is an example on how to add security to your login test. Knowledge about HTML locators is highly recommended in order to create custom steps
+```javascript
+//To run this step, add the following syntax in your feature file:
+//Given I want to login my solution
+ Given('I want to login my solution', {timeout: 30 * 1000}, function(callback) {
+    //define your elements by using locators in this case the UN/PW fields and the login button
+    var un_field = element(by.css("input[data-svy-name='formName.elementName']"));
+		var pw_field = element(by.css("data-servoydefault-password[data-svy-name='formName.elementName']")).$('input');
+		var loggin_button = element(by.css("data-servoydefault-button[data-svy-name='formName.elementName']")).$('button');
 
-    var { defineSupportCode } = require('../../lib/cucumberLoader').load();
-    var EC = protractor.ExpectedConditions;
-    var element = browser.element;
-
-    defineSupportCode(({ Given, Then, When, Before, After }) => {
-      <write your custom steps here>
+    //Wait for a maximum of 15 seconds until one of the fields is present. 
+		browser.wait(EC.presenceOf(un_field), 15 * 1000, 'Username field not found!').then(function() {
+      //sendKeys is a function that sends text to a field.
+      //In this example, the E2E_VAR_USERNAME and E2E_VAR_PASSWORD variables are used to login. See the 'Jenkins Parameters' section for more information
+			sendKeys(un_field, browser.params.E2E_VAR_USERNAME, null);
+      sendKeys(pw_field, browser.params.E2E_VAR_PASSWORD, null);
+      //clickElement is a function that waits until the element is clickable and present. 
+			clickElement(loggin_button).then(function() {
+        //wrapup is a test that finalizes the test step
+				wrapUp(callback, null);
+      });
+       //.catch is a function that is required to have in every single custom step and will catch any errors in the block above. If it is not present, and this step fails, the test
+       // will terminate. 
+		}).catch(function(error){
+  			callback(new Error(error.message));
     });
+  });
+  ```
+Another good custom step is to make sure the test always starts at the correct page. If the user is logged in and the test fails without login out, the login test will fail because it will try to find a US/PW field and a login button.
+To prevent this from happening, a custom step can be added to prevent this from happening
 
-Example custom step:
 
-    Given(‘I want to logout’, {timeout: 30 * 1000}, function(callback) {
-      <do your magic>
+```javascript
+  //Before trying to login, this step can be used to make sure the test starts correctly.
+  Then('I want to make sure I am on the landing page', {timeout: 30 * 1000}, function(callback) {
+    //First, wait for a maximum of 15 seconds
+    browser.wait(EC.urlContains('#login'), 15 * 1000).then(function(){
+      wrapUp(callback, null);
+    }).catch(function(error) {
+      //If the above step fails, that means the test is not on the login page. In this block the user should logout
+      //in this case, the logout button is inside a data-bootstrapextracomponents-navbar component.
+      var nav = element(by.css(`data-bootstrapextracomponents-navbar[data-svy-name='formName.elementName']`));
+      //wait for max 15 seconds until the element appears
+			browser.wait(EC.presenceOf(nav), 15 * 1000, 'Navigation menu not found!').then(function() {
+        //define the logout element.
+        var logoutBtn = nav.element(by.cssContainingText('*', 'Logout'));        
+        browser.wait(EC.presenceOf(logoutBtn), 15 * 1000, 'Logout item not found!').then(function() {
+          //Click on the logout button
+          clickElement(logoutBtn).then(function() {
+            //here you can do some extra validation like URL validaton in case you want to be sure everything went correct
+            wrapUp(callback, null);
+          });
+        });
+			}).catch(function() {
+				callback(new Error(error.message));
+			})
     });
+  });
+```
 
+Once this is setup and the build starts with E2E_ENABLED, the tests defined in config.json will be executed.
 
 
 **Examples**
