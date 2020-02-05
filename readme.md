@@ -240,14 +240,15 @@ Inside the **e2e-test-scripts**, a folder called **features** has to be added. I
 Once this is done, the structure should look like this:
 
 Root of the Repository<br>
-----| Jenkins Custom<br> 
---------| Features<br>
--------------| Config.json<br>
--------------| all your tests (these can be split into sub directories)<br>
--------------| custom_step_definitions<br>
------------------| custom_step_definitions.js<br>
--------------| custom_scripts (optional)<br>
------------------| custom JS scripts
+----| Jenkins Custom<br>
+--------|e2e-test-scripts<br>
+------------| Features<br>
+-----------------| Config.json<br>
+-----------------| all your tests (these can be split into sub directories)<br>
+-----------------| custom_step_definitions<br>
+---------------------| custom_step_definitions.js<br>
+-----------------| custom_scripts (optional)<br>
+---------------------| custom JS scripts
                     
 **Config.json** specifies which tests are executed, which browsers are used and which properties are set to each browser.
 
