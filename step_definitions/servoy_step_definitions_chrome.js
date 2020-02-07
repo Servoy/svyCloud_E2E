@@ -3406,16 +3406,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		rowNumber -= 1;
 		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
-			var locator = `div[row-index='${rowNumber}']`;
-			var row = table.all(by.css(locator)).first();
-			row.isPresent().then(function(isPresent) {
-				if(isPresent) {
-						doubleClickElement(row).then(function() {
-							wrapUp(callback, "clickEvent");
-						});	
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
 				} else {
-					groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
+					return "ag-body-viewport";
 				}
+			}).then(function (cName) {
+				var locator = `div[row-index='${rowNumber}']`;
+				var rowContainer = table.all(by.className(cName)).first()
+				var row = rowContainer.all(by.css(locator)).first();
+				row.isPresent().then(function(isPresent) {
+					if(isPresent) {
+							doubleClickElement(row).then(function() {
+								wrapUp(callback, "clickEvent");
+							});	
+					} else {
+						groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
+					}
+				});
 			});
 		}).catch(function (error) {			
 			tierdown(true);
@@ -3657,8 +3666,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {count} row(s)', { timeout: 30 * 1000 }, function (elementName, count, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"))), 25 * 1000, 'Table not found!').then(function(){		
+		var table = element.all(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(table), 25 * 1000, 'Table not found!').then(function(){		
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
@@ -3666,7 +3675,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					return "ag-body-viewport-wrapper";
 				}
 			}).then(function (containerClass) {
-				var rowContainer = table.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
+				var rowContainer = table.all(by.xpath(`//div[contains(@class, '${containerClass}')]`));
 				var rows = rowContainer.all(by.css("div[role=row]"));
 				rows.count().then(function(rowCount){
 					if(rowCount == count) {
@@ -3904,7 +3913,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (text.toLowerCase() === toastMessage.toLowerCase()) {
 					wrapUp(callback, "toastValidateTextEvent");
 				} else {
-					callback(new Error('Toast message did not appear within the timer'))
+					callback(new Error(`Toast message did not appear within the timer. Toast message is ${text}`));
 				}
 			});
 		}).catch(function (error) {			

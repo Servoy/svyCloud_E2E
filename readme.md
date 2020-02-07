@@ -241,7 +241,7 @@ Once this is done, the structure should look like this:
 
 Root of the Repository<br>
 ----| Jenkins Custom<br>
---------|e2e-test-scripts<br>
+--------| e2e-test-scripts<br>
 ------------| Features<br>
 -----------------| Config.json<br>
 -----------------| all your tests (these can be split into sub directories)<br>
@@ -253,7 +253,7 @@ Root of the Repository<br>
 **Config.json** specifies which tests are executed, which browsers are used and which properties are set to each browser.
 
 **config.json configuration**
-
+```json
     "configurations":{
       "capabilities":{
         
@@ -261,7 +261,8 @@ Root of the Repository<br>
       "multiCapabilities": [{
         "browserName": "firefox",
         "marionette": true,
-        "webdriverClick":false
+        "webdriverClick":false,
+        "shardTestFiles:": true
         }],
 
       "specs": [
@@ -273,7 +274,11 @@ Root of the Repository<br>
                 "~@skip", "@do-not-skip"
             ]
         }
-    }
+    }    
+```
+
+**shardTestFiles**
+If the shardTestFiles property is defined and has been set to true, the browser will restart after every test, including after every test inside a single feature file.
 
 **Tags**
 
