@@ -1706,14 +1706,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var table = element.all(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
-		var row = table.first().element(by.xpath("//option[@selected='selected']"));
+		var table = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).$('select');
+		var row = table.element(by.css("option[selected=selected]"));
 		browser.wait(EC.presenceOf(row), 30 * 1000, 'No row is selected!').then(function(){
 			row.getText().then(function(rowText){
 				if (rowText === text) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					callback(new Error("Validation failed. Expected " + text + ". Got " + rowText));
+					callback(new Error(`Validation failed. Expected '${text}'. Got '${rowText}' instead!`));
 				}
 			});
 		}).catch(function (error) {			
