@@ -5361,8 +5361,16 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 						elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();	 
 					} 
 				}
-				if(className) {
-					elementToScroll = rowContainer.all(by.css(`${className}`)).first();				
+				if(className && !text) {
+					elementToScroll = rowContainer.all(by.css(`${className}`)).first();
+				}
+
+				if(className && text) {
+					var elemWithText = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();
+					elemWithText.isPresent(function(bla) {
+						elementToScroll = elemWithText.element(by.xpath("..")).element(by.css(`${className}`));
+					});
+					
 				}
 				//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
 				elementToScroll.isPresent().then(function (isPresent) {
