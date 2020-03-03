@@ -3559,7 +3559,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function(containerClass) {
 				var locator = `div[row-index='${(rowNumber).toString()}']`;
@@ -3642,7 +3642,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function(containerClass) {
 				var locator = `div[row-index='${(rowNumber).toString()}']`;
@@ -3667,12 +3667,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that there are/is {count} row(s)', { timeout: 30 * 1000 }, function (elementName, count, callback) {
 		var table = element.all(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(table), 25 * 1000, 'Table not found!').then(function(){		
+		browser.wait(EC.presenceOf(table.first()), 25 * 1000, 'Table not found!').then(function(){		
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function (containerClass) {
 				var rowContainer = table.all(by.xpath(`//div[contains(@class, '${containerClass}')]`));
@@ -3700,7 +3700,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function (containerClass) {
 				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
@@ -3741,7 +3741,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if (isGrouped) {
 					return "ag-full-width-viewport";
 				} else {
-					return "ag-body-viewport-wrapper";
+					return "ag-body-viewport";
 				}
 			}).then(function (containerClass) {
 				var rowContainer = table.element(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
@@ -3788,7 +3788,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if(isGrouped) {
 						return "ag-full-width-viewport";
 					} else {
-						return "ag-body-viewport-wrapper";
+						return "ag-body-viewport";
 					}
 				}).then(function(containerClass) {
 					var rowContainer = tableItems.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
@@ -3835,7 +3835,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if(isGrouped) {
 						return "ag-full-width-viewport";
 					} else {
-						return "ag-body-viewport-wrapper";
+						return "ag-body-viewport";
 					}
 				}).then(function(containerClass) {
 					var rowContainer = tableItems.all(by.xpath("//div[contains(@class, '" + containerClass + "')]"));
@@ -4150,9 +4150,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY TABPANEL COMPONENT
 	When('servoy data-servoydefault-tabpanel component with name {elementName} the tab with the text {text} is clicked', {timeout: 60 * 1000}, function(elementName, text, callback){
-		var tabPanel = element(by.css("data-servoydefault-tabpanel[data-svy-name='"+elementName+"']"));
+		var tabPanel = element(by.css(`data-servoydefault-tabpanel[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(tabPanel), 30 * 1000, 'Tabelpanel not found!').then(function(){
-			var item = tabPanel.element(by.cssContainingText("span", text));
+			var item = tabPanel.element(by.xpath(`//span[text()='${text}']`));
 			clickElement(item).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
