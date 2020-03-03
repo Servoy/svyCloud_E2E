@@ -3437,7 +3437,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click the record with the text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
-		groupingGridTableScroll(elementName, text, callback, true, null, false, true, false, null);
+		groupingGridTableScroll(elementName, text, callback, true, null, false, false, true, null);
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 120 * 1000}, function(elementName, text, callback){
