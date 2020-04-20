@@ -3432,6 +3432,36 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to right click row number {rowNumber}', { timeout: 120 * 1000 }, function (elementName, rowNumber, callback) {
+		rowNumber -= 1;
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function(){
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (cName) {
+				var locator = `div[row-index='${rowNumber}']`;
+				var rowContainer = table.all(by.className(cName)).first()
+				var row = rowContainer.all(by.css(locator)).last();
+				row.isPresent().then(function(isPresent) {
+					if(isPresent) {
+							rightClickElement(row).then(function() {
+								wrapUp(callback, "clickEvent");
+							});	
+					} else {
+						groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
+					}
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
 	});
@@ -5118,7 +5148,8 @@ function doubleClickElement(elem) {
 function rightClickElement(elem) {
 	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
 		return browser.wait(EC.elementToBeClickable(elem), 30000, 'Element not clickable').then(function () {
-			return browser.actions().rightClick(elem).perform();
+			return browser.actions().click(elem, protractor.Button.RIGHT).perform();
+			// return elem.rightClick();
 		});
 	});
 }
