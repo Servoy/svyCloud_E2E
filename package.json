@@ -15,7 +15,7 @@
     "js-base64": "2.4.5",
     "jsonfile": "3.0.1",
     "lodash": "4.17.10",
-    "open": "0.0.5",
+    "open": "7.0.3",
     "protractor-cucumber-framework": "6.1.1",
     "protractor-multiple-cucumber-html-reporter-plugin": "1.8.0",
     "restler": "3.4.0",
