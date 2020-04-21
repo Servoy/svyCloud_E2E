@@ -225,6 +225,7 @@ recognition meaning the word tractor will be found in the word protractor
 ```
 
 **QA-PAAS**
+
 In order to run the tests during the automated build, the steps below have to be done.
 In the root of the repository of the main solution, a few folders have to be made:
 * jenkins-custom
@@ -250,7 +251,9 @@ Root of the Repository<br>
 -----------------| custom_scripts (optional)<br>
 ---------------------| custom JS scripts
                     
-**Config.json** specifies which tests are executed, which browsers are used and which properties are set to each browser.
+**Config.json** 
+
+specifies which tests are executed, which browsers are used and which properties are set to each browser.
 
 **config.json configuration**
 ```json
@@ -278,11 +281,12 @@ Root of the Repository<br>
 ```
 
 **shardTestFiles**
+
 If the shardTestFiles property is defined and has been set to true, the browser will restart after every test, including after every test inside a single feature file.
 
 **Tags**
 
-Inside config.json you can define tags. Tags defined in here can be placed in a .feature file. In the above example, every feature file that starts with '@skip', will NOT be run. This can be used to structure your feature files to make sure
+Inside config.json you can define tags. Tags defined in here can be placed in a .feature file. In the above example, every test file that starts with '@skip', will NOT be run. This can be used to structure your feature files to make sure
 Below of a feature that will always be skipped:
 
     @do-not-skip
