@@ -3284,11 +3284,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		findRecordByRowLevel(elementName, rowText, rowOption, rowLevel - 1, callback);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, sortBy, callback) {
-		var grid = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, text, callback) {
+		var grid = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
 			var gridHeader = grid.all(by.className("ag-header-row")).first();
-			var columnHeader = gridHeader.all(by.xpath(`//span[text()='${sortBy}']`)).first();
+			var columnHeader = gridHeader.all(by.xpath(`//span[text()[contains(translate(., '${text.toUpperCase()}', '${text.toLowerCase()}'), '${text.toLowerCase()}')]]`)).first();
 			clickElement(columnHeader).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
@@ -3447,10 +3447,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var rowContainer = table.all(by.className(cName)).first()
 				var row = rowContainer.all(by.css(locator)).last();
 				row.isPresent().then(function(isPresent) {
-					if(isPresent) {
-							rightClickElement(row).then(function() {
-								wrapUp(callback, "clickEvent");
-							});	
+					if(isPresent) { 
+						rightClickElement(row).then(function() {
+							wrapUp(callback, "clickEvent");
+						});
 					} else {
 						groupingGridTableScroll(elementName, null, callback, true, null, null, null, true, false, locator);
 					}
