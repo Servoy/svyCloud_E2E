@@ -36,7 +36,7 @@ exports.config = {
       durationInMS: true,
       pageTitle: "E2E Test Results",
       jsonOutputPath: "./reports/cucumber_reports",
-      pageFooter: "<div style='width:100%; text-align:center'><a href='https://source.servoy.com/projects/SC/repos/qapaas-e2e/browse'; target='_blank'>Github</a></div>",
+      pageFooter: "<div style='width:100%; text-align:center'><a href='https://github.com/Servoy/svyCloud_E2E'; target='_blank'>Github</a></div>",
       reportName: "E2E-test-results"
     }
   }],
