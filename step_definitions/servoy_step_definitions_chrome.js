@@ -181,6 +181,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	When('data-servoyextra-sidenav component with name {elementName} the tab with the class {className} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, className, tabLevel, callback){
+		const sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
+			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
+				var elem = menuItems.element(by.xpath(`//*[contains(@class, '${className}')]`));
+				browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function() {
+					clickElement(elem).then(function() {
+						wrapUp(callback, "clickEvent");
+					})
+				});
+			});			
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 	//END SERVOY SIDENAV COMPONENT
 
 	//SERVOY CALENDAR COMPONENT
