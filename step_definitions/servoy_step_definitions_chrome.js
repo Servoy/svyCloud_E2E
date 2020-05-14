@@ -919,11 +919,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('servoy extra table component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, className, rowNumber, callback) {
 		rowNumber -= 1;
-		var table = element(by.css("data-servoyextra-table[data-svy-name='" + elementName + "']"));
+		var table = element(by.css(`data-servoyextra-table[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function() {
 			var body = table.element(by.css('tbody'))
 			var row = body.all(by.css('tr')).get(rowNumber);
-			clickElement(row.element(by.className(className))).then(function() {
+			clickElement(row.element(by.xpath(`//td[contains(@class, '${className}')]`))).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {			
