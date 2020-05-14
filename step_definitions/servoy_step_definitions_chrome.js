@@ -186,8 +186,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		const sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
 			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
-				var elem = menuItems.element(by.xpath(`//*[contains(@class, '${className}')]`));
-				browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element not found!').then(function() {
+				var elem = menuItems.element(by.xpath(`//i[contains(@class, '${className}')]`));
+				browser.wait(EC.presenceOf(elem), 15 * 1000, 'Menuitem not found!').then(function() {
 					clickElement(elem).then(function() {
 						wrapUp(callback, "clickEvent");
 					})
