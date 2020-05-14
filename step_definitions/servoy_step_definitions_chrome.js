@@ -923,7 +923,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function() {
 			var body = table.element(by.css('tbody'))
 			var row = body.all(by.css('tr')).get(rowNumber);
-			clickElement(row.element(by.xpath(`//td[contains(@class, '${className}')]`))).then(function() {
+			// clickElement(row.element(by.xpath(`//td[contains(@class, '${className}')]`))).then(function() {
+			clickElement(row.element(by.css(`.${className}`))).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {			
