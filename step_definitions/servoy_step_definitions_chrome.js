@@ -524,6 +524,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('On the element with the name {elementName} I want to press {browserAction}', {timeout: 30 * 1000}, function(elementName, browserAction, callback) {
+		var elem = element(by.css(`*[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(elem), 15 * 1000, 'Element could not be found!').then(function() {
+			switch(browserAction.toLowerCase()) {
+				case "enter":
+					elem.sendKeys(protractor.Key.ENTER);
+					wrapUp(callback, null);
+					break;
+				default:
+					callback(new Error('Browser action not yet supported!'));
+					break;
+			}
+		}).catch(function(err) {
+			callback(new Error(err.message));
+		})
+	});
+
 	When('I want to press the {browserAction} key with the {key} key', { timeout: 15 * 1000 }, function (browserAction, key, callback) {		
 		browserAction = browserAction.toLowerCase();
 		var Key = protractor.Key;
