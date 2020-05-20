@@ -5711,7 +5711,8 @@ function pressKey(browserAction) {
 	browserAction = browserAction.toLowerCase();
 	switch (browserAction) {
 		case "enter":
-			return $('body').sendKeys(protractor.Key.ENTER);
+			// return $('body').sendKeys(protractor.Key.ENTER);
+			browser.actions().sendKeys(protractor.Key.ENTER).perform()
 		case "control":
 			return browser.actions().sendKeys(protractor.Key.CONTROL).perform()
 		case "tab":
