@@ -39,7 +39,7 @@ Once this is done, open a command prompt or any similar application and test if 
 
 Local installation guide:
 # Setting up your workspace
-To get the tests to work locally, either the jenkins-repository has to be cloned or downloaded as a zip (https://github.com/Servoy/svyCloud_E2E).
+To get the tests to work locally, either the repository has to be cloned or downloaded as a zip (https://github.com/Servoy/svyCloud_E2E).
 
 # Setup E2E environment
 Open a bash or command prompt and navigate to the qapaas-e2e folder and execute the following commands: 'npm install'. This will install all node packages that are required for e2e testing (minus Protractor)
