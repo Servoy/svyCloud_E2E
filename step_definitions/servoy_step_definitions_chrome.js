@@ -1832,9 +1832,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP CHECKBOX
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
+		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
-			checkbox.isSelected().then(function (isChecked) {
+			var input_fld = checkbox.$('input');
+			input_fld.isSelected().then(function (isChecked) {
 				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
 					clickElement(checkbox).then(function () {
 						wrapUp(callback, "checkboxEvent");
@@ -1851,9 +1852,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/input"));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			checkbox.isSelected().then(function (isChecked) {			
+		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+			var input_fld = checkbox.$('input');
+			input_fld.isSelected().then(function (isChecked) {		
 				if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
 					wrapUp(callback, "checkboxEvent");
 				} else {
@@ -1868,9 +1870,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/span"));
+		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			checkbox.getText().then(function(inputText) {
+			var input_fld = checkbox.$('span');
+			input_fld.getText().then(function(inputText) {
 				if(inputText === text) {
 					wrapUp(callback, "validateEvent")
 				} else {
@@ -1884,9 +1887,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label partially equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var checkbox = element(by.xpath("//data-bootstrapcomponents-checkbox[@data-svy-name='" + elementName + "']/div/label/span"));
+		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			checkbox.getText().then(function(inputText) {
+			var input_fld = checkbox.$('span');
+			input_fld.getText().then(function(inputText) {
 				if(inputText.indexOf(text) > -1) {
 					wrapUp(callback, "validateEvent")
 				} else {
