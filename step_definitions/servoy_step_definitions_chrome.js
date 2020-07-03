@@ -1223,9 +1223,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//DEFAULT CHECKBOX FIELD
 	When('servoy data-servoydefault-check component with name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
+		var checkbox = element(by.css(`data-servoydefault-check[data-svy-name='${elementName}']`));
 		browser.wait(EC.presenceOf(checkbox), 25 * 1000, 'Checkbox not found!').then(function(){
-			checkbox.isSelected().then(function (isChecked) {
+			var inputfield = checkbox.element(by.css('input'));
+			inputfield.isSelected().then(function (isChecked) {
 				return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
 			}).then(function(isChecked){
 				if(isChecked) {
@@ -1243,9 +1244,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('servoy data-servoydefault-check component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkBoxState, callback) {
-		var checkbox = element(by.xpath("//data-servoydefault-check[@data-svy-name='" + elementName + "']/label/input"));
+		var checkbox = element(by.css(`data-servoydefault-check[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			checkbox.isSelected().then(function (isChecked) {
+			var inputfield = checkbox.element(by.css('input'));
+			inputfield.isSelected().then(function (isChecked) {
 				return !isChecked && checkBoxState.toLowerCase() === "unchecked" || isChecked && checkBoxState.toLowerCase() === "checked"
 			}).then(function(isChecked) {
 				if (isChecked) {
