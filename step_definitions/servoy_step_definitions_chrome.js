@@ -5049,29 +5049,74 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			});
-		}).then(function () {
-			browser.ignoreSynchronization = false;
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
+
 	//END ADMIN LOG
-	After(function () {
+	After(function (scenario) {
 		console.log('Completed scenario');
 		if (!hasErrorDuringSuite) {
 			tierdown(false);
 		}
+		getAdminLogs(scenario);
 	});
 
 	Before(function () {
+		clearAdminPage();
 		hasErrorDuringSuite = false;
-		console.log('Starting scenario');
+		// console.log('Starting scenario');
 		browser.driver.getCapabilities().then(function(caps){
 			browser.browserName = caps.get('browserName');
 		});
 	});
 });
+
+function clearAdminPage() {
+	// console.log('Clearing logs...');
+	browser.ignoreSynchronization = true;
+	var admin_url = browser.params.servoyAdminGetURL + '/log';
+	browser.get(admin_url).then(function () {
+		var button = element(by.css("input[value='Clear Log']"));
+		browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+			clickElement(button).then(function () {
+				browser.ignoreSynchronization = false;
+			});
+		});
+	}).catch(function (error) {			
+		tierdown(true);
+		// console.log('Unable to clear the admin page logs!');
+		console.log(error.message);
+	});
+}
+
+function getAdminLogs(scenario) {
+	var scenarioName = scenario.scenario.name
+	console.log('Scenario name: ' + scenarioName);
+	console.log('Getting logs...');
+	browser.ignoreSynchronization = true;
+	var admin_url = browser.params.servoyAdminGetURL + '/log';
+	browser.get(admin_url).then(function() {
+		console.log('admin page reached')
+		var button = element(by.css("input[value='Clear Log']"));			
+		browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+			console.log('button found!');
+			browser.executeScript("return arguments[0].outerHTML;", element.all(by.css('table')).last()).then(function(result) {		
+				fs.appendFileSync(browser.params.htmlDirectory + '/admin_logs.html', '<div style="width:100%"><h1> Scenario results for: ' + scenarioName + "</h1></div>");
+				fs.appendFileSync(browser.params.htmlDirectory + '/admin_logs.html', '<table> ' + result + "</table>");
+				console.log('klaar');
+				browser.ignoreSynchronization = false;
+			})			
+		}).catch(function (error) {			
+			console.log(error.message);
+		});
+	}).catch(function (error) {			
+		console.log('Unable to get the admin page logs!');
+		console.log(error.message);
+	});
+}
 
 function errorHandleProcedure(callback, error) {
 	console.log(error.message);	

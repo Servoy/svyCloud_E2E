@@ -2,6 +2,7 @@ var startDate;
 var conf = require('./features/config.json');
 var jsonDirectory = 'reports/cucumber_reports/';
 var customStepsDirectory = 'features/custom_step_definitions/custom_step_definitions.js';
+var fs = require('fs-extra');
 exports.config = {
   // directConnect: true,
   seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
@@ -9,9 +10,9 @@ exports.config = {
 
   params: {
     testDomainURL: '',
-    screenshotDirectory: 'reports/screenshots/',
+  screenshotDirectory: 'reports/screenshots/',
     jsonDirectory: 'reports/cucumber_reports/'
-  },
+},
   allScriptsTimeout: 360 * 1000,
   frameworkPath: require.resolve('protractor-cucumber-framework'),
 
@@ -43,7 +44,6 @@ exports.config = {
 
   beforeLaunch: () => {
     console.log("beforeLaunch");
-    var fs = require('fs-extra');
     fs.emptyDirSync(jsonDirectory);
     startDate = new Date();
   },
@@ -53,11 +53,21 @@ exports.config = {
     if(browser.params.E2E_VAR_FULLSCREEN) {
       browser.driver.manage().window().maximize();
     }
-    
+
+    var base_html = '<html><body>'
+    fs.writeFile(browser.params.htmlDirectory + '/admin_logs.html', base_html, function(err) {
+      if(err) {
+        console.log('Error creating admin log file!!');
+      }
+      console.log('File created');
+    });
   },
 
   onComplete: () => {
-    console.log('onComplete');
+    browser.sleep(5000).then(function() {
+      console.log('onComplete');
+      fs.appendFile(browser.params.htmlDirectory + '/admin_logs.html', '</body></html>');
+    })
   },
 
   onCleanUp: (exitCode) => {
