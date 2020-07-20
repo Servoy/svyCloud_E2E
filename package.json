@@ -14,7 +14,7 @@
     "fs-extra": "6.0.1",
     "js-base64": "2.4.5",
     "jsonfile": "3.0.1",
-    "lodash": "4.17.10",
+    "lodash": "4.17.19",
     "open": "0.0.5",
     "protractor-cucumber-framework": "6.1.1",
     "protractor-multiple-cucumber-html-reporter-plugin": "1.8.0",
