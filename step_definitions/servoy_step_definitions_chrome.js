@@ -115,16 +115,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(isPresent){
 			if(isPresent) {
 				var item = sideNav.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text + "')] and contains(@class, 'svy-sidenav-item-text')]")).first();
-				browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
-					clickElement(item).then(function(){
-						wrapUp(callback, "Click event");
+				browser.wait(EC.presenceOf(item), 15 * 1000, 'Sidenavigation item not found!').then(function() {
+					browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
+						clickElement(item).then(function(){
+							wrapUp(callback, "Click event");
+						}).catch(function (error) {			
+							tierdown(true);
+							callback(new Error(error.message));
+						});
 					}).catch(function (error) {			
 						tierdown(true);
 						callback(new Error(error.message));
 					});
-				}).catch(function (error) {			
-					tierdown(true);
-					callback(new Error(error.message));
 				});
 			}
 		}).catch(function (error) {			
