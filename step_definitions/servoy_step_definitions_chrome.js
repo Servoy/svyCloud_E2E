@@ -2381,7 +2381,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
 			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(text === labelText) {
+				if(text.toLowerCase() === labelText.toLowerCase()) {
 					wrapUp(callback, "validateEvent");
 				} else {
 					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
@@ -2672,7 +2672,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var bootstrapLabel = fComponent.element(by.xpath(`//data-bootstrapcomponents-datalabel[@data-svy-name='${elementName}']`));
 			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
 				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-					if(text === labelText) {
+					if(text.toLowerCase() === labelText.toLowerCase()) {
 						wrapUp(callback, "validateEvent");
 					} else {
 						console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
