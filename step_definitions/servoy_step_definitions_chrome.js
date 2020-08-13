@@ -2393,6 +2393,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate and click on the label that has the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
+		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+				if(text.toLowerCase() === labelText.toLowerCase()) {
+					var span = bootstrapLabel.$('span');
+					clickElement(span).then(function() {
+						wrapUp(callback, "clickAndValidateEvent");
+					})
+				} else {
+					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+				}
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
 	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(elementName, callback){
 		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
 		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
