@@ -4589,6 +4589,34 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END FONT AWESOME
 
 	//Wildcard check
+	Then('I expect the {before|after} value of the CSS class property {property} of the {className} of the child of an element with the name {elementName} to be {value}', {timeout: 15 * 1000}, function(beforeAfter, cssProperty, className, elementName, value, callback){
+		var wildcard = element(by.css(`*[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(wildcard), 10 * 1000, 'Element could not be found!').then(function() {
+			var wildcardClassElem = element(by.css('.'+ className));
+			browser.wait(EC.presenceOf(wildcardClassElem), 10 * 1000, `Element with the class ${className} could not be found!`).then(function() {			
+				var script = `return window.getComputedStyle(document.querySelector('.${className}'), ':${beforeAfter}').getPropertyValue('${cssProperty}')`;
+				browser.executeScript(script).then(function(result) {
+					if(result[0] && result[result.length -1] == "\"") {
+						var result_parsed = result.substring(1, result.length - 1);
+						if(result_parsed.toLowerCase() == value.toLowerCase()) {
+							wrapUp(callback, "validationEvent");
+						} else {
+							callback(new Error(`Validation failed! Expected the property to be '${value}'. Got '${result}'` ));
+						}
+					} else {
+						if(result.toLowerCase() == value.toLowerCase()) {
+							wrapUp(callback, "validationEvent");
+						} else {
+							callback(new Error(`Validation failed! Expected the property to be '${value}'. Got '${result}'` ));
+						}
+					}
+				})
+			});
+		}).catch(function(err) {
+			callback(new Error(err.message));
+		})
+	});
+
 	Then('I expect an element with the name {elementName} to not be present', {timeout: 20 * 1000}, function(elementName, callback){
 		element.all(by.xpath("//*[@data-svy-name='" + elementName+"']")).then(function(items){
 			if(items.length === 0) {
@@ -5050,7 +5078,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('on the servoy admin page {url} I want to count the warnings and the errors in the log file', {timeout: 30 * 1000}, function(url, callback){
 		browser.ignoreSynchronization = true;
-		browser.get(url).then(function () {
+		browser.getCurrentUrl(function(url) {
+			var admin_url = browser.params.servoyAdminGetURL;
 			var button = element(by.css("input[value='Clear Log']"));
 			browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
 				element.all(by.xpath("//font[@color='#FC9206']")).count().then(function (warningCount) {
@@ -5093,6 +5122,53 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 });
+
+function clearAdminPage() {
+	// console.log('Clearing logs...');
+	// browser.ignoreSynchronization = true;
+	// var admin_url = browser.params.servoyAdminGetURL + '/log';
+	// browser.get(admin_url).then(function () {
+	// 	var button = element(by.css("input[value='Clear Log']"));
+	// 	browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+	// 		clickElement(button).then(function () {
+	// 			browser.ignoreSynchronization = false;
+	// 		});
+	// 	});
+	// }).catch(function (error) {			
+	// 	tierdown(true);
+	// 	// console.log('Unable to clear the admin page logs!');
+	// 	console.log(error.message);
+	// });
+}
+
+function getAdminLogs(scenario) {
+	if(!browser.params.servoyAdminGetURL) {
+		return;
+	}
+	var scenarioName = scenario.scenario.name
+	console.log('Scenario name: ' + scenarioName);
+	console.log('Getting logs...');
+	browser.ignoreSynchronization = true;
+	var admin_url = browser.params.servoyAdminGetURL + '/log';
+	browser.get(admin_url).then(function() {
+		console.log('admin page reached')
+		var button = element(by.css("input[value='Clear Log']"));			
+		browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function () {
+			console.log('button found!');
+			browser.executeScript("return arguments[0].outerHTML;", element.all(by.css('table')).last()).then(function(result) {		
+				fs.appendFileSync(browser.params.htmlDirectory + '/admin_logs.html', '<div style="width:100%"><h1> Scenario results for: ' + scenarioName + "</h1></div>");
+				fs.appendFileSync(browser.params.htmlDirectory + '/admin_logs.html', '<table> ' + result + "</table>");
+				console.log('klaar');
+				browser.ignoreSynchronization = false;
+			})			
+		}).catch(function (error) {			
+			console.log(error.message);
+		});
+	}).catch(function (error) {			
+		console.log('Unable to get the admin page logs!');
+		console.log(error.message);
+	});
+}
 
 function errorHandleProcedure(callback, error) {
 	console.log(error.message);	
@@ -5211,7 +5287,6 @@ function rightClickElement(elem) {
 	return browser.wait(EC.presenceOf(elem).call(), 30000, 'Element not visible').then(function () {
 		return browser.wait(EC.elementToBeClickable(elem), 30000, 'Element not clickable').then(function () {
 			return browser.actions().click(elem, protractor.Button.RIGHT).perform();
-			// return elem.rightClick();
 		});
 	});
 }
