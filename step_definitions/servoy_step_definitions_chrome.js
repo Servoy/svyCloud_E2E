@@ -3528,6 +3528,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to select the record with the partial text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
+		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null, null, null, true);
+	});	
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click the record with the text {text}', {timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, true, null);
 	});
