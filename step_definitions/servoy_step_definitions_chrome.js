@@ -169,7 +169,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var menuItem = menuItems.element(by.css('span'));
 				browser.wait(EC.presenceOf(menuItem), 15 * 1000, 'menuItem not found!').then(function() {
 					menuItem.getText().then(function(menuItemText) {
-						if(menuItemText === text) {
+						if(menuItemText.toLowerCase() === text.toLowerCase()) {
 							clickElement(menuItem).then(function() {
 								wrapUp(callback, "clickEvent");
 							});
