@@ -518,7 +518,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BROWSER ACTION
 	When('I press {browserAction}', { timeout: 30 * 1000 }, function (browserAction, callback) {
-		pressKey(browserAction, callback).then(function() {
+		pressKey(browserAction).then(function() {
 			wrapUp(callback, "insertEvent");
 		}).catch(function (error) {			
 			tierdown(true);
@@ -569,6 +569,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 					callback(new Error(error.message));
 				});
+				break;
 			case "shift": 
 				browser.actions().keyDown(protractor.Key.SHIFT).sendKeys(key).keyUp(protractor.Key.CONTROL).perform().then(function () {
 					wrapUp(callback, "keypressEvent");
@@ -576,6 +577,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					tierdown(true);
 					callback(new Error(error.message));
 				});
+				break;
 		}		
 	});
 	//END BROWSER ACTION
@@ -644,6 +646,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					clickElement(elem).then(function () {
 						wrapUp(callback, "clickEvent");
 					});
+					break;
 				default:
 					tierdown(true);
 					return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
@@ -5834,7 +5837,7 @@ function pressKey(browserAction) {
 	switch (browserAction) {
 		case "enter":
 			// return $('body').sendKeys(protractor.Key.ENTER);
-			browser.actions().sendKeys(protractor.Key.ENTER).perform()
+			return browser.actions().sendKeys(protractor.Key.ENTER).perform()
 		case "control":
 			return browser.actions().sendKeys(protractor.Key.CONTROL).perform()
 		case "tab":
