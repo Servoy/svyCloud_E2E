@@ -4126,7 +4126,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//DIALOG POPUP COMPONENT
 	When('default modal-dialog component the button with the text {text} is pressed', {timeout: 30 * 1000}, function(text, callback){
-		var dialog = element(by.xpath("//div[@class='modal-dialog']")).element(by.xpath("//button[text()[normalize-space() = '" + text + "']]"));
+		var dialog = element(by.xpath("//div[@class='modal-dialog']")).all(by.xpath("//button[text()[normalize-space() = '" + text + "']]")).last();
 		browser.wait(EC.presenceOf(dialog), 30 * 1000, 'Dialog button not found!').then(function(){
 			clickElement(dialog).then(function(){
 				wrapUp(callback, 'clickEvent');
