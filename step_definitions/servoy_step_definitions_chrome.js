@@ -3392,8 +3392,32 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY EXTRA COMPONENTS INSIDE FORMCOMPONENTS
 	//END FORMCOMPONENTS
 
+	//SERVOY-CORE FORMCOMPONENTS
+	//INPUT FIELDS
+	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with an input component with name {elementName} I want to insert the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
+			browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
+				clickElement(inputField).then(function() {
+					var typeaheadList = element(by.css("ul[role='listbox']"));
+					browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
+						var option = typeaheadList.element(by.css(`a[title='${text}']`));
+						clickElement(option).then(function() {
+							wrapUp(callback, null);
+						})
+					});
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	//END TYPEAHEAD
 	//SERVOY GROUPING GRID COMPONENT
-	When('servoy data-aggrid-groupingtable component with name {elementName} I scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
 		groupingGridTableScroll(elementName, recordText, callback, false, false, false, false, false, null);
 	});
 
