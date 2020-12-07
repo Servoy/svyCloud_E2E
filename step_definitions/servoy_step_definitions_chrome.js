@@ -3394,7 +3394,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY-CORE FORMCOMPONENTS
 	//INPUT FIELDS
-	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with an input component with name {elementName} I want to insert the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with an input component with name {elementName} I want to select the item with the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
 		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
 			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
