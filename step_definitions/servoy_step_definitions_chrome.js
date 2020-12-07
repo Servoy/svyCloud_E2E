@@ -1108,6 +1108,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	When('servoy default typeahead component with name {elementName} I want to select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback) {
+		var inputField = element(by.css(`input[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
+			clickElement(inputField).then(function() {
+				var typeaheadList = element(by.css("ul[role='listbox']"));
+				browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
+					var option = typeaheadList.element(by.css(`a[title='${text}']`));
+					clickElement(option).then(function() {
+						wrapUp(callback, null);
+					})
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 	//END SERVOY TYPEAHEAD
 		
 	//DEFAULT INPUT FIELD
