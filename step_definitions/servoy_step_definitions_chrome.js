@@ -3664,8 +3664,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+		columnNumber--;
+		rowNumber--;
+		groupingGridTableScroll(elementName, null, callback, true, null, null, null, null, null, null, null, null, columnNumber, rowNumber);
+	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+		columnNumber--;
+		rowNumber--;
+		groupingGridTableScroll(elementName, null, callback, null, null, null, null, true, null, null, null, null, columnNumber, rowNumber);
+	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to right click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+		columnNumber--;
+		rowNumber--;
+		groupingGridTableScroll(elementName, null, callback, null, null, null, null, null, null, null, null, null, columnNumber, rowNumber, true);
+	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record on row number {rowNumber} with the text {text} exists', {timeout: 30 * 1000}, function(elementName, rowNumber, text, callback){
 		rowNumber -= 1;
@@ -5603,7 +5618,7 @@ function scrollToElementTableComponent(elementName, recordText, shouldClick, cal
 }
 
 // SERVOY GROUPING TABLE
-function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator, insertInField, partialTextMatch){
+function groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator, insertInField, partialTextMatch, gridColumnIndex, gridRowIndex, shouldRightClick){
 	var elementWithClass;
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
@@ -5620,6 +5635,16 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 				var rowContainer = rowItems.all(by.className(cName));
 				var elementToScroll = null;
 				//Step 2a - Create the element that has to be found
+				if(gridColumnIndex >=0 && gridRowIndex >= 0) {
+					var c = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`));
+					elementToScroll = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`))
+					browser.wait(EC.presenceOf(c)).then(function() {
+						var rc = c.all(by.css('div[role="gridcell"]')).get(gridColumnIndex);
+						browser.wait(EC.presenceOf(rc)).then(function() {
+							elementToScroll = rc;
+						});
+					})
+				}
 				if (locator) {
 					elementToScroll = rowContainer.all(by.css(`${locator}`)).first();
 				} else {	
@@ -5657,6 +5682,10 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 								if (isPresent) {
 									if (shouldDoubleClick) {
 										doubleClickElement(elementWithClass).then(function () {
+											wrapUp(callback, "scrollEvent");
+										});
+									} else if(shouldRightClick) {
+										rightClickElement(elementWithClass).then(function () {
 											wrapUp(callback, "scrollEvent");
 										});
 									} else {
