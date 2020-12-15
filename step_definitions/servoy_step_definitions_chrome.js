@@ -3453,7 +3453,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var checkbox = fComponent.element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
 			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 				checkbox.isSelected().then(function (isChecked) {
-					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+					if ((isChecked && checkboxOption.toLowerCase() === "checked") || (!isChecked && checkboxOption.toLowerCase() === "unchecked")) {
 						checkbox.element(by.css('span')).click().then(function () {
 							wrapUp(callback, "checkboxEvent");
 						})
