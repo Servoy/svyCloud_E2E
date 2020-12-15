@@ -1910,11 +1910,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP CHECKBOX
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
 		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
+		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
+			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
+		}
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 			var input_fld = checkbox.$('input');
 			input_fld.isSelected().then(function (isChecked) {
 				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-					clickElement(checkbox).then(function () {
+					clickElement(checkbox.element(by.css('span'))).then(function () {
 						wrapUp(callback, "checkboxEvent");
 					})
 				} else {
@@ -1929,6 +1932,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
+		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
+		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
+			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
+		}
+		
 		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 			var input_fld = checkbox.$('input');
@@ -3434,6 +3442,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	//END TYPEAHEAD
+
+	//CHECKBOX
+	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
+		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
+			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
+		}
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function () {
+			var checkbox = fComponent.element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+				checkbox.isSelected().then(function (isChecked) {
+					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+						checkbox.element(by.css('span')).click().then(function () {
+							wrapUp(callback, "checkboxEvent");
+						})
+					} else {
+						console.log('Checkbox did not have to be changed');
+						wrapUp(callback, "checkboxEvent");
+					}
+				})
+			})
+		}).catch(function (error) {         
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+	//END CHECKBOX
 	//SERVOY GROUPING GRID COMPONENT
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll to the record with {string} as text', { timeout: 120 * 1000 }, function (elementName, recordText, callback) {
 		groupingGridTableScroll(elementName, recordText, callback, false, false, false, false, false, null);
