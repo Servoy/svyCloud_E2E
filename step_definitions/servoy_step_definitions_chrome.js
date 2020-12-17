@@ -3076,7 +3076,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			browser.wait(EC.presenceOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
 				checkbox.isSelected().then(function (isChecked) {
 					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-						checkbox.element(by.css('label')).click().then(function () {
+						checkbox.element(by.css('span')).click().then(function () {
 							wrapUp(callback, "checkboxEvent");
 						})
 					} else {
