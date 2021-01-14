@@ -3812,25 +3812,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									var parent = elementWithText.element(by.xpath(".."));
 									var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
 									rowColumn.getAttribute('class').then(function(classes) {
-										console.log(classes)
 										if(classes) {
 											if(classes.indexOf(className) > -1) {
-												console.log('test');
 												wrapUp(callback, null)
 											} else {
-												console.log('test2');
 												var nested_div = rowColumn.element(by.className(className));
 												nested_div.isPresent().then(function(isNestedDivPresent) {
 													console.log(isNestedDivPresent)
 													if(isNestedDivPresent) {
-														wrapUp(callback, "FINALLY");
+														wrapUp(callback, null);
 													} else {
-														callback(new Error('Give column exists, but does not contain the given class.'));			
+														callback(new Error('Given column exists, but does not contain the given class.'));			
 													}
 												});
 											}
 										} else {
-											callback(new Error('Give column number does not exist.'));
+											callback(new Error('Given column name does not exist.'));
 										}										
 									});
 								} else {
