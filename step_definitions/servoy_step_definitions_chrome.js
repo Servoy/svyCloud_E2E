@@ -3443,6 +3443,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//END TYPEAHEAD
 
+	//BOOTSTRAP LABELS
+	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var label = fComponent.element(by.css(`data-bootstrapcomponents-label[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
+				clickElement(label).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	
+	//END LABELS
+
 	//CHECKBOX
 	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
 		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
