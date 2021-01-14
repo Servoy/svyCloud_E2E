@@ -3779,7 +3779,74 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that on the row with the text {text}, the column with the text {columnName} contains the class {className}', {timeout: 30 * 1000}, function(elementName, text, columnName, className, callback){	
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var arr = []
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			var header = table.all(by.className('ag-header-row'));			
+			header.all(by.className('ag-table-header')).each(function(rowHeader) {
+				var colSpan = rowHeader.element(by.className('ag-header-cell-text'));
+				arr.push(colSpan.getText());
+			}).then(function() {
+				Promise.all(arr).then(function(returnVals) {
+					returnVals = returnVals.map(function(v) {
+						return v.toLowerCase();
+					});
+					  
+					var colNr = returnVals.indexOf(columnName.toLowerCase());
+					
+					if(colNr == -1) {
+						callback(new Error(`Column with the text '${columnName}' could not be found!`));
+					} else {
+						agGridIsGrouped(elementName).then(function (isGrouped) {
+							if (isGrouped) {
+								return "ag-full-width-viewport";
+							} else {
+								return "ag-body-viewport";
+							}
+						}).then(function (containerClass) {
+							var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
+							var elementWithText = rowContainer.all(by.cssContainingText('div', text)).last();
+							elementWithText.isPresent().then(function(isPresent) {
+								if(isPresent) {
+									var parent = elementWithText.element(by.xpath(".."));
+									var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
+									rowColumn.getAttribute('class').then(function(classes) {
+										console.log(classes)
+										if(classes) {
+											if(classes.indexOf(className) > -1) {
+												console.log('test');
+												wrapUp(callback, null)
+											} else {
+												console.log('test2');
+												var nested_div = rowColumn.element(by.className(className));
+												nested_div.isPresent().then(function(isNestedDivPresent) {
+													console.log(isNestedDivPresent)
+													if(isNestedDivPresent) {
+														wrapUp(callback, "FINALLY");
+													} else {
+														callback(new Error('Give column exists, but does not contain the given class.'));			
+													}
+												});
+											}
+										} else {
+											callback(new Error('Give column number does not exist.'));
+										}										
+									});
+								} else {
+									callback(new Error(`Record with the text '${text}' could not be found!`));
+								}
+							});
+						});
+					}
+				});
 
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
