@@ -3458,9 +3458,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
-
-	
 	//END LABELS
+
+
+	//TEXT FIELD 
+	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-textbox component with name {cElementName} I want to insert the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textbox not found!').then(function(){
+				sendKeys(textBox.element(by.css('input')), text).then(function() {
+					wrapUp(callback, null);
+				})
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+	//END TEXT FIELD
 
 	//CHECKBOX
 	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
