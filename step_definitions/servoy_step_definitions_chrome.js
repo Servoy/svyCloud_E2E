@@ -5361,6 +5361,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		if (!hasErrorDuringSuite) {
 			tierdown(false);
 		}
+
+		if(browser.params.E2E_KEEP_SESSION) return;
+		browser.executeScript('window.sessionStorage.clear();');
+		browser.executeScript('window.localStorage.clear();');
 	});
 
 	Before(function () {
