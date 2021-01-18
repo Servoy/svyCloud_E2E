@@ -3710,7 +3710,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		groupingGridTableScroll(elementName, text, callback, false, null, false, false, false, null, null, null, true);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} does not exist', {timeout: 30 * 1000}, function(elementName, text, callback){
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that a record with the text {text} does not exist', {timeout: 40 * 1000}, function(elementName, text, callback){
 		text = text.toLowerCase();
 		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='"+elementName+"']"));
 		browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function(){			
@@ -3734,19 +3734,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click column {columnNumber} on row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
 		columnNumber--;
 		rowNumber--;
 		groupingGridTableScroll(elementName, null, callback, true, null, null, null, null, null, null, null, null, columnNumber, rowNumber);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click column {columnNumber} on row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
 		columnNumber--;
 		rowNumber--;
 		groupingGridTableScroll(elementName, null, callback, null, null, null, null, true, null, null, null, null, columnNumber, rowNumber);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to right click column {columnNumber} on row {rowNumber}', {timeout: 30 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to right click column {columnNumber} on row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
 		columnNumber--;
 		rowNumber--;
 		groupingGridTableScroll(elementName, null, callback, null, null, null, null, null, null, null, null, null, columnNumber, rowNumber, true);
@@ -5761,7 +5761,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
 	var table = element.all(by.xpath(`//data-aggrid-groupingtable[@data-svy-name='${elementName}']`));
-	browser.wait(EC.presenceOf(table.first()), 30 * 1000, 'Table not found!').then(function () {
+	browser.wait(EC.presenceOf(table.first()), 15 * 1000, 'Table not found!').then(function () {
 		table.each(function (rowItems) {
 			agGridIsGrouped(elementName).then(function (isGrouped) {
 				if (isGrouped) {
