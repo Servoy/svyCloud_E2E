@@ -3880,6 +3880,57 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that on a column with the ID {columnID} there is a field with the text {text}. On the same row I want to validate that on the column with the ID {columnID} the text equals {text}', {timeout: 40 * 1000}, function(elementName, columnIDOne, columnTextOne, columnIDTwo, columnTextTwo, callback) {
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var arr = []
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
+				rowContainer.all(by.css(`div[col-id="${columnIDOne}" i`)).each(function(col) {
+					arr.push(col.getText());
+				}).then(function() {
+					Promise.all(arr).then(function(returnVals) {
+						if(returnVals.length == 0) {
+							callback(new Error(`Either the column with the id '${columnIDOne}' does not exist or there are 0 rows!`));
+						}
+
+						//lower case for proper testing
+						returnVals = returnVals.map(function(v) {
+							return v.toLowerCase();
+						});
+
+						var indx = returnVals.indexOf(columnTextOne.toLowerCase());
+						if(indx == -1) callback(new Error(`Column '${columnIDOne}' does not contain a record with the text '${columnTextOne}'`));
+
+						//get correct ROW using the index calculated above, no need to wait for this element, it exists based on previous checks
+						var colOne = rowContainer.all(by.css(`div[col-id="${columnIDOne}" i`)).get(indx);
+						var parent = colOne.element(by.xpath(".."));
+						var colTwo = parent.element(by.css(`div[col-id="${columnIDTwo}" i`));
+						browser.wait(EC.presenceOf(colTwo), 15 * 1000, `Column with the ID '${columnIDTwo}' could not be found!`).then(function() {
+							colTwo.getText().then(function(colTwoText) {
+								if(colTwoText.toLowerCase() == columnTextTwo.toLowerCase()) {
+									wrapUp(callback, null);
+								} else {
+									callback(new Error(`Column with the ID '${columnIDTwo}' does not equal the text '${columnTextTwo}'!`))
+								}
+							});
+						}).catch(function (error) {			
+							callback(new Error(error.message));
+						});
+					});					
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
 	});
