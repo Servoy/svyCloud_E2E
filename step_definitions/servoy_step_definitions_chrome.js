@@ -1131,7 +1131,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//DEFAULT INPUT FIELD
 	When('servoy default input component with name {elementName} the text {input} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var inputField = element(by.xpath(`//input[@data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
+		browser.wait(EC.visibilityOf(inputField), 25 * 1000, 'Textfield not found!').then(function(){
 			sendKeys(inputField, text).then(function(){
 				wrapUp(callback, 'insertEvent');
 			}).catch(function (error) {
@@ -3420,18 +3420,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY-CORE FORMCOMPONENTS
 	//INPUT FIELDS
+
+	//When data-servoycore-formcomponent formcomponent with the name {} with an input component with name layout_inputTypeahead.frmComp_country$containedForm$input I want to select the item with the text Belgium
 	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with an input component with name {elementName} I want to select the item with the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
 		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+		browser.wait(EC.presenceOf(fComponent), 25 * 1000, 'Formcomponent not visible!').then(function () {
 			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
 			browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
 				clickElement(inputField).then(function() {
-					var typeaheadList = element(by.css("ul[role='listbox']"));
+					var typeaheadList = element(by.xpath("//ul[@role='listbox' and @aria-hidden='false']"));
 					browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
 						var option = typeaheadList.element(by.css(`a[title='${text}']`));
 						clickElement(option).then(function() {
 							wrapUp(callback, null);
-						})
+						});
 					});
 				});
 			});
@@ -3739,6 +3741,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		rowNumber--;
 		groupingGridTableScroll(elementName, null, callback, true, null, null, null, null, null, null, null, null, columnNumber, rowNumber);
 	});
+
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click column {columnNumber} on row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnNumber, rowNumber, callback) {
 		columnNumber--;
