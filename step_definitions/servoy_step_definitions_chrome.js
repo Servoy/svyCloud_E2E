@@ -3934,6 +3934,90 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the {first|last} column of the row that equals the text {text} on the column with the columnID {columnID}', {timeout: 40 * 1000}, function(elementName, columnSelector, columnText, columnID, callback) {
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		var arr = []
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
+				rowContainer.all(by.css(`div[col-id="${columnID}" i`)).each(function(col) {
+					arr.push(col.getText());
+				}).then(function() {
+					Promise.all(arr).then(function(returnVals) {
+						if(returnVals.length == 0) {
+							callback(new Error(`Either the column with the id '${columnID}' does not exist or there are 0 rows!`));
+						}
+
+						//lower case for proper testing
+						returnVals = returnVals.map(function(v) {
+							return v.toLowerCase();
+						});
+
+						var indx = returnVals.indexOf(columnText.toLowerCase());
+						if(indx == -1) callback(new Error(`Column '${columnID}' does not contain a record with the text '${columnText}'`));
+
+						//get correct ROW using the index calculated above, no need to wait for this element, it exists based on previous checks
+						var col = rowContainer.all(by.css(`div[col-id="${columnID}" i`)).get(indx);
+						var parent = col.element(by.xpath(".."));
+						switch (columnSelector.toLowerCase()) {
+							case "first":
+								return parent.all(by.css("div[role='gridcell']")).first();
+							case "last":
+								return parent.all(by.css("div[role='gridcell']")).last();
+							default:
+								callback(new Error("Only 'first' or 'second' is permitted when identifying which column is to be selected!"));
+								break;
+						}
+					}).then(function(elem) {
+						clickElement(elem).then(function() {
+							wrapUp(callback, null);
+						});
+					});		
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the {first|last} column of row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnSelector, rowNumber, callback) {
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
+				var row = rowContainer.element(by.css(`div[row-index='${rowNumber}']`));
+				var parent = row.element(by.xpath(".."));
+				switch (columnSelector.toLowerCase()) {
+					case "first":
+						return parent.all(by.css("div[role='gridcell']")).first();
+					case "last":
+						return parent.all(by.css("div[role='gridcell']")).last();
+					default:
+						callback(new Error("Only 'first' or 'second' is permitted when identifying which column is to be selected!"));
+						break;
+				}			
+			}).then(function(elem) {
+				clickElement(elem).then(function() {
+					wrapUp(callback, null);
+				});
+			});	
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to scroll and select the row with the text {rowText}', { timeout: 120 * 1000}, function(elementName, text, callback){
 		groupingGridTableScroll(elementName, text, callback, true, null, false, false, false, null);
 	});
