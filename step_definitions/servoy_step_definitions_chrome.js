@@ -1574,15 +1574,16 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
-			textField.getAttribute('value').then(function(textFieldText){
-				if(text == textFieldText) {
+		// var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));		
+		var component = element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(component), 20 * 1000, 'Textfield not found!').then(function () {
+			component.element(by.css('input')).getAttribute('value').then(function(textFieldText){
+				if(text.toLowerCase() == textFieldText.toLowerCase()) {
 					wrapUp(callback, "validateEvent");
 				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + textFieldText);
+					callback(new Error(`Validation failed. Expected '${text}'. Got '${textFieldText}'!`));
 				}
-			})
+			});
 		}).catch(function (error) {			
 			tierdown(true);
 			callback(new Error(error.message));
@@ -5496,8 +5497,17 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END ADMIN LOG
 	After(function () {
 		console.log('Completed scenario');
+		browser.manage().logs().get('browser').then(function(browserLog) {
+			if(browserLog.length > 0) {
+				console.log('Warnings and/or errors found after running this feature file! An endless loop with errors can cause the test to be stuck in a certain state, resulting in an unclear error!');
+				console.log('Browser logs:');
+				console.log(browserLog);
+				console.log('End browser logs');
+			}
+		});
+
 		if (!hasErrorDuringSuite) {
-			tierdown(false);
+			// tierdown(false);
 		}
 
 		if(browser.params.E2E_KEEP_SESSION) return;
