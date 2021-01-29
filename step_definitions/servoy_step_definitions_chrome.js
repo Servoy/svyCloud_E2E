@@ -3516,9 +3516,9 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		findRecordByRowLevel(elementName, rowText, rowOption, rowLevel - 1, callback);
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: timeoutAgAction }, function (elementName, text, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to sort the table by {sortBy}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
 		var grid = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(grid), 30 * 1000, 'Table not found!').then(function () {
+		browser.wait(EC.presenceOf(grid), 20 * 1000, 'Table not found!').then(function () {
 			var gridHeader = grid.all(by.className("ag-header-row")).first();
 			var columnHeader = gridHeader.all(by.xpath(`//span[text()[contains(translate(., '${text.toUpperCase()}', '${text.toLowerCase()}'), '${text.toLowerCase()}')]]`)).first();
 			clickElement(columnHeader).then(function() {
@@ -3530,33 +3530,37 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to group the table by {tableHeaderText}', { timeout: timeoutAgAction }, function (elementName, tableHeaderText, callback) {
-		var table = element.all(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-aggrid-groupingtable[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Table not found!').then(function(){
-			table.each(function(tableItems){
-				var groupingHeaders = tableItems.all(by.xpath("//div[@class='ag-header-row']")).all(by.xpath("//div[contains(@class,'ag-header-cell') and contains(@class, 'g-header-cell-sortable')]"));
-				groupingHeaders.each(function(headerItems){
-					var headerText = headerItems.element(by.xpath("//span[text()='" + tableHeaderText + "']"))
-					headerText.isPresent().then(function(isPresent){
-						if(isPresent) {
-							var elem = headerText.element(by.xpath("..")).element(by.xpath("..//span[@ref='eMenu']"));
-							elem.isPresent().then(function(menuIsPresent){
-								if(menuIsPresent) {
-									browser.executeScript("arguments[0].click()", elem).then(function () {
-										clickElement(tableItems.element(by.cssContainingText("span", "Group by " + tableHeaderText))).then(function () {
-											wrapUp(callback, "tableGroupingEvent");
-										});
-									});
-								}
-							});
-						}
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to group the table by {tableHeaderText}', { timeout: 30 * 1000 }, function (elementName, tableHeaderText, callback) {
+		var arr = [];
+		var grid = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}'`));
+		waitForElement(grid, 20 * 1000, 'Grid could not be found!').then(function() {
+			var header = grid.all(by.className('ag-header-row'));
+			header.all(by.className('ag-table-header')).each(function(rowHeader) {
+				var colSpan = rowHeader.element(by.className('ag-header-cell-text'));
+				arr.push(colSpan.getText());
+			}).then(function() {
+				Promise.all(arr).then(function(returnVals) {
+					returnVals = returnVals.map(function(v) {
+						return v.toLowerCase();
 					});
+
+					var colNr = returnVals.indexOf(tableHeaderText.toLowerCase());
+					
+					if(colNr == -1) {
+						callback(new Error(`Column with the text '${tableHeaderText}' could not be found!`));
+					} else {
+						var headerColumn = header.all(by.className('ag-header-cell')).get(colNr);
+						browser.executeScript("arguments[0].click()", headerColumn.element(by.css('.ag-icon-menu'))).then(function () {
+							clickElement(element(by.css('.ag-menu-option-text'))).then(function() {
+								wrapUp(callback, null);
+							})
+						});
+					}
 				});
-			});
-		}).catch(function (error) {			
-			tierdown(true);
+			})
+		}).catch(function(error) {
 			callback(new Error(error.message));
-		});
+		})
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to ungroup the table by {tableHeaderText}', { timeout: timeoutAgAction }, function (elementName, filterTableText, callback) {
@@ -6128,6 +6132,10 @@ function dataServoyExtraTableScroll(elementName, text, shouldClick, callback){
 		console.log(error.message);
 		tierdown(true);
 	});
+}
+
+function waitForElement(elem, timeout, errMsg) {
+	return browser.wait(EC.presenceOf(elem), timeout, errMsg);
 }
 
 function setCalendar(day, month, year, calType, callback) {
