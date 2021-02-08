@@ -1835,6 +1835,82 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 	//END BOOTSTRAP SELECT
+	When('data-bootstrapcomponents-combobox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+		var selectComponent = element(by.css(`data-bootstrapcomponents-combobox[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
+			selectComponent.click().then(function () {
+				wrapUp(callback, "clickEvent");
+			});
+		}).catch(function (error) {
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-bootstrapcomponents-combobox component I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (text, callback) {
+		var combobox_container = element.all(by.className('ui-select-container'));
+		var arr = [];
+		browser.wait(EC.presenceOf(combobox_container.first()), 15 * 1000, 'Combobox container not found!').then(function() {
+			combobox_container.all(by.className('ui-select-choices-row')).each(function(comboboxRow) {
+				var comboboxItem = comboboxRow.element(by.className('ui-select-choices-row-inner'));
+				arr.push(comboboxItem.getText());
+			})
+		}).then(function() {
+			Promise.all(arr).then(function(returnVals) {
+				returnVals = returnVals.map(function(v) {
+					return v.toLowerCase();
+				});
+
+				var colNr = returnVals.indexOf(text.toLowerCase());
+				
+				clickElement(combobox_container.all(by.className('ui-select-choices-row')).get(colNr)).then(function() {
+					wrapUp(callback, null);
+				})
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-bootstrapcomponents-combobox component I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (rowNumber, callback) {
+		rowNumber--;
+		var combobox_container = element.all(by.className('ui-select-container'));
+		browser.wait(EC.presenceOf(combobox_container.first()), 15 * 1000, 'Combobox container not found!').then(function() {
+			var combobox_list = combobox_container.all(by.className('ui-select-choices-row'));
+			combobox_list.count().then(function(itemCount) {
+				if(rowNumber >= itemCount) {
+					callback(new Error(`Unable to select combobox item. There are only ${itemCount} items!`));
+				} else {
+					clickElement(combobox_list.get(rowNumber)).then(function() {
+						wrapUp(callback, null);
+					});
+				}
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('data-bootstrapcomponents-combobox component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, text, callback) {
+		var combobox = element(by.css(`data-bootstrapcomponents-combobox[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function() {
+			var selectedRow = combobox.element(by.className('ui-select-match-text'));
+			var selectedRowText = selectedRow.element(by.css('span'));
+			selectedRowText.getText().then(function(rowText) {
+				if(rowText.toLowerCase() == text.toLowerCase()) {
+					wrapUp(callback, null);
+				} else {
+					callback(new Error(`Validation failed! Excpected '${text}'. Got '${rowText}' instead!`));
+				}
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});	
+	//BOOTSTRAP COMBOBOX
+
+	//END BOOTSTRAP COMBOBOX
+
 
 	//BOOTSTRAP TEXTAREA
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
