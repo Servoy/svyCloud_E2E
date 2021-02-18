@@ -440,6 +440,39 @@ To prevent this from happening, a custom step can be added to prevent this from 
 
 Once this is setup and the build starts with E2E_ENABLED, the tests defined in config.json will be executed.
 
+**Common text editor for writing tests**
+
+Currently the application that is highly recommended is **Visual Studio Code**. VSC has a lot of support for syntax highlighting and makes the test files look readable. 
+To get this to work:
+- Download VSC [here](https://code.visualstudio.com/download)
+- Once downloaded and installed, launch the application and go to file/open Folder and select the root folder of the E2E repository or the root location where the .zip file has been extracted.
+- On the left side of the application, click on the icon called 'Extensions'
+You now see a search bar and, if already installed, a list of already installed extensions
+- In the search bar, insert the text 'Cucumber' and press Enter
+- Click on the first item called 'Cucumber (Gherkin) Full Support'
+- Click on install and restart VSC
+
+Your feature files will now be a lot more readable. For a highly popular feature, see the topic below. 
+
+**Gherkin Auto Completion**
+
+The language in which you write your feature files is very phrone for grammatical mistakes. To prevent such mistakes, we recommend to use the extension called **Cucumber (Gherkin) Full Support**. If the steps in the topic above have been followed, this extension should already be installed. If not, please see the topic above and follow the instructions.
+Once the extension is installed, a few things have to be done:
+- On the root of your folder, a folder called .vscode has to be created
+- In this folder, create a file called 'settings.json'.
+- In the file, paste the following content:
+
+```json
+{
+    "cucumberautocomplete.steps": [
+        "step_definitions/*.js",
+        "features/custom_step_definitions/*.js"
+    ],
+    "cucumberautocomplete.strictGherkinCompletion": true
+}
+```
+
+Once this has been done, save the file and restart VSC. Auto completion for feature files should now work.
 
 **Examples**
 ___
