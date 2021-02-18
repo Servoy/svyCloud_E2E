@@ -5627,6 +5627,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Before(function () {
+		console.log('Checking for templates...');
+		var path = './featureTemplates';
+		if (fs.existsSync(path)) {
+			var scenarios = arguments[0].scenario.feature.scenarios;
+			for(var x = 0; x < scenarios.length; x++) {
+				var scenarioSteps = scenarios[x].steps;
+				for(var i = 0; i < scenarioSteps.length; i++) {
+					/** @type{{name: String, keyword: String}} */
+					var obj = getFeatureString(scenarioSteps[i].name);
+					if(obj) {
+						scenarioSteps[i].name = obj.name;
+						scenarioSteps[i].keyword = obj.keyword + ' ';
+					}
+				}
+			}
+		}
+
 		hasErrorDuringSuite = false;
 		console.log('Starting scenario');
 		browser.driver.getCapabilities().then(function(caps){
@@ -5634,6 +5651,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 });
+
+function getFeatureString(name) {	
+	/** @type{{name:String, keyword: String}} */
+	var obj = {};
+	if(name.indexOf('I want to run the template ') == -1) return;
+	var resSplit = name.split('I want to run the template ');
+	var parsed = JSON.parse(resSplit[1]);
+	var templateDuplicate = fs.readFileSync('./featureTemplates/'+parsed[0], 'utf8');
+	if(parsed[1]) {
+		for (const property in parsed[1]) {
+			templateDuplicate = templateDuplicate.replace(`{${property}}`, parsed[1][property])
+		}
+	}
+	//get keyword (Then/Given/When etc) and the new String
+	obj.keyword = templateDuplicate.split(' ')[0];
+	obj.name = templateDuplicate.substring(templateDuplicate.indexOf(' ')+1);
+	console.log(obj);
+	return obj;
+}
 
 function clearAdminPage() {
 	// console.log('Clearing logs...');
