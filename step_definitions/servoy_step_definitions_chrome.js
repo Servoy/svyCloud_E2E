@@ -3555,6 +3555,20 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-textbox component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.presenceOf(textBox.element(by.css('input'))), 30 * 1000, 'Textbox not found!').then(function(){
+				clickElement(textBox).then(function() {
+					wrapUp(callback, null);
+				})
+			});
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	});
 	//END TEXT FIELD
 
 	//CHECKBOX
