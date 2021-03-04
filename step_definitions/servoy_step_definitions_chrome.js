@@ -3914,7 +3914,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that on the row with the text {text}, the column with the text {columnName} contains the class {className}', {timeout: 30 * 1000}, function(elementName, text, columnName, className, callback){	
 		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		var arr = []
+		var arr = [];
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
 			var header = table.all(by.className('ag-header-row'));			
 			header.all(by.className('ag-table-header')).each(function(rowHeader) {
@@ -3927,7 +3927,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 					  
 					var colNr = returnVals.indexOf(columnName.toLowerCase());
-					
 					if(colNr == -1) {
 						callback(new Error(`Column with the text '${columnName}' could not be found!`));
 					} else {
@@ -3945,23 +3944,28 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									var parent = elementWithText.element(by.xpath(".."));
 									var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
 									rowColumn.getAttribute('class').then(function(classes) {
-										if(classes) {
-											if(classes.indexOf(className) > -1) {
-												wrapUp(callback, null)
-											} else {
-												var nested_div = rowColumn.element(by.className(className));
-												nested_div.isPresent().then(function(isNestedDivPresent) {
-													console.log(isNestedDivPresent)
-													if(isNestedDivPresent) {
-														wrapUp(callback, null);
-													} else {
-														callback(new Error('Given column exists, but does not contain the given class.'));			
-													}
-												});
-											}
+										if(classes.indexOf(className) > -1) {
+											wrapUp(callback, null)
 										} else {
-											callback(new Error('Given column name does not exist.'));
-										}										
+											var class_string = '';
+											if(className.indexOf(' ') > -1) {
+												var classNameSplit = className.split(' ');
+												for(var x = 0; x < classNameSplit.length; x++) {
+													class_string+= '.' + classNameSplit[x];
+												}
+											}
+
+											if(!class_string){
+												class_string = '.' + className;
+											}
+											
+											var nested_div = rowColumn.element(by.css(class_string));
+											browser.wait(EC.presenceOf(nested_div), 10 * 1000, 'Column with the given class does not exist').then(function() {
+												wrapUp(callback, null);
+											}).catch(function(err) {
+												callback(new Error(err));		
+											});
+										}
 									});
 								} else {
 									callback(new Error(`Record with the text '${text}' could not be found!`));
