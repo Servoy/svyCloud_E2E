@@ -4661,7 +4661,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('default modal-dialog component I want to validate that the text {dialogText} is present', { timeout: 15 * 1000 }, function (dialogText, callback) {
-		var dialog = element(by.xpath("//div[@role='dialog']"));
+		var dialog = element(by.css("div[role='dialog']"));
 		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
 			var dialogItem = dialog.element(by.css(".bootbox-body"));
 			browser.wait(EC.presenceOf(dialogItem), 10 * 1000, 'Dialog text item could not be found!').then(function() {
