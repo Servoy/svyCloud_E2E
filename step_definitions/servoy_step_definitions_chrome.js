@@ -4664,7 +4664,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dialog = element(by.css("div[role='dialog']"));
 		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
 			var dialogItem = dialog.element(by.css(".bootbox-body"));
-			browser.wait(EC.presenceOf(dialogItem), 10 * 1000, 'Dialog text item could not be found!').then(function() {
+			browser.wait(EC.visibilityOf(dialogItem), 10 * 1000, 'Dialog text item could not be found!').then(function() {
 				dialogItem.getText().then(function(dialogItemText) {
 					if(dialogItemText.toLowerCase().indexOf(dialogText.toLowerCase()) >= 0) {
 						wrapUp(callback, null);
