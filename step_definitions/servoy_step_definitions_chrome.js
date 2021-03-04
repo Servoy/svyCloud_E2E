@@ -4290,7 +4290,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -4658,15 +4657,15 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('default modal-dialog component I want to validate that the text {dialogText} is present', { timeout: 15 * 1000 }, function (dialogText, callback) {
-		element.all(by.xpath("//div[contains(@class, 'modal-dialog')]")).each(function(dialogItems){
-			var textMessageThing = dialogItems.element(by.cssContainingText(".bootbox-body", dialogText))
-			textMessageThing.isPresent().then(function(isPresent){
-				if(isPresent) {
-					wrapUp(callback, "validateEvent")
+		var dialog = element(by.xpath("//div[@role='dialog']"));
+		var dialogItem = dialog.element(by.css(".bootbox-body"));
+		dialogItem.getText().then(function(dialogItemText) {
+			if(dialogItemText.toLowerCase().indexOf(dialogText)) {
+				wrapUp(callback, null);
+			} else {
+				callback(new Error(`Validation failed! Expected the dialog to contain '${dialogText}'. Got '${dialogItemText}' instead!`));
 				}
-			})
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
