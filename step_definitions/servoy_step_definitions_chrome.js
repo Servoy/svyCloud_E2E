@@ -4658,20 +4658,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	Then('default modal-dialog component I want to validate that the text {dialogText} is present', { timeout: 15 * 1000 }, function (dialogText, callback) {
 		var dialog = element(by.xpath("//div[@role='dialog']"));
-		var dialogItem = dialog.element(by.css(".bootbox-body"));
-		dialogItem.getText().then(function(dialogItemText) {
-			if(dialogItemText.toLowerCase().indexOf(dialogText)) {
-				wrapUp(callback, null);
-			} else {
-				callback(new Error(`Validation failed! Expected the dialog to contain '${dialogText}'. Got '${dialogItemText}' instead!`));
+		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
+			var dialogItem = dialog.element(by.css(".bootbox-body"));
+			dialogItem.getText().then(function(dialogItemText) {
+				if(dialogItemText.toLowerCase().indexOf(dialogText.toLowerCase()) >= 0) {
+					wrapUp(callback, null);
+				} else {
+					callback(new Error(`Validation failed! Expected the dialog to contain '${dialogText}'. Got '${dialogItemText}' instead!`));
 				}
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});			
+		})
 	});
 
 	Then('I expect a modal-dialog popup to appear', { timeout: 15 * 1000 }, function (callback) {
-		var dialog = element(by.xpath("//div[@class='modal-content']"));
+		var dialog = element(by.xpath("//div[@role='dialog']"));
 		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
 			wrapUp(callback, "modalDialogEvent");			
 		}).catch(function (error) {			
@@ -5635,8 +5637,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 
 		if(browser.params.E2E_KEEP_SESSION) return;
-		browser.executeScript('window.sessionStorage.clear();');
-		browser.executeScript('window.localStorage.clear();');
+			browser.executeScript('window.sessionStorage.clear();');
+			browser.executeScript('window.localStorage.clear();');
 	});
 
 	Before(function () {
