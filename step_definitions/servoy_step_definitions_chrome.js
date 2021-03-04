@@ -4664,12 +4664,14 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dialog = element(by.xpath("//div[@role='dialog']"));
 		browser.wait(EC.presenceOf(dialog), 10 * 1000, 'Dialog not present!').then(function(){			
 			var dialogItem = dialog.element(by.css(".bootbox-body"));
-			dialogItem.getText().then(function(dialogItemText) {
-				if(dialogItemText.toLowerCase().indexOf(dialogText.toLowerCase()) >= 0) {
-					wrapUp(callback, null);
-				} else {
-					callback(new Error(`Validation failed! Expected the dialog to contain '${dialogText}'. Got '${dialogItemText}' instead!`));
-				}
+			browser.wait(EC.presenceOf(dialogItem), 10 * 1000, 'Dialog text item could not be found!').then(function() {
+				dialogItem.getText().then(function(dialogItemText) {
+					if(dialogItemText.toLowerCase().indexOf(dialogText.toLowerCase()) >= 0) {
+						wrapUp(callback, null);
+					} else {
+						callback(new Error(`Validation failed! Expected the dialog to contain '${dialogText}'. Got '${dialogItemText}' instead!`));
+					}
+				});
 			}).catch(function (error) {			
 				callback(new Error(error.message));
 			});			
