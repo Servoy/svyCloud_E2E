@@ -55,10 +55,39 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	Then('I want to close the tab {tabNumber}', {timeout: 15 * 1000}, function(tabNumber, callback) {
+		browser.getAllWindowHandles().then(function(handles) {
+			browser.driver.switchTo().window(handles[tabNumber - 1]);
+			browser.driver.close();
+			browser.driver.switchTo().window(handles[tabNumber - 2]).then(function() {
+				wrapUp(callback, null);
+			})
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
 	//URL VALIDATION
 	Then('I expect the url to be {browserUrl}', { timeout: 30 * 1000 }, function (url, callback) {
 		browser.wait(EC.urlContains(url), 15 * 1000, 'URL has not changed!').then(function () {
 			wrapUp(callback, "validateEvent");
+		}).catch(function (error) {
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('I expect the url of tab {tabNumber} to contain the text {text}', {timeout: 20 * 1000}, function(tab, text, callback) {
+		browser.getAllWindowHandles().then(function(handles) {
+			var newTabHandle = handles[tab - 1];
+			browser.switchTo().window(newTabHandle).then(function () {
+				browser.getCurrentUrl().then(function(url) {
+					if(url.indexOf(text) > -1) {
+						wrapUp(callback, "navigateEvent");
+					}
+				})
+			});
 		}).catch(function (error) {
 			tierdown(true);
 			callback(new Error(error.message));
