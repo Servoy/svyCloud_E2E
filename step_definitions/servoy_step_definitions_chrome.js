@@ -3976,6 +3976,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 									console.log('Inner attributes detected:');
 									console.log(html);
 								});	
+								console.log('Index: ' + colNr)
 								rowColumn.getAttribute('class').then(function(classes) {
 									if(classes.indexOf(className) > -1) {
 										wrapUp(callback, null)
