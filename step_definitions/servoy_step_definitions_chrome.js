@@ -3954,7 +3954,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					returnVals = returnVals.map(function(v) {
 						return v.toLowerCase();
 					});
-					  
+					console.log(returnVals);
 					var colNr = returnVals.indexOf(columnName.toLowerCase());
 					if(colNr == -1) {
 						callback(new Error(`Column with the text '${columnName}' could not be found!`));
