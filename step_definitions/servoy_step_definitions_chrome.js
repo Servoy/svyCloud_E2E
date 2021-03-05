@@ -3943,6 +3943,10 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 							browser.wait(EC.visibilityOf(elementWithText), 10 * 1000, `Record with the text '${text}' could not be found!`).then(function(){
 								var parent = elementWithText.element(by.xpath(".."));
 								var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
+								rowColumn.getAttribute('innerHTML').then(function(html) {
+									console.log('Inner attributes detected:');
+									console.log(html);
+								});	
 								rowColumn.getAttribute('class').then(function(classes) {
 									if(classes.indexOf(className) > -1) {
 										wrapUp(callback, null)
