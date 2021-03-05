@@ -3938,38 +3938,37 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 							}
 						}).then(function (containerClass) {
 							var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-							var elementWithText = rowContainer.all(by.cssContainingText('div', text)).last();
-							elementWithText.isPresent().then(function(isPresent) {
-								if(isPresent) {
-									var parent = elementWithText.element(by.xpath(".."));
-									var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
-									rowColumn.getAttribute('class').then(function(classes) {
-										if(classes.indexOf(className) > -1) {
-											wrapUp(callback, null)
-										} else {
-											var class_string = '';
-											if(className.indexOf(' ') > -1) {
-												var classNameSplit = className.split(' ');
-												for(var x = 0; x < classNameSplit.length; x++) {
-													class_string+= '.' + classNameSplit[x];
-												}
+							// var elementWithText = rowContainer.all(by.cssContainingText('div', text)).last();
+							var elementWithText = rowContainer.all(by.xpath(`//div[text()='${text}']`)).last();
+							browser.wait(EC.visibilityOf(elementWithText), 10 * 1000, `Record with the text '${text}' could not be found!`).then(function(){
+								var parent = elementWithText.element(by.xpath(".."));
+								var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
+								rowColumn.getAttribute('class').then(function(classes) {
+									if(classes.indexOf(className) > -1) {
+										wrapUp(callback, null)
+									} else {
+										var class_string = '';
+										if(className.indexOf(' ') > -1) {
+											var classNameSplit = className.split(' ');
+											for(var x = 0; x < classNameSplit.length; x++) {
+												class_string+= '.' + classNameSplit[x];
 											}
-
-											if(!class_string){
-												class_string = '.' + className;
-											}
-											
-											var nested_div = rowColumn.element(by.css(class_string));
-											browser.wait(EC.presenceOf(nested_div), 10 * 1000, 'Column with the given class does not exist').then(function() {
-												wrapUp(callback, null);
-											}).catch(function(err) {
-												callback(new Error(err));		
-											});
 										}
-									});
-								} else {
-									callback(new Error(`Record with the text '${text}' could not be found!`));
-								}
+
+										if(!class_string){
+											class_string = '.' + className;
+										}
+										
+										var nested_div = rowColumn.element(by.css(class_string));
+										browser.wait(EC.presenceOf(nested_div), 10 * 1000, `Record with the text '${text}' has been found, but the column with the class '${className}' could not be found!`).then(function() {
+											wrapUp(callback, null);
+										}).catch(function(err) {
+											callback(new Error(err));		
+										});
+									}
+								});
+							}).catch(function (error) {			
+								callback(new Error(error.message));
 							});
 						});
 					}
@@ -3977,7 +3976,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -5561,7 +5559,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 	//END STORE VALUES
-
 	//SET IGNORESYNCHRONIZATION
 	When('I want to set the synchronization to {option}', {timeout: 10 * 1000}, function(option, callback){
 		if(option === "true") {
