@@ -3971,11 +3971,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 							var elementWithText = rowContainer.all(by.xpath(`//div[text()='${text}']`)).last();
 							browser.wait(EC.visibilityOf(elementWithText), 10 * 1000, `Record with the text '${text}' could not be found!`).then(function(){
 								var parent = elementWithText.element(by.xpath(".."));
+
+								parent.getAttribute('innerHTML').then(function(parentHtml) {
+									console.log(parentHtml);
 								var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
-								rowColumn.getAttribute('innerHTML').then(function(html) {
-									console.log('Inner attributes detected:');
-									console.log(html);
-								});	
+								
 								console.log('Index: ' + colNr)
 								rowColumn.getAttribute('class').then(function(classes) {
 									if(classes.indexOf(className) > -1) {
@@ -4000,6 +4000,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 											callback(new Error(err));		
 										});
 									}
+								});
 								});
 							}).catch(function (error) {			
 								callback(new Error(error.message));
