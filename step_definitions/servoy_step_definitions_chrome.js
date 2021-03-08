@@ -3974,33 +3974,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 								parent.getAttribute('innerHTML').then(function(parentHtml) {
 									console.log(parentHtml);
-								var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
+									var rowColumn = parent.all(by.css('div[role="gridcell"]')).get(colNr);
 								
-								console.log('Index: ' + colNr)
-								rowColumn.getAttribute('class').then(function(classes) {
-									if(classes.indexOf(className) > -1) {
-										wrapUp(callback, null)
-									} else {
-										var class_string = '';
-										if(className.indexOf(' ') > -1) {
-											var classNameSplit = className.split(' ');
-											for(var x = 0; x < classNameSplit.length; x++) {
-												class_string+= '.' + classNameSplit[x];
+									console.log('Index: ' + colNr)
+									rowColumn.getAttribute('class').then(function(classes) {
+										if(classes.indexOf(className) > -1) {
+											wrapUp(callback, null)
+										} else {
+											var class_string = '';
+											if(className.indexOf(' ') > -1) {
+												var classNameSplit = className.split(' ');
+												for(var x = 0; x < classNameSplit.length; x++) {
+													class_string+= '.' + classNameSplit[x];
+												}
 											}
-										}
 
-										if(!class_string){
-											class_string = '.' + className;
+											if(!class_string){
+												class_string = '.' + className;
+											}
+											
+											var nested_div = rowColumn.element(by.css(class_string));
+											browser.wait(EC.presenceOf(nested_div), 10 * 1000, `Record with the text '${text}' has been found, but the column with the class '${className}' could not be found!`).then(function() {
+												wrapUp(callback, null);
+											}).catch(function(err) {
+												callback(new Error(err));		
+											});
 										}
-										
-										var nested_div = rowColumn.element(by.css(class_string));
-										browser.wait(EC.presenceOf(nested_div), 10 * 1000, `Record with the text '${text}' has been found, but the column with the class '${className}' could not be found!`).then(function() {
-											wrapUp(callback, null);
-										}).catch(function(err) {
-											callback(new Error(err));		
-										});
-									}
-								});
+									});
 								});
 							}).catch(function (error) {			
 								callback(new Error(error.message));
@@ -4009,6 +4009,54 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					}
 				});
 
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+
+
+	Then('servoy data-aggrid-groupingtable component with name {elementName} I want to validate that on the row with the text {text}, the column with the ID {columnID} contains the class {className}', {timeout: 30 * 1000}, function(elementName, text, columnID, className, callback){	
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.className(containerClass));	
+				var itemWithText = rowContainer.element(by.xpath(`//div[text()='${text}']`))
+				browser.wait(EC.presenceOf(itemWithText), 15 * 1000, `Column with the text '${text}' could not be found!`).then(function() {
+					var parent = itemWithText.element(by.xpath(".."));
+					var rowColumn = parent.element(by.css(`div[col-id="${columnID}" i`));
+					rowColumn.getAttribute('class').then(function(classes) {
+						if(classes.indexOf(className) > -1) {
+							wrapUp(callback, null)
+						} else {
+							var class_string = '';
+							if(className.indexOf(' ') > -1) {
+								var classNameSplit = className.split(' ');
+								for(var x = 0; x < classNameSplit.length; x++) {
+									class_string+= '.' + classNameSplit[x];
+								}
+							}
+
+							if(!class_string){
+								class_string = '.' + className;
+							}
+							
+							var nested_div = rowColumn.element(by.css(class_string));
+							browser.wait(EC.presenceOf(nested_div), 10 * 1000, `Record with the text '${text}' has been found, but the column with the class '${className}' could not be found!`).then(function() {
+								wrapUp(callback, null);
+							}).catch(function(err) {
+								callback(new Error(err));		
+							});
+						}
+					});
+				});
 			});
 		}).catch(function (error) {			
 			callback(new Error(error.message));
