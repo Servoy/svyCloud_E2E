@@ -4166,6 +4166,33 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the column with the ID {columnID} of the row that equals the text {text}', {timeout: 40 * 1000}, function(elementName, columnID, text, callback) {
+		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
+		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+			agGridIsGrouped(elementName).then(function (isGrouped) {
+				if (isGrouped) {
+					return "ag-full-width-viewport";
+				} else {
+					return "ag-body-viewport";
+				}
+			}).then(function (containerClass) {
+				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
+				var columnWithText = rowContainer.element(by.xpath(`//div[text()='${text}']`));
+				browser.wait(EC.presenceOf(columnWithText), 10 * 1000, `Column with the text '${text}' could not be found!`).then(function() {
+					var parent = columnWithText.element(by.xpath(".."));
+					var columnToClick = parent.element(by.css(`div[col-id='${columnID}' i]`));
+					browser.wait(EC.presenceOf(columnToClick), 10 * 1000, `Column with the text exists, but no column with the ID '${columnID}' could be found!`).then(function() {
+						clickElement(columnToClick).then(function() {
+							wrapUp(callback, null);
+						});
+					});					
+				});		
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to click on the {first|last} column of row {rowNumber}', {timeout: 40 * 1000}, function(elementName, columnSelector, rowNumber, callback) {
 		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
