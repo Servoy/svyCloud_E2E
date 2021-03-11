@@ -3528,7 +3528,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//INPUT FIELDS
 
 	//When data-servoycore-formcomponent formcomponent with the name {} with an input component with name layout_inputTypeahead.frmComp_country$containedForm$input I want to select the item with the text Belgium
-	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with an input component with name {elementName} I want to select the item with the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+	When('data-servoycore-formcomponent with the name {formComponentName} with an input component with name {elementName} I want to select the item with the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
 		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
 		browser.wait(EC.presenceOf(fComponent), 25 * 1000, 'Formcomponent not visible!').then(function () {
 			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
@@ -3601,7 +3601,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END TEXT FIELD
 
 	//CHECKBOX
-	When('data-servoycore-formcomponent formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
+	When('data-servoycore-formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 15 * 1000 }, function (formComponentName, elementName, checkboxOption, callback) {
 		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
 			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
 		}
