@@ -2800,6 +2800,37 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END DATA-BOOTSTRAPCOMPONENTS-TABPANEL
 
+	//BOOTSTRAP BREADCRUMBS
+	When('bootstrap data-bootstrapextracomponents-breadcrumbs component with the name {elementName} I want to click the breadcrumb with the text {text}', {timeout: 20 * 1000}, function(elementName, text, callback) {
+		// text += ' ';
+		var component = element(by.css(`data-bootstrapextracomponents-breadcrumbs[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(component), 15 * 1000, `Breadcrumb component could not be found!`).then(function() {
+			var breadcrumb = component.element(by.xpath(`//a[text()[contains(translate(., '${text.toUpperCase()}', '${text.toLowerCase()}'), '${text.toLowerCase()}')]]`));
+			browser.wait(EC.presenceOf(breadcrumb), 10 * 1000, `Breadcrum item with the text '${text}' could not be found!`).then(function() {
+				clickElement(breadcrumb).then(function() {
+					wrapUp(callback, null);
+				});
+			});
+		}).catch(function(err) {
+			callback(new Error(err.message));
+		})
+	});
+
+	Then('bootstrap data-bootstrapextracomponents-breadcrumbs component with the name {elementName} I want to validate that there are {breadcrumbCount} breadcrumbs', {timeout: 15 * 1000}, function(elementName, breadcrumbCount, callback) {
+		var component = element.all(by.css(`data-bootstrapextracomponents-breadcrumbs[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(component), 15 * 1000, `Breadcrumb component could not be found!`).then(function() {
+			var breadcrumbs = component.all(by.css('li'));
+			breadcrumbs.count().then(function(amount) {
+				if(amount == breadcrumbCount) {
+					wrapUp(callback, null);
+				}
+			});
+		}).catch(function(err) {
+			callback(new Error(err.message));
+		});
+	});
+	//END BOOTSTRAP BREADCRUMBS
+
 	//BOOTSTRAP COMPONENTS INSIDE FORMCOMPONENT
 	//TEXT FIELDS
 	When('formcomponent with the name {formComponentName} with a bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
