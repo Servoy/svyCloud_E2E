@@ -129,15 +129,13 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END ENVORONMENT SETUP
 	//SERVOY SIDENAV COMPONENT
 	When('servoy sidenav component with name {elementName} the menu is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoyextra-sidenav[@data-svy-name='" + elementName + "']/div/div/i")))).then(function () {
-			element(by.xpath("//data-servoyextra-sidenav[@data-svy-name='" + elementName + "']/div/div/i")).click().then(function () {
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+		var sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`))
+		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component could not be found!').then(function () {
+			var sideNavMenu = sideNav.element(by.className('svy-sidenav-action-open'));
+			clickElement(sideNavMenu).then(function() {
+				wrapUp(callback, null);
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
