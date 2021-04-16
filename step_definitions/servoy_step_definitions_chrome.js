@@ -3582,6 +3582,21 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('data-servoycore-formcomponent with the name {formComponentName} with an input component with name {elementName} is clicked', { timeout: 40 * 1000 }, function (formComponentName, elementName, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
+			browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
+				clickElement(inputField).then(function() {
+					wrapUp(callback, null);
+				});
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
+
 	//END TYPEAHEAD
 
 	//BOOTSTRAP LABELS
