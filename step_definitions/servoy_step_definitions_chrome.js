@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 var proc = require('process');
 var { defineSupportCode } = require('../lib/cucumberLoader').load();
 var EC = protractor.ExpectedConditions;
