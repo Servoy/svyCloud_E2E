@@ -6410,7 +6410,6 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 									});
 								}).catch(function (error) {
 									callback(new Error(error.message));
-									tierdown(true);
 								})
 							});
 						});
