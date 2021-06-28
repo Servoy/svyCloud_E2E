@@ -6392,7 +6392,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 							if (isGrouped) {
 								return "ag-full-width-viewport";
 							} else {
-								return "ag-body-viewport";
+								return "ag-center-cols-container";
 							}
 						}).then(function (cName) {
 							var rowContainer = rowItems.all(by.className(cName));
