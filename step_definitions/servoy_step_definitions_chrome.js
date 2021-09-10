@@ -5630,6 +5630,64 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 	//END SERVOY EXTRA SLIDER
 
+	//SERVOY EXTRA COLLAPSIBLE
+	When('data-servoyextra-collapse with name {elementName} I want to click on the header', {timeout: 30 * 1000}, function(elementName, callback){
+		var collapsable = element.all(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsable not found!').then(function(){
+			var header = collapsable.all(by.css('.svy-collapse-header-content')).first();
+			clickElement(header).then(function() {
+				wrapUp(callback, "");
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('data-servoyextra-collapse with name {elementName} I want to validate that the collapsable is {collapsed!expanded}', {timeout: 30 * 1000}, function(elementName, collapsed, callback){
+		var collapsable = element.all(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`)).first();
+		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsable not found!').then(function(){
+			var header = collapsable.all(by.css('.svy-collapse-header')).first();
+			header.getAttribute('class').then(function(headerClasses) {
+				switch (collapsed) {
+					case 'collapsed':
+						if(headerClasses.indexOf('collapsed') > -1) {
+							wrapUp(callback, "");
+						} else {
+							callback(new Error(`Collapsible is currently ${collapsed}!`));
+						}
+						break;
+					case 'expanded':
+						if(headerClasses.indexOf('collapsed') > -1) {
+							callback(new Error(`Collapsible is currently ${collapsed}!`));
+						} else {
+							wrapUp(callback, "");
+						}
+						break;
+					default:
+						callback(new Error("Either 'collapsed' or 'expanded' is supported for this test!"));
+						break;
+				}
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-servoyextra-collapse with name {elementName} I want to click on the element with the data-target {dataTarget}', {timeout: 30 * 1000}, function(elementName, dataTarget, callback){
+		var collapsable = element.all(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`)).first();
+		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsable not found!').then(function(){
+			var collapsableIcon = collapsable.element(by.css(`*[data-target='${dataTarget}']`));
+			browser.wait(EC.presenceOf(collapsableIcon), 30 * 1000, 'Element with the given data-target could not be found!').then(function(){
+				clickElement(collapsableIcon).then(function() {
+					wrapUp(callback, "");
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+	//END SERVOY EXTRA COLLAPSIBLE	
+
 	//STORE VALUES
 	When('servoy {componentType} with name {elementName} I want to store the value and {parse} it to a numeric value', {timeout: 30 * 1000}, function(componentType, elementName, parse, callback){		
 		var wildCard = element(by.xpath("//" + componentType + "[@data-svy-name='" + elementName + "']"));
