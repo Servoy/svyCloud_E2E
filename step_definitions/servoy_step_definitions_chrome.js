@@ -3609,6 +3609,38 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	Then('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to validate that the text equals the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
+			inputField.getAttribute('value').then(function(inputValue) {
+				if(inputValue.toLowerCase() == text.toLowerCase()) {
+					wrapUp(callback, "");
+				} else {
+					callback(new Error(`Text field does not eqaul the text '${text}'! It contains the text '${inputValue}'!'`))
+				}
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	Then('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to validate that the text contains the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
+			inputField.getAttribute('value').then(function(inputValue) {
+				if(inputValue.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+					wrapUp(callback, "");
+				} else {
+					callback(new Error(`Text field does not contain the text '${text}'! It contains the text '${inputValue}'!'`))
+				}
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
 	//END TYPEAHEAD
 
 	//TEXT AREAS
