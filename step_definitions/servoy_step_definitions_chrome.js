@@ -3597,7 +3597,73 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
+	When('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to insert the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
+			sendKeys(inputField, text).then(function() {
+				wrapUp(callback, null);
+			});
+		}).catch(function (error) {			
+			tierdown(true);
+			callback(new Error(error.message));
+		});
+	});
 	//END TYPEAHEAD
+
+	//TEXT AREAS
+	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-textarea component with name {cElementName} I want to insert the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textarea[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textarea not found!').then(function(){
+				sendKeys(textBox.element(by.css('textarea')), text).then(function() {
+					wrapUp(callback, null);
+				})
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-servoycore-formcomponent with the name {fcName} with a data-bootstrapcomponents-textarea component with name {elementName} I want to validate that the text equals the exact text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textarea[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textarea not found!').then(function(){
+				var textArea = textBox.element(by.css('textarea'));
+				textArea.getAttribute('value').then(function(textAreaText) {
+					if(textAreaText.toLowerCase() == text.toLowerCase()) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`The textarea does not equal the text '${text}'! It eqauls the text '${textAreaText}' instead!`));
+					}
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-servoycore-formcomponent with the name {fcName} with a data-bootstrapcomponents-textarea component with name {elementName} I want to validate that the text equals the partial text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textarea[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textarea not found!').then(function(){
+				var textArea = textBox.element(by.css('textarea'));
+				textArea.getAttribute('value').then(function(textAreaText) {
+					if(textAreaText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`The textarea does not contain the text '${text}'! It eqauls the text '${textAreaText}' instead!`));
+					}
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+	//END TEXT AREAS
 
 	//BOOTSTRAP LABELS
 	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-label component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
