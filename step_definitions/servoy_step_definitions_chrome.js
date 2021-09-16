@@ -3744,6 +3744,44 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			callback(new Error(error.message));
 		});
 	});
+
+	When('data-servoycore-formcomponent with the name {fcName} with a data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the text equals the exact text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Text Field not found!').then(function(){
+				var textArea = textBox.element(by.css('input'));
+				textArea.getAttribute('value').then(function(textFieldText) {
+					if(textFieldText.toLowerCase() == text.toLowerCase()) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`The textfield does not equal the text '${text}'! It eqauls the text '${textFieldText}' instead!`));
+					}
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
+
+	When('data-servoycore-formcomponent with the name {fcName} with a data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the text equals the partial text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
+		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
+		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Text Field not found!').then(function(){
+				var textArea = textBox.element(by.css('input'));
+				textArea.getAttribute('value').then(function(textFieldText) {
+					if(textFieldText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`The textfield does not contain the text '${text}'! It eqauls the text '${textFieldText}' instead!`));
+					}
+				});
+			});
+		}).catch(function (error) {			
+			callback(new Error(error.message));
+		});
+	});
 	//END TEXT FIELD
 
 	//CHECKBOX
