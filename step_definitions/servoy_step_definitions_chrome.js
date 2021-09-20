@@ -219,18 +219,23 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY CALENDAR COMPONENT
 	When('servoy calendar component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var calendar = element(by.xpath("//data-servoydefault-calendar[@data-svy-name='" + elementName + "']/div/span[1]"));
-		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function () {
-			clickElement(calendar).then(function () {
-				wrapUp(callback, "Click event");
+		var retObj = getElement('data-servoydefault-calendar',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var calendar = retObj.elem.element(by.css('.glyphicon.glyphicon-calendar'));
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function () {
+				clickElement(calendar).then(function () {
+					wrapUp(callback, "Click event");
+				}).catch(function (error) {			
+					tierdown(true);
+					callback(new Error(error.message));
+				});
 			}).catch(function (error) {			
 				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('I want to {activity} for {second} second(s)', {timeout: 120 * 1000}, function (activity, timer, callback) {
@@ -426,18 +431,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY SELECT2TOKENIZER COMPONENT
 	When('servoy select2tokenizer component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"))
-		browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
-			clickElement(tokenizer).then(function () {
-				wrapUp(callback, "Click event");
+		var retObj = getElement('data-servoyextra-select2tokenizer',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var tokenizer = retObj.elem;
+			browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function(){
+				clickElement(tokenizer).then(function () {
+					wrapUp(callback, "Click event");
+				});
 			}).catch(function (error) {				
-				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {				
-			tierdown(true);
-			callback(new Error(error.message));
-		});	
+		}
 	});
 
 	When('servoy select2tokenizer component record number {rowNumber} is clicked', { timeout: 60 * 1000 }, function (rowNumber, callback) {
@@ -462,7 +468,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			})
 		}).catch(function (error) {
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -485,32 +490,41 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
 
 	When('servoy select2tokenizer component with name {elementName} I want to unselect the item with the text {text}', {timeout: 20 * 1000}, function(elementName, text, callback) {
-		var tokenizer = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function() {
-			var elemToDeselect = tokenizer.element(by.css("li[title='" + text + "']"));
-			clickElement(elemToDeselect.element(by.css("span"))).then(function() {
-				wrapUp(callback, "clickEvent");
-			});
-		}).catch(function(error) {
-			tierdown(true);
-			callback(new Error(error.message));
-		})
+		var retObj = getElement('data-servoyextra-select2tokenizer',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var tokenizer = retObj.elem;
+			browser.wait(EC.presenceOf(tokenizer), 15 * 1000, 'Tokenizer not found!').then(function() {
+				var elemToDeselect = tokenizer.element(by.css("li[title='" + text + "']"));
+				clickElement(elemToDeselect.element(by.css("span"))).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function(error) {
+				callback(new Error(error.message));
+			})
+		}
 	});
 
 	When('servoy select2tokenizer component with name {elementName} the text {recordText} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
-		var elem = element(by.css("data-servoyextra-select2tokenizer[data-svy-name='" + elementName + "']")).element(by.css("input"));
-		sendKeys(elem, text, 'tokenizer').then(function () {
-			wrapUp(callback, "Click event");
-		}).catch(function (error) {
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-servoyextra-select2tokenizer',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var elem = retObj.elem;
+			browser.wait(EC.presenceOf(elem), 30 * 1000, 'Tokenizer could not be found!').then(function() {
+				sendKeys(elem.element(by.css("input")), text, 'tokenizer').then(function () {
+					wrapUp(callback, "Click event");
+				}).catch(function (error) {
+					callback(new Error(error.message));
+				});
+			});
+		}
 	});
 
 	When('servoy select2tokenizer component I want to select the record with the exact text {text}', { timeout: 60 * 1000 }, function (text, callback) {
@@ -521,7 +535,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				wrapUp(callback, "clickEvent");
 			})
 		}).catch(function(error) {
-			tierdown(false);
 			callback(new Error(error.message))
 		});
 	});
