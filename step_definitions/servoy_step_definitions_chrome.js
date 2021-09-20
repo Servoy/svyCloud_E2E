@@ -5779,9 +5779,29 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	Then('data-servoyextra-collapse with name {elementName} I want to validate that the collapsable is {collapsed!expanded}', {timeout: 30 * 1000}, function(elementName, collapsed, callback){
-		var collapsable = element.all(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`)).first();
-		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsable not found!').then(function(){
+	When('data-servoyextra-collapse with name {elementName} I want to click on collapsible item number {number} with the text {headerText}', {timeout: 30 * 1000}, function(elementName, collapsibleItemNo, headerText, callback){
+		collapsibleItemNo--;
+        var retObj = getElement('data-servoyextra-collapse', elementName, false, collapsibleItemNo);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var elem = retObj.elem;
+			browser.wait(EC.presenceOf(elem), 30 * 1000, 'Collapsable not found!').then(function(){
+				var collapsibleItem = elem.all(by.xpath(`//div[text()='${headerText}']`)).get(collapsibleItemNo);
+				browser.wait(EC.presenceOf(collapsibleItem), 30 * 1000, `Collapsable item with the text '${headerText}'not found!`).then(function(){
+					clickElement(collapsibleItem).then(function() {
+						wrapUp(callback, null);
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('data-servoyextra-collapse with name {elementName} I want to validate that the collapsible is {collapsed!expanded}', {timeout: 30 * 1000}, function(elementName, collapsed, callback){
+		var collapsable = element(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`));
+		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsible not found!').then(function(){
 			var header = collapsable.all(by.css('.svy-collapse-header')).first();
 			header.getAttribute('class').then(function(headerClasses) {
 				switch (collapsed) {
@@ -5809,18 +5829,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('data-servoyextra-collapse with name {elementName} I want to click on the element with the data-target {dataTarget}', {timeout: 30 * 1000}, function(elementName, dataTarget, callback){
-		var collapsable = element.all(by.css(`data-servoyextra-collapse[data-svy-name='${elementName}']`)).first();
-		browser.wait(EC.presenceOf(collapsable), 30 * 1000, 'Collapsable not found!').then(function(){
-			var collapsableIcon = collapsable.element(by.css(`*[data-target='${dataTarget}']`));
-			browser.wait(EC.presenceOf(collapsableIcon), 30 * 1000, 'Element with the given data-target could not be found!').then(function(){
-				clickElement(collapsableIcon).then(function() {
-					wrapUp(callback, "");
+	When('data-servoyextra-collapse with name {elementName} I want to click element number {elementTarget} with the data-target {dataTarget}', {timeout: 30 * 1000}, function(elementName, number, dataTarget, callback){
+		number--;
+		var retObj = getElement('data-servoyextra-collapse',elementName, null, number);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var elem = retObj.elem;
+			browser.wait(EC.presenceOf(elem), 30 * 1000, 'Collapsable not found!').then(function(){
+				var collapsableIcon = elem.all(by.css(`*[data-target='${dataTarget}']`)).get(number);
+				browser.wait(EC.presenceOf(collapsableIcon), 30 * 1000, 'Element with the given data-target could not be found!').then(function(){
+					clickElement(collapsableIcon).then(function() {
+						wrapUp(callback, "");
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END SERVOY EXTRA COLLAPSIBLE	
 
@@ -6076,6 +6102,32 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 });
+
+function getElement(component, dataSvyName, number) {
+	if(!number) {
+		number = 0; 
+	} else {
+		number--;
+	}
+	var length = dataSvyName.length;
+	if(!component) component = '*';
+	var retObj = {};
+	var elem;
+
+	if(dataSvyName.indexOf('*') == 0) {
+		dataSvyName= dataSvyName.replace('*', '');
+		retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+	} else if(dataSvyName.indexOf('*') == (length-= 1)) {
+		dataSvyName = dataSvyName.replace('*', '');
+		retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+	} else if(dataSvyName.indexOf('*') > -1 && (dataSvyName.indexOf('*') > 0 && dataSvyName.indexOf('*') < (length-= 1))) {
+		retObj.message = `Wilcard elements can only be used to indicate if the name should end with or start with the given name. Example: '*NameThatEndsLikeThis' or 'NameThatStartsLikeT*`;
+	} else {
+		retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+	}
+
+	return retObj
+}
 
 function getFeatureString(name) {	
 	/** @type{{name:String, keyword: String}} */
