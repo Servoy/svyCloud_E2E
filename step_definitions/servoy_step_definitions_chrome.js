@@ -129,107 +129,91 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END ENVORONMENT SETUP
 	//SERVOY SIDENAV COMPONENT
 	When('servoy sidenav component with name {elementName} the menu is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`))
-		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component could not be found!').then(function () {
-			var sideNavMenu = sideNav.element(by.className('svy-sidenav-action-open'));
-			clickElement(sideNavMenu).then(function() {
-				wrapUp(callback, null);
+		var retObj = getElement('data-servoyextra-sidenav',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var elem = retObj.elem;
+			browser.wait(EC.presenceOf(elem), 15 * 1000, 'Sidenavigation component could not be found!').then(function () {
+				var sideNavMenu = elem.element(by.className('svy-sidenav-action-open'));
+				clickElement(sideNavMenu).then(function() {
+					wrapUp(callback, null);
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy sidenav component with name {elementName} tab {tabName} is clicked', { timeout: 30 * 1000 }, function (elementName, text, callback) {
 		text = text.toLowerCase();
-		var sideNav = element(by.css("data-servoyextra-sidenav[data-svy-name='"+elementName+"']"));
-		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(isPresent){
-			if(isPresent) {
-				var item = sideNav.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text + "')] and contains(@class, 'svy-sidenav-item-text')]")).first();
-				browser.wait(EC.presenceOf(item), 15 * 1000, 'Sidenavigation item not found!').then(function() {
-					browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
-						clickElement(item).then(function(){
-							wrapUp(callback, "Click event");
+		var retObj = getElement('data-servoyextra-sidenav',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var sideNav = retObj.elem;
+			browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(isPresent){
+				if(isPresent) {
+					var item = sideNav.all(by.xpath("//*[text()[contains(translate(., '" + text.toUpperCase() + "', '" + text.toLowerCase() + "'), '" + text + "')] and contains(@class, 'svy-sidenav-item-text')]")).first();
+					browser.wait(EC.presenceOf(item), 15 * 1000, 'Sidenavigation item not found!').then(function() {
+						browser.wait(EC.elementToBeClickable(item), 30 * 1000, 'Element not clickable').then(function(){
+							clickElement(item).then(function(){
+								wrapUp(callback, "Click event");
+							}).catch(function (error) {			
+								tierdown(true);
+								callback(new Error(error.message));
+							});
 						}).catch(function (error) {			
 							tierdown(true);
 							callback(new Error(error.message));
 						});
-					}).catch(function (error) {			
-						tierdown(true);
-						callback(new Error(error.message));
 					});
-				});
-			}
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+				}
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
+			});
+		}
 	});
 
 	When('servoy sidenav component with name {elementName} I want to click tab number {tabNumber}', {timeout: 15 * 1000}, function(elementName, tabNumber, callback) {
-		var sideNav = element(by.css("data-servoyextra-sidenav[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(sideNav), 10 * 1000, 'Sidenavigation component not found!').then(function() {
-			var navMenu = sideNav.all(by.className('svy-sidenav-menu')).first();
-			var navMenuItem = navMenu.all(by.css("li")).get(tabNumber - 1);
-			clickElement(navMenuItem).then(function() {
-				wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-servoyextra-sidenav',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var sideNav = retObj.elem;
+			browser.wait(EC.presenceOf(sideNav), 10 * 1000, 'Sidenavigation component not found!').then(function() {
+				var navMenu = sideNav.all(by.className('svy-sidenav-menu')).first();
+				var navMenuItem = navMenu.all(by.css("li")).get(tabNumber - 1);
+				clickElement(navMenuItem).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	Then('servoy sidenav component with name {elementName} I expect the tab {tabText} to be present', {timeout: 30 * 1000 },function(elementName, tabText, callback){
-		var sideNav = element(by.xpath("//data-servoyextra-sidenav[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(sideNav), 30 * 1000, 'Sidenav not found!').then(function(){
-			var sideNavTab = sideNav.element(by.xpath("//span[text()='" + tabText + "']"));
-			browser.wait(EC.presenceOf(sideNavTab), 20 * 1000, 'Tab with the given text not found!').then(function(){
-				wrapUp(callback, "validateEvent");
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('data-servoyextra-sidenav component with name {elementName} the tab with the text {tabText} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, text, tabLevel, callback){
-		const sideNav = element.all(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
-			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
-				var menuItem = menuItems.element(by.css('span'));
-				browser.wait(EC.presenceOf(menuItem), 15 * 1000, 'menuItem not found!').then(function() {
-					menuItem.getText().then(function(menuItemText) {
-						if(menuItemText.toLowerCase() === text.toLowerCase()) {
-							clickElement(menuItem).then(function() {
-								wrapUp(callback, "clickEvent");
-							});
-						}
-					})
-				});			
-			});			
-			
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('data-servoyextra-sidenav component with name {elementName} the tab with the class {className} on level {tabLevel} is clicked', {timeout: 40 * 1000}, function(elementName, className, tabLevel, callback){
-		const sideNav = element(by.css(`data-servoyextra-sidenav[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
-			sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
-				var elem = menuItems.element(by.xpath(`//i[contains(@class, '${className}')]`));
-				browser.wait(EC.presenceOf(elem), 15 * 1000, 'Menuitem not found!').then(function() {
-					clickElement(elem).then(function() {
-						wrapUp(callback, "clickEvent");
-					})
-				});
-			});			
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-servoyextra-sidenav',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			const sideNav = retObj.elem;
+			browser.wait(EC.presenceOf(sideNav), 15 * 1000, 'Sidenavigation component not found!').then(function(){
+				sideNav.all(by.xpath(`//a[contains(@class, 'sn-level-${parseInt(tabLevel)}')]`)).each(function (menuItems) {
+					var elem = menuItems.element(by.xpath(`//i[contains(@class, '${className}')]`));
+					browser.wait(EC.presenceOf(elem), 15 * 1000, 'Menuitem not found!').then(function() {
+						clickElement(elem).then(function() {
+							wrapUp(callback, "clickEvent");
+						})
+					});
+				});			
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END SERVOY SIDENAV COMPONENT
 
