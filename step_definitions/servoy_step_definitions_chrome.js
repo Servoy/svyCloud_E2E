@@ -1702,95 +1702,122 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
+	When('bootstrap data-bootstrapcomponents-button component I want to click on component number {componentNumber} with the name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, componentNumber, callback) {
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, componentNumber);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				clickElement(button).then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});	
+		}
+	});
+
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is right clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var button = element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css('button'));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
-			rightClickElement(button).then(function () {
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				console.log(error.message);
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				rightClickElement(button).then(function () {
+					wrapUp(callback, "clickEvent");
+				}).catch(function (error) {
+					console.log(error.message);
+					tierdown(true);
+				});
+			}).catch(function (error) {			
 				tierdown(true);
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});	
+				callback(new Error(error.message));
+			});	
+		}
 	});
 
 
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is double clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
-			doubleClickElement(button).then(function () {
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				callback(new Error(error.message));
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});	
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				doubleClickElement(button).then(function () {
+					wrapUp(callback, "clickEvent");
+				}).catch(function (error) {			
+					callback(new Error(error.message));
+				});	
+			});	
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button is {enabled|disabled}', { timeout: 30 * 1000 }, function (elementName, state, callback) {
-		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.presenceOf(button), 15 * 1000, 'Button not found!').then(function(){
-			button.isEnabled().then(function(buttonState) {
-				if(!buttonState && state === 'disabled' || buttonState && state === 'enabled') {
-					wrapUp(callback, "validateEvent");
-				} else {
-					if(!buttonState) {
-						callback(new Error('Button is currently disabled. Expected it to be enabled.'));
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.presenceOf(button), 15 * 1000, 'Button not found!').then(function(){
+				button.isEnabled().then(function(buttonState) {
+					if(!buttonState && state === 'disabled' || buttonState && state === 'enabled') {
+						wrapUp(callback, "validateEvent");
 					} else {
-						callback(new Error('Button is currently enabled. Expected it to be disabled.'));
+						if(!buttonState) {
+							callback(new Error('Button is currently disabled. Expected it to be enabled.'));
+						} else {
+							callback(new Error('Button is currently enabled. Expected it to be disabled.'));
+						}
 					}
-				}
+				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button its text partially equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
-			button.getText().then(function(buttonText){
-				if(buttonText.indexOf(text) > -1) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error("Partial validation failed. Expected " + text + ". Got " + buttonText));
-				}
+		
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				button.getText().then(function(buttonText){
+					if(buttonText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Partial validation failed. Expected " + text + ". Got " + buttonText));
+					}
+				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	
 	Then('bootstrap data-bootstrapcomponents-button component with name {elementName} I want to validate that the button its text equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var button = element(by.xpath("//data-bootstrapcomponents-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
-			button.getText().then(function(buttonText){
-				if(buttonText === text) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
-				}
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				button.getText().then(function(buttonText){
+					if(buttonText === text) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Partial validation failed. Expected " + text + ". Got " + buttonText);
+					}
+				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP BUTTON
 
