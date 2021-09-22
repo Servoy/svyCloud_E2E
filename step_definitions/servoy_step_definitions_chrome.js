@@ -1687,18 +1687,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var button = element(by.css("data-bootstrapcomponents-button[data-svy-name='" + elementName + "']")).element(by.css('button'));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
-			clickElement(button).then(function () {
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});	
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function(){
+				clickElement(button).then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});	
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-button component with name {elementName} is right clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
