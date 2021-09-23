@@ -3587,24 +3587,28 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//When data-servoycore-formcomponent formcomponent with the name {} with an input component with name layout_inputTypeahead.frmComp_country$containedForm$input I want to select the item with the text Belgium
 	When('data-servoycore-formcomponent with the name {formComponentName} with an input component with name {elementName} I want to select the item with the text {text}', { timeout: 30 * 1000 }, function (formComponentName, elementName, text, callback) {
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 25 * 1000, 'Formcomponent not visible!').then(function () {
-			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
-			browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
-				clickElement(inputField).then(function() {
-					var typeaheadList = element(by.xpath("//ul[@role='listbox' and @aria-hidden='false']"));
-					browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
-						var option = typeaheadList.element(by.css(`a[title='${text}']`));
-						clickElement(option).then(function() {
-							wrapUp(callback, null);
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 25 * 1000, 'Formcomponent not visible!').then(function () {
+				var inputField = getElement('input',elementName, null, fComponent);
+				browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
+					clickElement(inputField).then(function() {
+						var typeaheadList = element(by.xpath("//ul[@role='listbox' and @aria-hidden='false']"));
+						browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
+							var option = typeaheadList.element(by.css(`a[title='${text}']`));
+							clickElement(option).then(function() {
+								wrapUp(callback, null);
+							});
 						});
 					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('data-servoycore-formcomponent with the name {formComponentName} with an input component with name {elementName} is clicked', { timeout: 40 * 1000 }, function (formComponentName, elementName, callback) {
@@ -3742,18 +3746,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//TEXT FIELD 
 	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-textbox component with name {cElementName} I want to insert the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
-			var textBox = fComponent.element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
-			browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textbox not found!').then(function(){
-				sendKeys(textBox.element(by.css('input')), text).then(function() {
-					wrapUp(callback, null);
-				})
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+				var retObjWithParent = getElement('data-bootstrapcomponents-textbox',elementName, null, fComponent);
+				if(retObj.message) {
+					callback(new Error(retObj.message));
+				} else {
+					var textBox = retObjWithParent.elem;
+					browser.wait(EC.visibilityOf(textBox), 30 * 1000, 'Textbox not found!').then(function(){
+						sendKeys(textBox.element(by.css('input')), text).then(function() {
+							wrapUp(callback, null);
+						});
+					});
+				}
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('data-servoycore-formcomponent with the name {elementName} with a data-bootstrapcomponents-textbox component with name {cElementName} is clicked', {timeout: 30 * 1000}, function(formComponentName, elementName, callback){
@@ -6128,7 +6141,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 });
 
-function getElement(component, dataSvyName, number) {
+function getElement(component, dataSvyName, number, parent) {
 	if(!number) {
 		number = 0; 
 	} else {
@@ -6137,20 +6150,30 @@ function getElement(component, dataSvyName, number) {
 	var length = dataSvyName.length;
 	if(!component) component = '*';
 	var retObj = {};
-	var elem;
 
 	if(dataSvyName.indexOf('*') == 0) {
-		dataSvyName= dataSvyName.replace('*', '');
-		retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+		dataSvyName= dataSvyName.replace('*', '');		
+		if(parent) {
+			retObj.elem = parent.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+		} else {
+			retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+		}		
 	} else if(dataSvyName.indexOf('*') == (length-= 1)) {
 		dataSvyName = dataSvyName.replace('*', '');
-		retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+		if(parent) {
+			retObj.elem = parent.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+		} else {
+			retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+		}
 	} else if(dataSvyName.indexOf('*') > -1 && (dataSvyName.indexOf('*') > 0 && dataSvyName.indexOf('*') < (length-= 1))) {
 		retObj.message = `Wilcard elements can only be used to indicate if the name should end with or start with the given name. Example: '*NameThatEndsLikeThis' or 'NameThatStartsLikeT*`;
 	} else {
-		retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+		if(parent) {
+			retObj.elem = parent.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+		} else {
+			retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+		}		
 	}
-
 	return retObj
 }
 
