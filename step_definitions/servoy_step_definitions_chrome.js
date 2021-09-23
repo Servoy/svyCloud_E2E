@@ -1703,7 +1703,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('bootstrap data-bootstrapcomponents-button component I want to click on component number {componentNumber} with the name {elementName} is clicked', { timeout: 30 * 1000 }, function (componentNumber, elementName, callback) {
-		var retObj = getElement('data-bootstrapcomponents-button',elementName, null, componentNumber);
+		var retObj = getElement('data-bootstrapcomponents-button',elementName, componentNumber, null);
 		if(retObj.message) {
 			callback(new Error(retObj.message));
 		} else {
