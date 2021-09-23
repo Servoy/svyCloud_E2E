@@ -3593,7 +3593,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
         } else {
 			var fComponent = retObj.elem;
 			browser.wait(EC.presenceOf(fComponent), 25 * 1000, 'Formcomponent not visible!').then(function () {
-				var inputField = getElement('input',elementName, null, fComponent);
+				var inputField = getElement('input',elementName, null, fComponent).elem;
 				browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
 					clickElement(inputField).then(function() {
 						var typeaheadList = element(by.xpath("//ul[@role='listbox' and @aria-hidden='false']"));
@@ -3612,63 +3612,81 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	When('data-servoycore-formcomponent with the name {formComponentName} with an input component with name {elementName} is clicked', { timeout: 40 * 1000 }, function (formComponentName, elementName, callback) {
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
-			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
-			browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
-				clickElement(inputField).then(function() {
-					wrapUp(callback, null);
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not visible!').then(function () {
+				var inputField = getElement('input',elementName, null, fComponent).elem;
+				browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
+					clickElement(inputField).then(function() {
+						wrapUp(callback, null);
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to insert the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
-			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
-			sendKeys(inputField, text).then(function() {
-				wrapUp(callback, null);
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+				var inputField = getElement('input',elementName, null, fComponent).elem;
+				sendKeys(inputField, text).then(function() {
+					wrapUp(callback, null);
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to validate that the text equals the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
-			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
-			inputField.getAttribute('value').then(function(inputValue) {
-				if(inputValue.toLowerCase() == text.toLowerCase()) {
-					wrapUp(callback, "");
-				} else {
-					callback(new Error(`Text field does not eqaul the text '${text}'! It contains the text '${inputValue}'!'`))
-				}
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+				var inputField = getElement('input',elementName, null, fComponent).elem;
+				inputField.getAttribute('value').then(function(inputValue) {
+					if(inputValue.toLowerCase() == text.toLowerCase()) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`Text field does not eqaul the text '${text}'! It contains the text '${inputValue}'!'`))
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('data-servoycore-formcomponent with the name {elementName} with an input component with the name {cElementName} I want to validate that the text contains the text {text}', {timeout: 30 * 1000}, function(formComponentName, elementName, text, callback){
-		var fComponent = element(by.css(`data-servoycore-formcomponent[data-svy-name='${formComponentName}']`));
-		browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
-			var inputField = fComponent.element(by.css(`input[data-svy-name='${elementName}']`));
-			inputField.getAttribute('value').then(function(inputValue) {
-				if(inputValue.toLowerCase().indexOf(text.toLowerCase()) > -1) {
-					wrapUp(callback, "");
-				} else {
-					callback(new Error(`Text field does not contain the text '${text}'! It contains the text '${inputValue}'!'`))
-				}
+		var retObj = getElement('data-servoycore-formcomponent',formComponentName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var fComponent = retObj.elem;
+			browser.wait(EC.presenceOf(fComponent), 30 * 1000, 'Formcomponent not found!').then(function(){
+				var inputField = getElement('input',elementName, null, fComponent).elem;
+				inputField.getAttribute('value').then(function(inputValue) {
+					if(inputValue.toLowerCase().indexOf(text.toLowerCase()) > -1) {
+						wrapUp(callback, "");
+					} else {
+						callback(new Error(`Text field does not contain the text '${text}'! It contains the text '${inputValue}'!'`))
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END TYPEAHEAD
 
@@ -6522,48 +6540,31 @@ function groupingGridScrollToTop(elementName, callback) {
 // SERVOY TABLE
 function findRecordTableComponent(elementName, recordText, shouldClick, callback) {
 	var found = false;
-	var baseTable = element.all(by.xpath("//div[@data-svy-name='" + elementName + "']"));
-	browser.wait(EC.presenceOf(baseTable), 15 * 1000, 'Table ')
-	baseTable.first().element(by.xpath("//span[text()='" + recordText + "']")).isPresent().then(function (isPresent) {
-		if(isPresent) {
-			if(shouldClick) {
-				browser.executeScript("arguments[0].scrollIntoView(true);", baseTable.first().element(by.xpath("//span[text()='" + recordText + "']")).getWebElement()).then(function () {
-					clickElement(baseTable.first().element(by.xpath("//span[text()='" + recordText + "']"))).then(function(){
-						found = true;
-						wrapUp(callback, "scrollEvent");
-					});
-				});
-				
-			} else {
-				found = true;
-				wrapUp(callback, "scrollEvent");
-			}
-
-		} else {
-			baseTable.all(by.xpath("//input")).each(function(rowItems) {
-				rowItems.getAttribute('value').then(function(value) {
-					if(value === recordText) {
-						if(shouldClick){
-							clickElement(rowItems).then(function(){
-								found = true;
-								wrapUp(callback, "scrollEvent");
-							});
-						} else {
-							found = true;
+	var retObj = getElement('div',elementName, null, null);
+	if(retObj.message) {
+		callback(new Error(retObj.message));
+	} else {
+		var baseTable = retObj.elem;
+		browser.wait(EC.presenceOf(baseTable), 15 * 1000, 'Table not found!').then(function() {
+			baseTable.element(by.xpath(`//span[text()='${recordText}']`)).isPresent().then(function (isPresent) {
+				if(isPresent) {
+					if(shouldClick) {
+						clickElement(baseTable.first().element(by.xpath(`//span[text()='${recordText}']`))).then(function(){
 							wrapUp(callback, "scrollEvent");
-						}
+						});
+					} else {
+						wrapUp(callback, "scrollEvent");
 					}
-				});
-			});
-		}
-	}).then(function () {
-		if (!found) {
-			scrollToElementTableComponent(elementName, recordText, shouldClick, callback);
-		}
-	}).catch(function (error) {
-		console.log(error.message);
-		tierdown(true);
-	});
+				} else {
+					browser.executeScript("arguments[0].scrollIntoView(true);", baseTable.element(by.xpath(`//span[text()='${recordText}']`)).getWebElement()).then(function () {
+						findRecordTableComponent(elementName, recordText, shouldClick, callback);
+					});
+				}
+			})
+		}).catch(function (error) {
+			callback(new Error(error.message));
+		});
+	}
 }
 
 function scrollToElementTableComponent(elementName, recordText, shouldClick, callback) {
