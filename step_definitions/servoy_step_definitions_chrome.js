@@ -6159,7 +6159,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 });
 
-function getElement(component, dataSvyName, number, parent) {
+function getElement(component, dataSvyName, number, parent, selectAll) {
 	if(!number) {
 		number = 0; 
 	} else {
@@ -6172,24 +6172,50 @@ function getElement(component, dataSvyName, number, parent) {
 	if(dataSvyName.indexOf('*') == 0) {
 		dataSvyName= dataSvyName.replace('*', '');		
 		if(parent) {
-			retObj.elem = parent.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+			if(selectAll)  {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)); //name that starts with the given name
+			} else {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number);
+			}
 		} else {
-			retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number); //name that starts with the given name
+			if(selectAll) {
+				retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)); //name that starts with the given name
+			} else {
+				retObj.elem = element.all(by.css(component + `[data-svy-name$='${dataSvyName}']`)).get(number);
+			}
 		}		
 	} else if(dataSvyName.indexOf('*') == (length-= 1)) {
 		dataSvyName = dataSvyName.replace('*', '');
 		if(parent) {
-			retObj.elem = parent.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+			if(selectAll) {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name^='${dataSvyName}']`));//name that ends with the given name
+			} else {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);
+			}
+			
 		} else {
-			retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);//name that ends with the given name
+			if(selectAll) {
+				retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`));//name that ends with the given name
+			} else {
+				retObj.elem = element.all(by.css(component + `[data-svy-name^='${dataSvyName}']`)).get(number);
+			}
+			
 		}
 	} else if(dataSvyName.indexOf('*') > -1 && (dataSvyName.indexOf('*') > 0 && dataSvyName.indexOf('*') < (length-= 1))) {
 		retObj.message = `Wilcard elements can only be used to indicate if the name should end with or start with the given name. Example: '*NameThatEndsLikeThis' or 'NameThatStartsLikeT*`;
 	} else {
 		if(parent) {
-			retObj.elem = parent.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+			if(selectAll) {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name='${dataSvyName}']`));
+			} else {
+				retObj.elem = parent.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+			}
 		} else {
-			retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+			if(selectAll) {
+				retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`));
+			} else {
+				retObj.elem = element.all(by.css(component + `[data-svy-name='${dataSvyName}']`)).get(number);
+			}
 		}		
 	}
 	return retObj
@@ -6581,149 +6607,154 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 	var elementWithClass;
 	var found = false;
 	//Step 1 - Wait untill the table component is visible
-	var table = element.all(by.xpath(`//data-aggrid-groupingtable[@data-svy-name='${elementName}']`));
-	browser.wait(EC.presenceOf(table.first()), 15 * 1000, 'Table not found!').then(function () {
-		table.each(function (rowItems) {
-			agGridIsGrouped(elementName).then(function (isGrouped) {
-				if (isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport";
-				}
-			}).then(function (cName) {
-				var rowContainer = rowItems.all(by.className(cName));
-				var elementToScroll = null;
-				//Step 2a - Create the element that has to be found
-				if(gridColumnIndex >=0 && gridRowIndex >= 0) {
-					var c = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`));
-					elementToScroll = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`))
-					browser.wait(EC.presenceOf(c)).then(function() {
-						var rc = c.all(by.css('div[role="gridcell"]')).get(gridColumnIndex);
-						browser.wait(EC.presenceOf(rc)).then(function() {
-							elementToScroll = rc;
-						});
-					})
-				}
-				if (locator) {
-					elementToScroll = rowContainer.all(by.css(`${locator}`)).first();
-				} else {	
-					if(partialTextMatch) {
-						elementToScroll = rowContainer.all(by.cssContainingText(`*`, `${text}`)).first();
-					} else if(text) {
-						elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();	 
-					} 
-				}
-				if(className && !text) {
-					elementToScroll = rowContainer.all(by.css(`${className}`)).first();
-				}
-
-				if(className && text) {
-					var elemWithText = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();
-					elemWithText.isPresent(function(bla) {
-						elementToScroll = elemWithText.element(by.xpath("..")).element(by.css(`${className}`));
-					});
-					
-				}
-				//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
-				elementToScroll.isPresent().then(function (isPresent) {
-					//Step 3a - Check if the element is present
-					if (isPresent) {
-						found = true;
-						//Step 3b - Element has been found. Conclude the test
-						if (className) {
-							if(locator) {
-								elementWithClass = elementToScroll.all(by.className(className)).first();
-							} else {
-								elementWithClass = elementToScroll.all(by.xpath("..")).all(by.className(className)).first();
-							}
-							
-							elementWithClass.isPresent().then(function (isPresent) {
-								if (isPresent) {
-									if (shouldDoubleClick) {
-										doubleClickElement(elementWithClass).then(function () {
-											wrapUp(callback, "scrollEvent");
-										});
-									} else if(shouldRightClick) {
-										rightClickElement(elementWithClass).then(function () {
-											wrapUp(callback, "scrollEvent");
-										});
-									} else {
-										clickElement(elementWithClass).then(function () {
-											wrapUp(callback, "scrollEvent");
-										});
-									}
-								} else {
-									if(locator) {
-										elementWithClass = elementToScroll.findElement(by.className(className));
-									} else {
-										elementWithClass = elementToScroll.getWebElement().findElement(by.className(className));
-									}
-									
-									if (shouldDoubleClick) {
-										elementWithClass.doubleClick();
-									} else {
-										elementWithClass.click();
-									}
-								}
-							});
-						} else if (shouldClick) {
-							if (shouldDoubleClick) {
-								browser.actions().doubleClick(elementToScroll).perform().then(function () {
-									wrapUp(callback, "scrollEvent");
-								});
-							} else {
-								clickElement(elementToScroll).then(function () {
-									wrapUp(callback, "scrollEvent");
-								});
-							}
-						} else if (rowOption) {
-							findRecordByRowLevel(elementName, text, rowOption, level, callback);
-						} else {
-							wrapUp(callback, "scrollEvent");
-						}
+	var retObj = getElement('data-aggrid-groupingtable',elementName, null, null, true);
+	if(retObj.message) {
+		callback(new Error(retObj.message));
+	} else {
+		var table = retObj.elem;
+		browser.wait(EC.presenceOf(table.first()), 15 * 1000, 'Table not found!').then(function () {
+			table.each(function (rowItems) {
+				agGridIsGrouped(elementName).then(function (isGrouped) {
+					if (isGrouped) {
+						return "ag-full-width-viewport";
 					} else {
-						//Rows are sorted underneath a different contrainer when grouped or not
-						agGridIsGrouped(elementName).then(function (isGrouped) {
-							if (isGrouped) {
-								return "ag-full-width-viewport";
-							} else {
-								return "ag-center-cols-container";
-							}
-						}).then(function (cName) {
-							var rowContainer = rowItems.all(by.className(cName));
-							var grid = rowContainer.$$("div[role=row]");
-							var maxIndex = 0;
-							grid.each(function (row) {
-								row.getAttribute('row-index').then(function (index) {
-									maxIndex = (parseInt(index)) > maxIndex ? parseInt(index) : maxIndex;
-								})
-							}).then(function () {
-								var lastElement = rowContainer.all(by.css(`div[row-index='${(maxIndex - 1).toString()}']`)).first();
-								browser.wait(EC.presenceOf(lastElement), 10 * 1000, 'Unable to scroll to last element or element with the given text has not been found!').then(function () {
-									browser.executeScript("arguments[0].scrollIntoView(true);", lastElement.getWebElement()).then(function () {
-										groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator);
-									});
-								}).catch(function (error) {
-									callback(new Error(error.message));
-								})
-							});
-						});
+						return "ag-body-viewport";
 					}
+				}).then(function (cName) {
+					var rowContainer = rowItems.all(by.className(cName));
+					var elementToScroll = null;
+					//Step 2a - Create the element that has to be found
+					if(gridColumnIndex >=0 && gridRowIndex >= 0) {
+						var c = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`));
+						elementToScroll = rowContainer.all(by.css(`div[row-index="${gridRowIndex}"]`))
+						browser.wait(EC.presenceOf(c)).then(function() {
+							var rc = c.all(by.css('div[role="gridcell"]')).get(gridColumnIndex);
+							browser.wait(EC.presenceOf(rc)).then(function() {
+								elementToScroll = rc;
+							});
+						})
+					}
+					if (locator) {
+						elementToScroll = rowContainer.all(by.css(`${locator}`)).first();
+					} else {	
+						if(partialTextMatch) {
+							elementToScroll = rowContainer.all(by.cssContainingText(`*`, `${text}`)).first();
+						} else if(text) {
+							elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();	 
+						} 
+					}
+					if(className && !text) {
+						elementToScroll = rowContainer.all(by.css(`${className}`)).first();
+					}
+
+					if(className && text) {
+						var elemWithText = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();
+						elemWithText.isPresent(function(bla) {
+							elementToScroll = elemWithText.element(by.xpath("..")).element(by.css(`${className}`));
+						});
+						
+					}
+					//Step 2b - Try and locate the required element (interaction with an element outside the viewport causes protractor to crash. isPresent handles this)
+					elementToScroll.isPresent().then(function (isPresent) {
+						//Step 3a - Check if the element is present
+						if (isPresent) {
+							found = true;
+							//Step 3b - Element has been found. Conclude the test
+							if (className) {
+								if(locator) {
+									elementWithClass = elementToScroll.all(by.className(className)).first();
+								} else {
+									elementWithClass = elementToScroll.all(by.xpath("..")).all(by.className(className)).first();
+								}
+								
+								elementWithClass.isPresent().then(function (isPresent) {
+									if (isPresent) {
+										if (shouldDoubleClick) {
+											doubleClickElement(elementWithClass).then(function () {
+												wrapUp(callback, "scrollEvent");
+											});
+										} else if(shouldRightClick) {
+											rightClickElement(elementWithClass).then(function () {
+												wrapUp(callback, "scrollEvent");
+											});
+										} else {
+											clickElement(elementWithClass).then(function () {
+												wrapUp(callback, "scrollEvent");
+											});
+										}
+									} else {
+										if(locator) {
+											elementWithClass = elementToScroll.findElement(by.className(className));
+										} else {
+											elementWithClass = elementToScroll.getWebElement().findElement(by.className(className));
+										}
+										
+										if (shouldDoubleClick) {
+											elementWithClass.doubleClick();
+										} else {
+											elementWithClass.click();
+										}
+									}
+								});
+							} else if (shouldClick) {
+								if (shouldDoubleClick) {
+									browser.actions().doubleClick(elementToScroll).perform().then(function () {
+										wrapUp(callback, "scrollEvent");
+									});
+								} else {
+									clickElement(elementToScroll).then(function () {
+										wrapUp(callback, "scrollEvent");
+									});
+								}
+							} else if (rowOption) {
+								findRecordByRowLevel(elementName, text, rowOption, level, callback);
+							} else {
+								wrapUp(callback, "scrollEvent");
+							}
+						} else {
+							//Rows are sorted underneath a different contrainer when grouped or not
+							agGridIsGrouped(elementName).then(function (isGrouped) {
+								if (isGrouped) {
+									return "ag-full-width-viewport";
+								} else {
+									return "ag-center-cols-container";
+								}
+							}).then(function (cName) {
+								var rowContainer = rowItems.all(by.className(cName));
+								var grid = rowContainer.$$("div[role=row]");
+								var maxIndex = 0;
+								grid.each(function (row) {
+									row.getAttribute('row-index').then(function (index) {
+										maxIndex = (parseInt(index)) > maxIndex ? parseInt(index) : maxIndex;
+									})
+								}).then(function () {
+									var lastElement = rowContainer.all(by.css(`div[row-index='${(maxIndex - 1).toString()}']`)).first();
+									browser.wait(EC.presenceOf(lastElement), 10 * 1000, 'Unable to scroll to last element or element with the given text has not been found!').then(function () {
+										browser.executeScript("arguments[0].scrollIntoView(true);", lastElement.getWebElement()).then(function () {
+											groupingGridTableScroll(elementName, text, callback, shouldClick, className, rowOption, level, shouldDoubleClick, isDone, locator);
+										});
+									}).catch(function (error) {
+										callback(new Error(error.message));
+									})
+								});
+							});
+						}
+					});
 				});
+			}).catch(function (error) {
+				callback(new Error(error.message));
 			});
+		}).then(function(){
+			if(insertInField && found) {
+				return true;
+			}
+			if(found) {
+				wrapUp(callback, "scrollEvent");
+			}
 		}).catch(function (error) {
 			callback(new Error(error.message));
 		});
-	}).then(function(){
-		if(insertInField && found) {
-			return true;
-		}
-		if(found) {
-			wrapUp(callback, "scrollEvent");
-		}
-	}).catch(function (error) {
-		callback(new Error(error.message));
-	});
+	}
 }
 
 function findRecordByRowLevel(elementName, recordText, rowOption, level, callback) {
