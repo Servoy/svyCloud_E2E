@@ -1556,7 +1556,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP COMPONENTS
 	//BOOTSTRAP TEXTBOX
-	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 35 * 1000 }, function (elementName, text, callback) {
 		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1572,7 +1572,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 35 * 1000 }, function (elementName, callback) {
 		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1588,7 +1588,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 35 * 1000}, function(elementName, callback){		
 		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1608,7 +1608,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 35 * 1000 }, function (elementName, text, callback) {
 		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1629,7 +1629,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});	
 
-	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to insert the date {day} {month} {year}', { timeout: 30 * 1000 }, function (elementName, day, month, year, callback) {		
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to insert the date {day} {month} {year}', { timeout: 35 * 1000 }, function (elementName, day, month, year, callback) {		
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var index = monthList.indexOf(month.toLowerCase()) + 1;
 		if(!index) {
@@ -1658,7 +1658,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to set the date to today {+|-} {number} day(s)', { timeout: 30 * 1000 }, function (elementName, operator, dayCount, callback) {
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to set the date to today {+|-} {number} day(s)', { timeout: 35 * 1000 }, function (elementName, operator, dayCount, callback) {
 		var newDate;
 		if(operator === '+') {
 			newDate = dateUtils.addDays(parseInt(dayCount));
@@ -1695,7 +1695,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
+	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to clear the text', {timeout: 35 * 1000}, function(elementName, callback) {
 		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
