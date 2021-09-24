@@ -1557,65 +1557,76 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BOOTSTRAP COMPONENTS
 	//BOOTSTRAP TEXTBOX
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textbox = element.all(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input")).first()
-		browser.wait(EC.visibilityOf(textbox), 30 * 1000, 'Textfield not found!').then(function () {
-			sendKeys(textbox, text).then(function () {
-				wrapUp(callback, "insertTextEvent");
-			}).catch(function (error) {
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+				sendKeys(textField, text).then(function () {
+					wrapUp(callback, "insertTextEvent");
+				});
+			}).catch(function (error) {			
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName+"']/input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
-			textField.click().then(function() {
-				wrapUp(callback, "insertTextEvent");
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+				textField.click().then(function() {
+					wrapUp(callback, "insertTextEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+				textField.getAttribute('value').then(function (value) {
+					if (!value) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Validation failed. Expected an empty text field. Got " + value));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var component = retObj.elem;
+			browser.wait(EC.presenceOf(component), 20 * 1000, 'Textfield not found!').then(function () {
+				component.element(by.css('input')).getAttribute('value').then(function(textFieldText){
+					if(text.toLowerCase() == textFieldText.toLowerCase()) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error(`Validation failed. Expected '${text}'. Got '${textFieldText}'!`));
+					}
+				});
 			}).catch(function (error) {			
 				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
-		var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.presenceOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
-			textField.getAttribute('value').then(function (value) {
-				if (!value) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error("Validation failed. Expected an empty text field. Got " + value));
-				}
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	Then('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		// var textField = element(by.xpath("//data-bootstrapcomponents-textbox[@data-svy-name='" + elementName + "']/input"));		
-		var component = element(by.css(`data-bootstrapcomponents-textbox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(component), 20 * 1000, 'Textfield not found!').then(function () {
-			component.element(by.css('input')).getAttribute('value').then(function(textFieldText){
-				if(text.toLowerCase() == textFieldText.toLowerCase()) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Validation failed. Expected '${text}'. Got '${textFieldText}'!`));
-				}
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});	
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to insert the date {day} {month} {year}', { timeout: 30 * 1000 }, function (elementName, day, month, year, callback) {		
@@ -1624,21 +1635,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		if(!index) {
 			callback(new Error('Invalid date inserted!'));
 		}
-		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css('input'));
-		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
-			clickElement(textField).then(function() {
-				textField.sendKeys(day).then(function() {
-					textField.sendKeys(index).then(function() {
-						textField.sendKeys(year).then(function() {
-							wrapUp(callback, "insertEvent");
+
+		
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
+				clickElement(textField).then(function() {
+					textField.sendKeys(day).then(function() {
+						textField.sendKeys(index).then(function() {
+							textField.sendKeys(year).then(function() {
+								wrapUp(callback, "insertEvent");
+							});
 						});
 					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to set the date to today {+|-} {number} day(s)', { timeout: 30 * 1000 }, function (elementName, operator, dayCount, callback) {
@@ -1649,40 +1666,50 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			newDate = dateUtils.substractDays(parseInt(dayCount));
 		}
 		
-		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css('input'));
-		browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
-			clickElement(textField).then(function() {
-				textField.sendKeys(newDate.getDate()).then(function() {
-					if((newDate.getDate()) < 4) {
-						browser.actions().sendKeys(protractor.Key.TAB).perform()
-					}
-					textField.sendKeys(newDate.getMonth() + 1).then(function() {
-						if((newDate.getMonth() + 1) < 2) {
-							browser.actions().sendKeys(protractor.Key.TAB).perform();
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(textField), 15 * 1000, 'Textfield not found!').then(function() {
+				clickElement(textField).then(function() {
+					textField.sendKeys(newDate.getDate()).then(function() {
+						if((newDate.getDate()) < 4) {
+							browser.actions().sendKeys(protractor.Key.TAB).perform()
 						}
-						
-						textField.sendKeys(newDate.getFullYear()).then(function() {
-							wrapUp(callback, "insertEvent");
+						textField.sendKeys(newDate.getMonth() + 1).then(function() {
+							if((newDate.getMonth() + 1) < 2) {
+								browser.actions().sendKeys(protractor.Key.TAB).perform();
+							}
+							
+							textField.sendKeys(newDate.getFullYear()).then(function() {
+								wrapUp(callback, "insertEvent");
+							});
 						});
 					});
 				});
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-textbox component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
-		var textField = element(by.css("data-bootstrapcomponents-textbox[data-svy-name='" + elementName + "']")).element(by.css("input"));
-		browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
-			textField.clear().then(function() {
-				wrapUp(callback, "clearEvent");
+		var retObj = getElement('data-bootstrapcomponents-textbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(textField), 30 * 1000, 'Textfield not found!').then(function () {
+				textField.clear().then(function() {
+					wrapUp(callback, "clearEvent");
+				});
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP TEXTBOX
 	//BOOTSTRAP BUTTON
