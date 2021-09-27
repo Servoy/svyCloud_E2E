@@ -5159,7 +5159,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var menu = element(by.className('yui-module'));
 		browser.wait(EC.presenceOf(menu), 15 * 1000, 'Popup menu has not been found!').then(function() {
 			console.log('found menu')
-			clickElement(menu.element(by.xpath(`//span[text()='${text}']`))).then(function() {
+			clickElement(menu.element(by.xpath(`//*[text()='${text}']`))).then(function() {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function(error) {
