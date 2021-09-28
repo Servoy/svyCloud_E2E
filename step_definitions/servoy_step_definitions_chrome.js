@@ -5914,7 +5914,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('data-servoyextra-collapse with name {elementName} I want to click element number {elementTarget} with the data-target {dataTarget}', {timeout: 30 * 1000}, function(elementName, number, dataTarget, callback){
 		number--;
-		var retObj = getElement('data-servoyextra-collapse',elementName, null, number);
+		var retObj = getElement('data-servoyextra-collapse',elementName, number, null);
 		if(retObj.message) {
 			callback(new Error(retObj.message));
 		} else {
