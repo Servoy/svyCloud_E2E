@@ -5875,7 +5875,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	When('data-servoyextra-collapse with name {elementName} I want to click on collapsible item number {number} with the text {headerText}', {timeout: 30 * 1000}, function(elementName, collapsibleItemNo, headerText, callback){
 		collapsibleItemNo--;
-        var retObj = getElement('data-servoyextra-collapse', elementName, false, collapsibleItemNo);
+        var retObj = getElement('data-servoyextra-collapse', elementName, collapsibleItemNo, false);
 		if(retObj.message) {
 			callback(new Error(retObj.message));
 		} else {
@@ -5934,6 +5934,49 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				var collapsableIcon = elem.all(by.css(`*[data-target='${dataTarget}']`)).get(number);
 				browser.wait(EC.presenceOf(collapsableIcon), 30 * 1000, 'Element with the given data-target could not be found!').then(function(){
 					clickElement(collapsableIcon).then(function() {
+						wrapUp(callback, "");
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	When('data-servoyextra-collapse with name {elementName} inside collapsible with the {main|sub} header with the text {headerText} I want to click on the element with the data-target {dataTarget}', {timeout: 30 * 1000}, function(elementName, header, text, dataTarget, callback){
+		var retObj = getElement('data-servoyextra-collapse',elementName, null, null);
+		if(retObj.message) {
+			callback(new Error(retObj.message));
+		} else {
+			var elem = retObj.elem;
+			var collapsibleItem = elem.element(by.xpath(`//div[text()='${text}']`));
+			browser.wait(EC.presenceOf(collapsibleItem), 15 * 1000, `Collapsable header with the text '${text}' could not be found!`).then(function() {
+				var parent = collapsibleItem.element(by.xpath("..")).element(by.xpath(".."));
+				if(header == "main") {
+					parent = parent.element(by.xpath(".."));
+				}
+				var target = parent.element(by.css(`*[data-target='${dataTarget}']`));
+				browser.wait(EC.presenceOf(target), 15 * 1000, `Collapsable item with the data-target '${dataTarget}' could not be found!`).then(function() {
+					clickElement(target).then(function() {
+						wrapUp(callback, "");
+					});
+				});
+			}).catch(function(err) {
+				callback(new Error(err.message));
+			});
+		}
+	});
+
+	When('data-servoyextra-collapse with name {elementName} I want to click on the header with the text {text}', {timeout: 15 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-servoyextra-collapse',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var collapsable = retObj.elem;
+			browser.wait(EC.presenceOf(collapsable), 5 * 1000, 'Collapsable not found!').then(function(){
+				var header = collapsable.element(by.xpath(`//div[text()='${text}']`));
+				browser.wait(EC.presenceOf(header), 5 * 1000, `Header with the text '${text}' could not be found!`).then(function(){
+					clickElement(header).then(function() {
 						wrapUp(callback, "");
 					});
 				});
