@@ -1339,7 +1339,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy data-servoydefault-password component with name {elementName} is right clicked', {timeout: 30 * 1000}, function(elementName, callback){
+	When('servoy data-servoydefault-password component with the name {elementName} is right clicked', {timeout: 30 * 1000}, function(elementName, callback){
 		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1355,7 +1355,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy data-servoydefault-password component with name {elementName} is double clicked', {timeout: 30 * 1000}, function(elementName, callback){
+	When('servoy data-servoydefault-password component with the name {elementName} is double clicked', {timeout: 30 * 1000}, function(elementName, callback){
 		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
         if(retObj.message) {
             callback(new Error(retObj.message));
