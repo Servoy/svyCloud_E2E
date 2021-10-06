@@ -1027,40 +1027,44 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//SERVOY TYPAHEAD
 	When('servoy default typeahead component with name {elementName} the text {text} is inserted', { timeout: 60 * 1000 }, function (elementName, text, callback) {
-		var typeahead = element(by.xpath("//input[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function () {
-			sendKeys(typeahead, text).then(function () {
-				wrapUp(callback, "Insert value event");
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var typeahead = retObj.elem;
+			browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function () {
+				sendKeys(typeahead, text).then(function () {
+					wrapUp(callback, "Insert value event");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy default typeahead component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var typeahead = element(by.css("input[data-svy-name='" + elementName +"']"));
-		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function(){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+		var typeahead = retObj.elem;
 			if(browser.browserName === 'firefox') {
 				typeahead.click().then(function(){
 					wrapUp(callback, "clickEvent");
-				}).catch(function (error) {
+				}).catch(function (error) {			
 					callback(new Error(error.message));
 				});
 			} else {
 				clickElement(typeahead).then(function(){
 					wrapUp(callback, "clickEvent");
-				}).catch(function (error) {
+				}).catch(function (error) {			
 					callback(new Error(error.message));
 				});
 			}
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy default typeahead component I want row {rowNumber} to equal {text}', { timeout: 30 * 1000 }, function (rowNumber, text, callback) {
+	When('servoy default typeahead component I want row {rowNumber} to equal the text {text}', { timeout: 30 * 1000 }, function (rowNumber, text, callback) {
 		browser.wait(EC.visibilityOf(element(by.xpath("//ul[contains(concat(' ', @class, ' '), ' dropdown-menu ') and contains(concat(' ', @class, ' '), ' ng-isolate-scope ') and not(contains(concat(' ', @class, ' '), ' ng-hide '))]")))).then(function () {
 			element.all(by.xpath("//ul[contains(concat(' ', @class, ' '), ' dropdown-menu ') and contains(concat(' ', @class, ' '), ' ng-isolate-scope ') and not(contains(concat(' ', @class, ' '), ' ng-hide '))]")).each(function (typeaheadSelectOptions) {
 				typeaheadSelectOptions.all(by.xpath("//li[contains(@class, 'uib-typeahead-match') and contains(@class, 'ng-scope')]/a")).get(rowNumber - 1).getText().then(function (liText) {
@@ -1070,56 +1074,60 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
 
 	When('servoy default typeahead component I want to select row number {rowNumber}', { timeout: 30 * 1000 }, function (rowNumber, callback) {
-		// dropdown-menu ng-isolate-scope
 		element.all(by.xpath("//ul[contains(concat(' ', @class, ' '), ' dropdown-menu ') and contains(concat(' ', @class, ' '), ' ng-isolate-scope ') and not(contains(concat(' ', @class, ' '), ' ng-hide '))]")).each(function (typeaheadSelectOptions) {
 			clickElement(typeaheadSelectOptions.all(by.xpath("//li[contains(@class, 'uib-typeahead-match') and contains(@class, 'ng-scope')]/a")).get(rowNumber - 1)).then(function () {
 				wrapUp(callback, "clickEvent");
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
 
 	Then('servoy default typeahead component with name {elementName} I want to validate that the typeahead equals the text {text}', {timeout: 15 * 1000}, function(elementName, text, callback){
-		var typeahead = element(by.css(`input[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function(){
-			typeahead.getAttribute('value').then(function(value){
-				if (value.toLowerCase() === text.toLowerCase()) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log('Expected value: ' + text);
-					console.log('Actual value: ' + value);
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var typeahead = retObj.elem;
+			browser.wait(EC.visibilityOf(typeahead), 15 * 1000, 'Typeahead not visible!').then(function(){
+				typeahead.getAttribute('value').then(function(value){
+					if (value.toLowerCase() === text.toLowerCase()) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error(`Validation failed! Expected the input field to equal the text '${text}'. Got '${value}' instead.`))
+					}
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
 	When('servoy default typeahead component with name {elementName} I want to select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback) {
-		var inputField = element(by.css(`input[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(inputField), 15 * 1000, 'Input field not found!').then(function() {
-			clickElement(inputField).then(function() {
-				var typeaheadList = element(by.css("ul[role='listbox']"));
-				browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
-					var option = typeaheadList.element(by.css(`a[title='${text}']`));
-					clickElement(option).then(function() {
-						wrapUp(callback, null);
-					})
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var typeahead = retObj.elem;
+			browser.wait(EC.presenceOf(typeahead), 15 * 1000, 'Input field not found!').then(function() {
+				clickElement(typeahead).then(function() {
+					var typeaheadList = element(by.css("ul[role='listbox']"));
+					browser.wait(EC.presenceOf(typeaheadList), 15 * 1000, 'Typeahead menu not found!').then(function() {
+						var option = typeaheadList.element(by.css(`a[title='${text}']`));
+						clickElement(option).then(function() {
+							wrapUp(callback, null);
+						})
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END SERVOY TYPEAHEAD
 		
