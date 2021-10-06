@@ -5967,8 +5967,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('data-servoyextra-collapse with name {elementName} inside collapsible with the {main|sub} header with the text {headerText} I want to click on the data-bootstrapcomponents-button with the name {elementName}', {timeout: 30 * 1000}, function(elementName, header, text, elementName, callback){
-		var retObj = getElement('data-servoyextra-collapse',elementName, null, null);
+	When('data-servoyextra-collapse with name {elementName} inside collapsible with the {main|sub} header with the text {headerText} I want to click on the data-bootstrapcomponents-button with the name {elementName}', {timeout: 30 * 1000}, function(collapsibleElementName, header, text, elementName, callback){
+		var retObj = getElement('data-servoyextra-collapse',collapsibleElementName, null, null);
 		if(retObj.message) {
 			callback(new Error(retObj.message));
 		} else {
