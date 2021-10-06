@@ -1307,28 +1307,38 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END DEFAULT CHECKBOX FIELD
 
 	//SERVOY PASSWORD FIELD
-	When('servoy data-servoydefault-password component with name {elementName} the text {password} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var inputField = element(by.xpath("//data-servoydefault-password[@data-svy-name='" + elementName + "']/input"));
-		browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
-			sendKeys(inputField, text).then(function () {
-				wrapUp(callback, 'insertEvent');
+	When('servoy data-servoydefault-password component with the name {elementName} the text {password} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
+				sendKeys(inputField, text).then(function () {
+					wrapUp(callback, 'insertEvent');
+				});
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy data-servoydefault-password component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.xpath(`//data-servoydefault-password[@data-svy-name='${elementName}']/input`));
-		browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
-			clickElement(inputField).then(function () {
-				wrapUp(callback, 'insertEvent');
+	When('servoy data-servoydefault-password component with the name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
+		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
+				clickElement(inputField).then(function () {
+					wrapUp(callback, 'insertEvent');
+				});
+			}).catch(function (error) {			
+				tierdown(true);
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy data-servoydefault-password component with name {elementName} is right clicked', {timeout: 30 * 1000}, function(elementName, callback){
