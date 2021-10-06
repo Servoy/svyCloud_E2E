@@ -1249,47 +1249,60 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END DEFAULT INPUT FIELD 
 
 	//DEFAULT CHECKBOX FIELD
-	When('servoy data-servoydefault-check component with name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.css(`data-servoydefault-check[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(checkbox), 25 * 1000, 'Checkbox not found!').then(function(){
-			var inputfield = checkbox.element(by.css('input'));
-			inputfield.isSelected().then(function (isChecked) {
-				return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
-			}).then(function(isChecked){
-				if(isChecked) {
-					clickElement(checkbox).then(function () {
+	When('servoy data-servoydefault-check component with the name {elementName} I want it to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
+		if(checkboxOption.toLowerCase() != 'checked' && checkboxOption.toLowerCase() != 'unchecked') {
+			callback(new Error(`The checkbox value can only be set to 'checked' or 'unchecked'!`));
+		}
+		
+		var retObj = getElement('data-servoydefault-check',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			browser.wait(EC.presenceOf(checkbox), 25 * 1000, 'Checkbox not found!').then(function(){
+				var inputfield = checkbox.element(by.css('input'));
+				inputfield.isSelected().then(function (isChecked) {
+					return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
+				}).then(function(isChecked){
+					if(isChecked) {
+						clickElement(checkbox).then(function () {
+							wrapUp(callback, "checkboxEvent");
+						})
+					} else {
 						wrapUp(callback, "checkboxEvent");
-					})
-				} else {
-					wrapUp(callback, "checkboxEvent");
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('servoy data-servoydefault-check component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkBoxState, callback) {
-		var checkbox = element(by.css(`data-servoydefault-check[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			var inputfield = checkbox.element(by.css('input'));
-			inputfield.isSelected().then(function (isChecked) {
-				return !isChecked && checkBoxState.toLowerCase() === "unchecked" || isChecked && checkBoxState.toLowerCase() === "checked"
-			}).then(function(isChecked) {
-				if (isChecked) {
-					wrapUp(callback, "checkboxEvent");
-				} else {
-					tierdown(true);
-				}
+					}
+				})
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
+	});
+
+	When('servoy data-servoydefault-check component with the name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkBoxState, callback) {
+		if(checkBoxState.toLowerCase() != 'checked' && checkBoxState.toLowerCase() != 'unchecked') {
+			callback(new Error(`The checkbox value can only be set to 'checked' or 'unchecked'!`));
+		}
+
+		var retObj = getElement('data-servoydefault-check',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+				var inputfield = checkbox.element(by.css('input'));
+				inputfield.isSelected().then(function (isChecked) {
+					return !isChecked && checkBoxState.toLowerCase() === "unchecked" || isChecked && checkBoxState.toLowerCase() === "checked"
+				}).then(function(isChecked) {
+					if (isChecked) {
+						wrapUp(callback, "checkboxEvent");
+					} else {
+						tierdown(true);
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END DEFAULT CHECKBOX FIELD
 
