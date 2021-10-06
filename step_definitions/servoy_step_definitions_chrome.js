@@ -1124,55 +1124,55 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY TYPEAHEAD
 		
 	//DEFAULT INPUT FIELD
-	When('servoy default input component with name {elementName} the text {input} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var inputField = element(by.xpath(`//input[@data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(inputField), 25 * 1000, 'Textfield not found!').then(function(){
+	When('servoy default input component with the name {elementName} the text {input} is inserted', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			sendKeys(inputField, text).then(function(){
 				wrapUp(callback, 'insertEvent');
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			console.log(error.message);
-			tierdown(true);
-		});
+		}
 	});
 
-	When('servoy default input component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
+	When('servoy default input component with the name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			clickElement(inputField).then(function(){
 				wrapUp(callback, 'insertEvent');
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy default input component with name {elementName} I want to clear the text field', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Textfield not found!').then(function(){
+	When('servoy default input component with the name {elementName} I want to clear the text field', {timeout: 30 * 1000}, function(elementName, callback){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			clearKeys(inputField).then(function(){
 				wrapUp(callback, 'insertEvent');
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('servoy default input component with name {elementName} I want to validate that the input field equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+	Then('servoy default input component with the name {elementName} I want to validate that the input field equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var val;
-		var inputField = element(by.xpath("//input[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			inputField.getAttribute('value').then(function(inputText){
 				val = inputText;
 				return inputText.toLowerCase() === text.toLowerCase();
@@ -1180,46 +1180,48 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				if(isValidated) {
 					wrapUp(callback, 'validateEvent');
 				} else {
-					callback(new Error("Validation failed! Expected the input field to equal the text '" + text + "'. Got '" + val + "' instead."))
+					callback(new Error(`Validation failed! Expected the input field to equal the text '${text}'. Got '${val}' instead.`))
 				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
-	Then('servoy default input component with name {elementName} I want to validate that the input field contains the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var inputField = element(by.css("input[data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+	Then('servoy default input component with the name {elementName} I want to validate that the input field contains the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			inputField.getAttribute('value').then(function(inputText) {
 				if(inputText.toLowerCase().indexOf(text.toLowerCase()) > -1) {
 					wrapUp(callback, "validateEvent");
 				} else {
 					callback(new Error("Validation failed! Expected the input field to contain the text '" + text + "'. Got '" + inputText + "' instead."))
 				}
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('servoy default input component with name {elementName} I want to validate that the input field is empty', {timeout: 30 * 1000}, function(elementName, callback){
-		var val;
-		var inputField = element(by.css(`input[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(inputField), 30 * 1000, 'Input field not found!').then(function(){
+	Then('servoy default input component with the name {elementName} I want to validate that the input field is empty', {timeout: 30 * 1000}, function(elementName, callback){
+		var retObj = getElement('input',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem;
 			inputField.getAttribute('value').then(function(inputText){
 				if(!inputText) {
 					wrapUp(callback, 'validateEvent');
 				} else {
 					callback(new Error(`Validation failed! Expected the input field to be empty. Got '${inputText}' instead.`))
 				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	
 	Then('servoy default input component I want to validate that the input field contains the text {text} in element number {elementNumber} with name {elementName}', {timeout: 30 * 1000}, function(text, elementNumber, elementName, callback){
@@ -1233,7 +1235,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				}
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
