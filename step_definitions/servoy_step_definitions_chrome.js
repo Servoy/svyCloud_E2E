@@ -1318,7 +1318,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'insertEvent');
 				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
 		}
@@ -1335,34 +1334,41 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					wrapUp(callback, 'insertEvent');
 				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
 		}
 	});
 
 	When('servoy data-servoydefault-password component with name {elementName} is right clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.xpath(`//data-servoydefault-password[@data-svy-name='${elementName}']/input`));
-		browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
-			rightClickElement(inputField).then(function () {
-				wrapUp(callback, 'insertEvent');
+		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
+				rightClickElement(inputField).then(function () {
+					wrapUp(callback, 'insertEvent');
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy data-servoydefault-password component with name {elementName} is double clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var inputField = element(by.xpath(`//data-servoydefault-password[@data-svy-name='${elementName}']/input`));
-		browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
-			doubleClickElement(inputField).then(function () {
-				wrapUp(callback, 'insertEvent');
+		var retObj = getElement('data-servoydefault-password',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputField = retObj.elem.element(by.css('input'));
+			browser.wait(EC.visibilityOf(inputField), 15 * 1000, 'Input field not found!').then(function () {
+				doubleClickElement(inputField).then(function () {
+					wrapUp(callback, 'insertEvent');
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END SERVOY PASSWORD FIELD
 
