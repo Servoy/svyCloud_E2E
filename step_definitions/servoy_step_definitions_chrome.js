@@ -791,11 +791,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY TABLE COMPONENT
 
 	//SERVOY EXTRA TABLE COMPONENT
-	When('servoy extra table component with name {elementName} I scroll to the record with {string} as text', { timeout: 60 * 1000 }, function (elementName, recordText, callback) {
+	When('servoy data-servoyextra-table component with the name {elementName} I scroll to the record with {string} as text', { timeout: 60 * 1000 }, function (elementName, recordText, callback) {
 		dataServoyExtraTableScroll(elementName, recordText, false, callback);
 	});
 
-	When('servoy extra table component with name {elementName} I want to measure the time it takes to render the cell with text {string}', { timeout: 60 * 1000 }, function (elementName, recordText, callback) {
+	When('servoy data-servoyextra-table component with the name {elementName} I want to measure the time it takes to render the cell with text {string}', { timeout: 60 * 1000 }, function (elementName, recordText, callback) {
 		var retObj = getElement('data-servoyextra-table',elementName, null, null);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -812,7 +812,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy extra table component with name {elementName} I want to select row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
+	When('servoy data-servoyextra-table component with the name {elementName} I want to select row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
 		var retObj = getElement('data-servoyextra-table',elementName, null, null, true);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -830,7 +830,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy extra table component with name {elementName} I want to double click row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
+	When('servoy data-servoyextra-table component with the name {elementName} I want to double click row number {rowNumber}', { timeout: 30 * 1000 }, function (elementName, rowNumber, callback) {
 		var retObj = getElement('data-servoyextra-table',elementName, null, null, true);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -849,31 +849,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	//NOTE: this test step only works for the timesheet application
-	When('servoy data-servoyextra-table component I want to edit row number {rowNumber} of {weekDay}', { timeout: 30 * 1000 }, function (rowNumber, weekDay, callback) {
-		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='timesheetPage.table" + weekDay.toLowerCase().charAt(0).toUpperCase() + weekDay.slice(1) + "']"));
-		clickElement(table.$$("tbody").$$("tr").get(rowNumber - 1).$$("td").get(5)).then(function () {
-			wrapUp(callback, "clickEvent");
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	//NOTE: this test step only works for the timesheet application
-	When('servoy data-servoyextra-table component I want to delete row number {rowNumber} of {weekDay}', { timeout: 30 * 1000 }, function (rowNumber, weekDay, callback) {
-		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='timesheetPage.table" + weekDay.toLowerCase().charAt(0).toUpperCase() + weekDay.slice(1) + "']"));
-		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Element not found!').then(function () {
-			clickElement(table.$$("tbody").$$("tr").get(rowNumber - 1).$$("td").get(6)).then(function () {
-				wrapUp(callback, "clickEvent");
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('servoy extra table component with name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
+	When('servoy data-servoyextra-table component with the name {elementName} I want to validate that a record with the text {text} exists', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var found = false;
 		var table = element.all(by.xpath("//data-servoyextra-table[@data-svy-name='"+elementName+"']"));
 		table.each(function(tableItems){
@@ -894,32 +870,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	//NOTE: this test step only works for the timesheet application
-	//ToDo: check if element exists if there are 0 elements
-	When('servoy data-servoyextra-table component I want to validate {weekDay} has {rowCount} row(s)', { timeout: 30 * 1000 }, function (weekDay, rowCount, callback) {
-		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='timesheetPage.table" + weekDay.toLowerCase().charAt(0).toUpperCase() + weekDay.slice(1) + "']"));
-		table.$$("tbody").$$("tr").get(0).isPresent().then(function (isPresent) {
-			if (isPresent) {
-				table.$$("tbody").$$("tr").count().then(function (count) {
-					console.log(count);
-					if (count == rowCount) {
-						console.log("Count matches with the amount of rows");
-						wrapUp(callback, "validateEvent");
-					}
-				})
-			} else { //table row doesn't exist, meaning, there are 0 rows
-				if (rowCount == 0) {
-					wrapUp(callback, "validateEvent");
-				}
-			}
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('servoy data-servoyextra-table component with name {elementName} I want to validate that there are {rowCount} row(s)', { timeout: 30 * 1000 }, function (elementName, rowCount, callback) {
-		var retObj = getElement('data-servoyextra-table',elementName, null, null, truee);
+	When('servoy data-servoyextra-table component with the name {elementName} I want to validate that there are {rowCount} row(s)', { timeout: 30 * 1000 }, function (elementName, rowCount, callback) {
+		var retObj = getElement('data-servoyextra-table',elementName, null, null, true);
         if(retObj.message) {
             callback(new Error(retObj.message));
         } else {
@@ -935,59 +887,67 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy data-servoyextra-table component with name {elementName} I want to scroll and select the row with text {rowText}', { timeout: 60 * 1000}, function(elementName, text, callback){
+	When('servoy data-servoyextra-table component with the name {elementName} I want to scroll and select the row with text {rowText}', { timeout: 60 * 1000}, function(elementName, text, callback){
 		dataServoyExtraTableScroll(elementName, text, true, callback);
 	});
 
-	When('servoy data-servoyextra-table component with name {elementName} I want to click on the icon with the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
-		var table = element(by.xpath("//data-servoyextra-table[@data-svy-name='"+elementName+"']"));
-		var elementToFind = table.element(by.xpath("//div[text()='"+text+"']"));
-		browser.wait(EC.visibilityOf(table), 15 * 1000, 'Table not found!').then(function(){			
-			elementToFind.isPresent().then(function(isPresent){
-				if(isPresent) {
-					clickElement(elementToFind.element(by.xpath("..")).element(by.xpath("..")).element(by.xpath("//td[contains(@class, '" + className +"')]"))).then(function(){
+	When('servoy data-servoyextra-table component with the name {elementName} I want to click on the icon with the class {className} on the row with the text {text}', {timeout: 45 * 1000}, function(elementName, className, text, callback){
+		var retObj = getElement('data-servoyextra-table',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var table = retObj.elem;
+			browser.wait(EC.visibilityOf(table), 15 * 1000, 'Table not found!').then(function(){
+				var elementToFind = table.element(by.xpath(`//div[text()='${text}']`));	
+				browser.wait(EC.visibilityOf(elementToFind), 15 * 1000, `Table element with the text '${text}' could not be found!`).then(function(){		
+					console.log('yo')
+					clickElement(elementToFind.element(by.xpath("..")).element(by.xpath("..")).element(by.className(className))).then(function(){
 						wrapUp(callback, "clickEvent");
 					});
-				}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy data-servoyextra-table component with name {elementName} I want to sort the table by {tableHeader}', {timeout: 30 * 1000}, function(elementName, tableHeader, callback){
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']"))), 30 * 1000, 'Element not found!').then(function () {
-			element.all(by.xpath("//data-servoyextra-table[@data-svy-name='" + elementName + "']")).each(function (rowItems) {
-				var header = rowItems.element(by.xpath("//thead/tr/th/div/div/div[text()='" + tableHeader + "']"));
-				browser.wait(EC.presenceOf(header), 30 * 1000, 'Element not visible').then(function(){
-					browser.wait(EC.elementToBeClickable(header), 30 * 1000, 'Element not clickable').then(function(){
-						clickElement(header).then(function(){
-							wrapUp(callback, 'clickEvent');
-						});
+	When('servoy data-servoyextra-table component with the name {elementName} I want to sort the table by {tableHeader}', {timeout: 40 * 1000}, function(elementName, tableHeader, callback){
+		var retObj = getElement('data-servoyextra-table',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var table = retObj.elem;
+			browser.wait(EC.visibilityOf(table), 30 * 1000, 'Element not found!').then(function () {
+				var headerContainer = table.element(by.css('thead'));
+				var headerItem = headerContainer.element(by.xpath(`//div[text()='${tableHeader}']`));
+				browser.wait(EC.presenceOf(headerItem), 15 * 1000, `Table header with the text '${tableHeader}' could not be found!'`).then(function() {
+					clickElement(headerItem).then(function() {
+						wrapUp(callback, "");
 					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy data-servoyextra-table component with name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, className, rowNumber, callback) {
+	When('servoy data-servoyextra-table component with the name {elementName} I want to click on the element which contains the class {className} in row number {rowNumber}', {timeout: 30 * 1000}, function(elementName, className, rowNumber, callback) {
 		rowNumber -= 1;
-		var table = element(by.css(`data-servoyextra-table[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function() {
-			var body = table.element(by.css('tbody'))
-			var row = body.all(by.css('tr')).get(rowNumber);
-			// clickElement(row.element(by.xpath(`//td[contains(@class, '${className}')]`))).then(function() {
-			clickElement(row.element(by.css(`.${className}`))).then(function() {
-				wrapUp(callback, "clickEvent");
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});	
+		var retObj = getElement('data-servoyextra-table',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var table = retObj.elem;
+			browser.wait(EC.presenceOf(table), 15 * 1000, 'Table not found!').then(function() {
+				var body = table.element(by.css('tbody'))
+				var row = body.all(by.css('tr')).get(rowNumber);
+				clickElement(row.element(by.css(`.${className}`))).then(function() {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});	
+		}
 	});
 	//END SERVOY EXTRA TABLE COMPONENT
 
