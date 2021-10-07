@@ -13,6 +13,7 @@ var fs = require('fs-extra');
 var timeoutAgAction = 60 * 1000;
 var storedValues = [];
 var dateUtils = require('../lib/dateUtils/dateUtils');
+const { WSAEPROTOTYPE } = require('constants');
 
 defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//BASIC NAGIVATION
@@ -1513,65 +1514,48 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END DEFAULT INPUT FIELD
 	//SERVOY LABEL 
 	When('servoy data-servoydefault-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback) {
-		var labelButton = element(by.xpath(`//data-servoydefault-button[@data-svy-name='${elementName}']/button`));
-		labelButton.isPresent().then(function(isPresent){
-			if(isPresent){
-				clickElement(labelButton).then(function(){
-					wrapUp(callback, "clickEvent");
-				}).catch(function (error) {			
-					tierdown(true);
-					callback(new Error(error.message));
-				});
-			} else {
-				var label = element(by.xpath(`//data-servoydefault-label[@data-svy-name='${elementName}']`));
-				browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
-					clickElement(element(by.xpath(`//data-servoydefault-label[@data-svy-name='${elementName}']/div`))).then(function(){
+		var retObj = getElement('data-servoydefault-button',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var elem = retObj.elem;
+			var labelButton = elem.element(by.css('button'));
+			labelButton.isPresent().then(function(isPresent){
+				if(isPresent){
+					clickElement(labelButton).then(function(){
 						wrapUp(callback, "clickEvent");
-					}).catch(function (error) {			
-						tierdown(true);
-						callback(new Error(error.message));
 					});
-				}).catch(function (error) {			
-					tierdown(true);
-					callback(new Error(error.message));
-				});
-			}
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+				} else {
+					retObj = getElement('data-servoydefault-label',elementName, null, null, false);
+					if(retObj.message) {
+						callback(new Error(retObj.message));
+					} else {
+						browser.wait(EC.visibilityOf(retObj.elem), 25 * 1000, 'Label not found!').then(function(){
+							clickElement(retObj.elem.element(by.css('div'))).then(function(){
+								wrapUp(callback, "clickEvent");
+							});
+						});
+					}
+				}
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
 	Then('servoy data-servoydefault-label component with name {elementName} I want to validate that the label equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var label = element(by.css(`data-servoydefault-label[data-svy-name='${elementName}']`));
-		var labelButton = element(by.xpath("//data-servoydefault-button[@data-svy-name='"+elementName+"']/button/div/span[2]"));
-		labelButton.isPresent().then(function(isPresent){
-			if(isPresent){
-				labelButton.getText().then(function(labelText){
-					if(labelText.indexOf(text) !== -1) {
-						wrapUp(callback, 'valdiateEvent')
-					}
-				});
-			} else {
-				browser.wait(EC.visibilityOf(label), 30 * 1000, 'Label not found!').then(function(){
-					label.getText().then(function(labelText){
-						console.log(labelText);
-						if(labelText.indexOf(text) !== -1) {
-							wrapUp(callback, 'valdiateEvent')
-						}
-					}).catch(function (error) {
-						console.log(error.message);
-						tierdown(true);
-					});
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
-				});
-			}
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-servoydefault-label',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var label = retObj.elem;
+			var labelText = label.element(by.xpath(`//span[text()='${text}']`));
+			browser.wait(EC.presenceOf(labelText), 15 * 1000, `This text of this label does not equal '${text}'!`).then(function() {
+				wrapUp(callback, "");
+			}).catch(function(error) {
+				callback(new Error(error.message));
+			});
+		}
 	})
 	//END SERVOY LABEL
 
