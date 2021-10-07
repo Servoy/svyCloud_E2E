@@ -5980,30 +5980,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('data-servoyextra-collapse with name {elementName} inside collapsible with the {main|sub} header with the text {headerText} I want to click on the data-bootstrapcomponents-button with the name {elementName}', {timeout: 30 * 1000}, function(collapsibleElementName, header, text, elementName, callback){
-		var retObj = getElement('data-servoyextra-collapse',collapsibleElementName, null, null);
-		if(retObj.message) {
-			callback(new Error(retObj.message));
-		} else {
-			var elem = retObj.elem;
-			var collapsibleItem = elem.element(by.xpath(`//div[text()='${text}']`));
-			browser.wait(EC.presenceOf(collapsibleItem), 15 * 1000, `Collapsable header with the text '${text}' could not be found!`).then(function() {
-				var parent = collapsibleItem.element(by.xpath("..")).element(by.xpath(".."));
-				if(header == "main") {
-					parent = parent.element(by.xpath(".."));
-				}
-				var target = parent.element(by.css(`data-bootstrapcomponents-button[data-svy-name='${elementName}']`));
-				browser.wait(EC.presenceOf(target), 15 * 1000, `Collapsable item with the element name '${elementName}' could not be found!`).then(function() {
-					clickElement(target).then(function() {
-						wrapUp(callback, "");
-					});
-				});
-			}).catch(function(err) {
-				callback(new Error(err.message));
-			});
-		}
-	});
-
 	When('data-servoyextra-collapse with name {elementName} I want to click on the header with the text {text}', {timeout: 15 * 1000}, function(elementName, text, callback){
 		var retObj = getElement('data-servoyextra-collapse',elementName, null, null);
         if(retObj.message) {
