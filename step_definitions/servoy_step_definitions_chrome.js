@@ -1477,28 +1477,36 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY COMBOBOX
 
 	//SERVOY BUTTON
-	When('servoy button component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var button = element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
-			clickElement(button).then(function () {
-				wrapUp(callback, "Click event");
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+	When('servoy button component with the name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
+		var retObj = getElement('data-servoydefault-button',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
+				clickElement(button).then(function () {
+					wrapUp(callback, "Click event");
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
-	When('servoy button component with name {elementName} is double clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var button = element(by.xpath("//data-servoydefault-button[@data-svy-name='" + elementName + "']/button"));
-		browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
-			doubleClickElement(button).then(function () {
-				wrapUp(callback, "Click event");
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+	When('servoy button component with the name {elementName} is double clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
+		var retObj = getElement('data-servoydefault-button',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var button = retObj.elem.element(by.css('button'));
+			browser.wait(EC.visibilityOf(button), 15 * 1000, 'Button not found!').then(function () {
+				doubleClickElement(button).then(function () {
+					wrapUp(callback, "Click event");
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END SERVOY BUTTON
 
