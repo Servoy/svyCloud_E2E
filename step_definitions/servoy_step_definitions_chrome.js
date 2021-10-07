@@ -1373,22 +1373,27 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END SERVOY PASSWORD FIELD
 
 	//SERVOY COMBOBOX
-	When('servoy combobox component with name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
-		var combobox = element(by.css("data-servoydefault-combobox[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
-			if(browser.browserName = 'firefox') {
-				clickElement(combobox.element(by.className("pull-left"))).then(function () {
-					wrapUp(callback, "Click event");
-				});
-			} else {
-				clickElement(combobox).then(function () {
-					wrapUp(callback, "Click event");
-				})
-			}
-			
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+	When('servoy combobox component with the name {elementName} is clicked', { timeout: 60 * 1000 }, function (elementName, callback) {
+		var retObj = getElement('data-servoydefault-combobox',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var combobox = retObj.elem;
+			browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function () {
+				if(browser.browserName = 'firefox') {
+					clickElement(combobox.element(by.className("pull-left"))).then(function () {
+						wrapUp(callback, "Click event");
+					});
+				} else {
+					clickElement(combobox).then(function () {
+						wrapUp(callback, "Click event");
+					});
+				}
+				
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	
 	Then('servoy combobox component I want to select number {comboboxNumber} in the combobox', { timeout: 60 * 1000 }, function (comboboxNumber, callback) {
@@ -1397,7 +1402,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				wrapUp(callback, "comboboxSelectEvent");
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -1412,43 +1416,47 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
 
-	When('servoy combobox component with name {elementName} I want to validate that the combobox item with text {text} is selected', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var combobox = element(by.css(`data-servoydefault-combobox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
-			var selectedItem = combobox.element(by.xpath(`//span[contains(@class, 'ui-select-match-text') and text()='${text}']`));
-			selectedItem.isPresent().then(function(isPresent){
-				if(isPresent) {
-					wrapUp(callback, 'validateEvent');
-				}
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+	When('servoy combobox component with the name {elementName} I want to validate that the combobox item with text {text} is selected', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-servoydefault-combobox',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var combobox = retObj.elem.element(by.css('input'));
+			browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
+				var selectedItem = combobox.element(by.xpath(`//span[contains(@class, 'ui-select-match-text') and text()='${text}']`));
+				selectedItem.isPresent().then(function(isPresent){
+					if(isPresent) {
+						wrapUp(callback, 'validateEvent');
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('servoy combobox component with name {elementName} I want to validate that the selected combobox item is empty', {timeout: 30 * 1000}, function(elementName, callback){
-		var combobox = element(by.css(`data-servoydefault-combobox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
-			combobox.element(by.className(`ui-select-match-text`)).getText().then(function(selectedItemText){
-				if(!selectedItemText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Validation failed! The selected combobox item is not empty. The selected item is: ${selectedItemText}`));
-				}
+	When('servoy combobox component with the name {elementName} I want to validate that the selected combobox item is empty', {timeout: 30 * 1000}, function(elementName, callback){
+		var retObj = getElement('data-servoydefault-combobox',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var combobox = retObj.elem.all(by.css('input')).last();
+			browser.wait(EC.presenceOf(combobox), 30 * 1000, 'Combobox not found!').then(function(){
+				retObj.elem.first().element(by.className(`ui-select-match-text`)).getText().then(function(selectedItemText){
+					if(!selectedItemText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error(`Validation failed! The selected combobox item is not empty. The selected item is: ${selectedItemText}`));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy combobox component the text {text} is inserted', { timeout: 60 * 1000 }, function (text, callback) {
