@@ -1513,7 +1513,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//END DEFAULT INPUT FIELD
 	//SERVOY LABEL 
-	When('servoy data-servoydefault-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback) {
+	When('servoy data-servoydefault-label component with the name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback) {
 		var retObj = getElement('data-servoydefault-button',elementName, null, null, false);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -1543,16 +1543,31 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	Then('servoy data-servoydefault-label component with name {elementName} I want to validate that the label equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+	Then('servoy data-servoydefault-label component with the name {elementName} I want to validate that the label equals the text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
 		var retObj = getElement('data-servoydefault-label',elementName, null, null, false);
         if(retObj.message) {
             callback(new Error(retObj.message));
         } else {
 			var label = retObj.elem;
 			var labelText = label.element(by.xpath(`//span[text()='${text}']`));
-			browser.wait(EC.presenceOf(labelText), 15 * 1000, `This text of this label does not equal '${text}'!`).then(function() {
-				wrapUp(callback, "");
-			}).catch(function(error) {
+			labelText.isPresent().then(function(isPresent){
+				if(isPresent){
+					wrapUp(callback, "");
+				} else {
+					var retObj = getElement('data-servoydefault-button',elementName, null, null, false);
+					if(retObj.message) {
+						callback(new Error(retObj.message));
+					} else {
+						label = retObj.elem;
+						labelText = label.element(by.xpath(`//span[text()='${text}']`));
+						browser.wait(EC.presenceOf(labelText), 15 * 1000, `This text of this label does not equal '${text}'!`).then(function() {
+							wrapUp(callback, "");
+						}).catch(function(error) {
+							callback(new Error(error.message));
+						});
+					}
+				}
+			}).catch(function (error) {			
 				callback(new Error(error.message));
 			});
 		}
