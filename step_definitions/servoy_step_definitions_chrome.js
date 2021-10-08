@@ -2443,39 +2443,47 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP CALENDAR
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to select {day} {month} {year}', { timeout: 120 * 1000 }, function (elementName, day, month, year, callback) {
-		var calendar = element(by.xpath("//data-bootstrapcomponents-calendar[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(calendar), 30 * 1000, 'Calendar not found!').then(function (){
-			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
-				var promise = Promise.resolve(setCalendar(day, month, year, 'bootstrap', callback));
-				promise.then(function() {					
-					wrapUp(callback, "calendarEvent");					
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem;
+			browser.wait(EC.presenceOf(calendar), 30 * 1000, 'Calendar not found!').then(function (){
+				clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+					var promise = Promise.resolve(setCalendar(day, month, year, 'bootstrap', callback));
+					promise.then(function() {					
+						wrapUp(callback, "calendarEvent");					
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today', {timeout: 120 * 1000}, function(elementName, callback) {				
 		var dToday = new Date();
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var selectedMonth = monthList[dToday.getMonth()];
-		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
-			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
-				var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
-				promise.then(function() {					
-					wrapUp(callback, "calendarEvent");					
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem;
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+				clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+					var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
+					promise.then(function() {					
+						wrapUp(callback, "calendarEvent");					
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today {+|-} {days} days', {timeout: 120 * 1000}, function(elementName, operator, dayAmount, callback) {
+	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(elementName, operator, dayAmount, callback) {
 		var dToday = new Date();		
 		if(operator === '-') {
 			dToday.setDate(dToday.getDate() - parseInt(dayAmount));
@@ -2486,18 +2494,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 		var monthList = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 		var selectedMonth = monthList[dToday.getMonth()];
-		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
-			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {				
-				var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
-				promise.then(function() {					
-					wrapUp(callback, "calendarEvent");					
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem;
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+				clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {				
+					var promise = Promise.resolve(setCalendar(dToday.getDate(), selectedMonth, dToday.getFullYear(), 'bootstrap', callback));
+					promise.then(function() {					
+						wrapUp(callback, "calendarEvent");					
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to {weekDay} {before|after} today', {timeout: 120 * 1000}, function(elementName, weekDay, direction ,callback){
@@ -2512,52 +2524,56 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dayToday = newDate.getDay();
 		var selectedMonth;
 		var difference;
-		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
-			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
-				switch (direction) {
-					case "before":
-						if(day === dayToday) {
-							newDate.setDate(newDate.getDate() - 7);
-						} else {
-							difference = dayToday - day;
-							if(difference > 0) {
-								newDate.setDate(newDate.getDate() - difference);
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem;
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+				clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+					switch (direction) {
+						case "before":
+							if(day === dayToday) {
+								newDate.setDate(newDate.getDate() - 7);
 							} else {
-								difference = (7 - (difference * -1));
-								newDate.setDate(newDate.getDate() - difference);
-							}							
-						}
-						selectedMonth = monthList[newDate.getMonth()];
-						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
-						promise.then(function() {					
-							wrapUp(callback, "calendarEvent");					
-						});				
-						break;
-					case "after":
-						if(day === dayToday) {
-							newDate.setDate(newDate.getDate() + 7);
-						} else {
-							difference = day - dayToday;
-							if(difference > 0) {
-								newDate.setDate(newDate.getDate() + difference);
-							} else {
-								difference = (7 - (difference * -1));
-								newDate.setDate(newDate.getDate() + difference);
+								difference = dayToday - day;
+								if(difference > 0) {
+									newDate.setDate(newDate.getDate() - difference);
+								} else {
+									difference = (7 - (difference * -1));
+									newDate.setDate(newDate.getDate() - difference);
+								}							
 							}
-						}
-						selectedMonth = monthList[newDate.getMonth()];
-						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
-						promise.then(function() {					
-							wrapUp(callback, "calendarEvent");					
-						});	
-						break;
-					default:
-						tierdown(true);	
-						return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));						
-				}
+							selectedMonth = monthList[newDate.getMonth()];
+							var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+							promise.then(function() {					
+								wrapUp(callback, "calendarEvent");					
+							});				
+							break;
+						case "after":
+							if(day === dayToday) {
+								newDate.setDate(newDate.getDate() + 7);
+							} else {
+								difference = day - dayToday;
+								if(difference > 0) {
+									newDate.setDate(newDate.getDate() + difference);
+								} else {
+									difference = (7 - (difference * -1));
+									newDate.setDate(newDate.getDate() + difference);
+								}
+							}
+							selectedMonth = monthList[newDate.getMonth()];
+							var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+							promise.then(function() {					
+								wrapUp(callback, "calendarEvent");					
+							});	
+							break;
+						default:
+							return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));						
+					}
+				});
 			});
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I want to set the date to {weekDay} {before|after} today {+|-} {days} day(s)', {timeout: 120 * 1000}, function(elementName, weekDay, direction, operator, days, callback){
@@ -2571,112 +2587,112 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var dayToday = newDate.getDay();
 		var selectedMonth;
 		var difference;
-		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
-			clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
-				switch (direction) {
-					case "before":
-						if(day === dayToday) {
-							newDate.setDate(newDate.getDate() - 7);
-						} else {
-							difference = dayToday - day;
-							if(difference > 0) {
-								newDate.setDate(newDate.getDate() - difference);
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem;
+			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+				clickElement(calendar.element(by.css("span[class='glyphicon glyphicon-calendar']"))).then(function () {
+					switch (direction) {
+						case "before":
+							if(day === dayToday) {
+								newDate.setDate(newDate.getDate() - 7);
 							} else {
-								difference = (7 - (difference * -1));
-								newDate.setDate(newDate.getDate() - difference);
-							}							
-						}
-
-						switch(operator) {
-							case "+":
-								newDate.setDate(newDate.getDate() + parseInt(days));
-								break;
-							case "-":
-								newDate.setDate(newDate.getDate() - parseInt(days));
-								break;
-							default: 
-								tierdown(true);
-								return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
-						}
-						selectedMonth = monthList[newDate.getMonth()];	
-						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
-						promise.then(function() {					
-							wrapUp(callback, "calendarEvent");					
-						});				
-						break;
-					case "after":
-						if (day === dayToday) {
-							newDate.setDate(newDate.getDate() + 7);
-						} else {
-							difference = day - dayToday;
-							if (difference > 0) {
-								newDate.setDate(newDate.getDate() + difference);
-							} else {
-								difference = (7 - (difference * -1));
-								newDate.setDate(newDate.getDate() + difference);								
+								difference = dayToday - day;
+								if(difference > 0) {
+									newDate.setDate(newDate.getDate() - difference);
+								} else {
+									difference = (7 - (difference * -1));
+									newDate.setDate(newDate.getDate() - difference);
+								}							
 							}
-						}
 
-						switch(operator) {
-							case "+":
-								newDate.setDate(newDate.getDate() + parseInt(days));
-								break;
-							case "-":
-								newDate.setDate(newDate.getDate() - parseInt(days));
-								break;
-							default: 
-								return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
-						}
-						selectedMonth = monthList[newDate.getMonth()];
-						var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
-						promise.then(function() {					
-							wrapUp(callback, "calendarEvent");					
-						});	
-						break;
-					default:
-						tierdown(true);	
-						return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
-				}
+							switch(operator) {
+								case "+":
+									newDate.setDate(newDate.getDate() + parseInt(days));
+									break;
+								case "-":
+									newDate.setDate(newDate.getDate() - parseInt(days));
+									break;
+								default: 
+									tierdown(true);
+									return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+							}
+							selectedMonth = monthList[newDate.getMonth()];	
+							var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+							promise.then(function() {					
+								wrapUp(callback, "calendarEvent");					
+							});				
+							break;
+						case "after":
+							if (day === dayToday) {
+								newDate.setDate(newDate.getDate() + 7);
+							} else {
+								difference = day - dayToday;
+								if (difference > 0) {
+									newDate.setDate(newDate.getDate() + difference);
+								} else {
+									difference = (7 - (difference * -1));
+									newDate.setDate(newDate.getDate() + difference);								
+								}
+							}
+
+							switch(operator) {
+								case "+":
+									newDate.setDate(newDate.getDate() + parseInt(days));
+									break;
+								case "-":
+									newDate.setDate(newDate.getDate() - parseInt(days));
+									break;
+								default: 
+									return callback(new Error("Invalid operator given! Only '+' or '-' is allowed."));
+							}
+							selectedMonth = monthList[newDate.getMonth()];
+							var promise = Promise.resolve(setCalendar(newDate.getDate(), selectedMonth, newDate.getFullYear(), 'bootstrap', callback));
+							promise.then(function() {					
+								wrapUp(callback, "calendarEvent");					
+							});	
+							break;
+						default:
+							return callback(new Error("Invalid input given! Use 'after' and 'before' is supported."));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});	
 
 	Then('bootstrap data-bootstrapcomponents-calendar component with name {elementName} I expect it to be {visible|present|hidden}', {timeout: 30 * 1000}, function(elementName, state, callback){
-		var calendar = element(by.css("data-bootstrapcomponents-calendar[data-svy-name='" + elementName + "']")).all(by.css("div")).get(0);
-		if (state.toLowerCase() === 'visible') {
-			browser.wait(EC.visibilityOf(calendar), 15 * 1000, 'Calendar not visible!').then(function() {
-				wrapUp(callback, "validateEvent");
-			}).catch(function(error) {
-				tierdown(true);
-				callback(new Error(error.message));
-			});
-		} else if (state.toLowerCase() === 'present') {
-			
-			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
-				wrapUp(callback, "validateEvent");
-			}).catch(function(error) {
-				tierdown(true);
-				callback(new Error(error.message));
-			});
-		} else if (state.toLowerCase() === 'hidden') {
-			browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not rendered!').then(function(){
-				browser.wait(EC.invisibilityOf(calendar), 15 * 1000, 'Calendar never disappeared!').then(function() {
+		var retObj = getElement('data-bootstrapcomponents-calendar',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var calendar = retObj.elem.all(by.css("div")).get(0);
+			if (state.toLowerCase() === 'visible') {
+				browser.wait(EC.visibilityOf(calendar), 15 * 1000, 'Calendar not visible!').then(function() {
 					wrapUp(callback, "validateEvent");
 				}).catch(function(error) {
-					tierdown(true);
 					callback(new Error(error.message));
 				});
-			}).catch(function(error) {
-				tierdown(true);
-				callback(new Error(error.message));
-			})
-		} else {
-			tierdown(true);
-			callback(new Error("Expected input is 'visible', 'present' or 'hidden'"));
+			} else if (state.toLowerCase() === 'present') {
+				browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not found!').then(function() {
+					wrapUp(callback, "validateEvent");
+				}).catch(function(error) {
+					callback(new Error(error.message));
+				});
+			} else if (state.toLowerCase() === 'hidden') {
+				browser.wait(EC.presenceOf(calendar), 15 * 1000, 'Calendar not rendered!').then(function(){
+					browser.wait(EC.invisibilityOf(calendar), 15 * 1000, 'Calendar never disappeared!').then(function() {
+						wrapUp(callback, "validateEvent");
+					})
+				}).catch(function(error) {
+					callback(new Error(error.message));
+				})
+			} else {
+				callback(new Error("Expected input is 'visible', 'present' or 'hidden'"));
+			}
 		}
 	});
 	//END BOOTSTRAP CALENDAR
@@ -7208,9 +7224,6 @@ function setCalendar(day, month, year, calType, callback) {
 						return Promise.resolve();
 					});
 				} else {
-					if(browser.browserName != 'firefox') {
-						browser.actions().sendKeys(protractor.Key.ENTER).perform();
-					}
 					return Promise.resolve();
 				}
 			});
