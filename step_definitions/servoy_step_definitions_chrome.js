@@ -1952,16 +1952,22 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 	//END BOOTSTRAP SELECT
+
+	//BOOTSTRAP COMBOBOX
 	When('data-bootstrapcomponents-combobox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var selectComponent = element(by.css(`data-bootstrapcomponents-combobox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
-			selectComponent.click().then(function () {
-				wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-bootstrapcomponents-combobox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var comboboxComponent = retObj.elem;
+			browser.wait(EC.presenceOf(comboboxComponent), 15 * 1000, 'Select component not found!').then(function () {
+				comboboxComponent.click().then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('data-bootstrapcomponents-combobox component I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (text, callback) {
@@ -2009,20 +2015,25 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	});
 
 	Then('data-bootstrapcomponents-combobox component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var combobox = element(by.css(`data-bootstrapcomponents-combobox[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(combobox), 15 * 1000, 'Combobox not found!').then(function() {
-			var selectedRow = combobox.element(by.className('ui-select-match-text'));
-			var selectedRowText = selectedRow.element(by.css('span'));
-			selectedRowText.getText().then(function(rowText) {
-				if(rowText.toLowerCase() == text.toLowerCase()) {
-					wrapUp(callback, null);
-				} else {
-					callback(new Error(`Validation failed! Excpected '${text}'. Got '${rowText}' instead!`));
-				}
+		var retObj = getElement('data-bootstrapcomponents-combobox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var comboboxComponent = retObj.elem;
+			browser.wait(EC.presenceOf(comboboxComponent), 15 * 1000, 'Combobox not found!').then(function() {
+				var selectedRow = comboboxComponent.element(by.className('ui-select-match-text'));
+				var selectedRowText = selectedRow.element(by.css('span'));
+				selectedRowText.getText().then(function(rowText) {
+					if(rowText.toLowerCase() == text.toLowerCase()) {
+						wrapUp(callback, null);
+					} else {
+						callback(new Error(`Validation failed! Excpected '${text}'. Got '${rowText}' instead!`));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			callback(new Error(error.message));
-		});
+		}
 	});	
 	//BOOTSTRAP COMBOBOX
 
