@@ -2134,83 +2134,99 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP CHECKBOX
 	When('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want it to be {checkboxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
-		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
-			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
-		}
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
-			var input_fld = checkbox.$('input');
-			input_fld.isSelected().then(function (isChecked) {
-				if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
-					clickElement(checkbox.element(by.css('span'))).then(function () {
+		var retObj = getElement('data-bootstrapcomponents-checkbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
+				callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
+			}
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+				var input_fld = checkbox.$('input');
+				input_fld.isSelected().then(function (isChecked) {
+					if (isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked") {
+						clickElement(checkbox.element(by.css('span'))).then(function () {
+							wrapUp(callback, "checkboxEvent");
+						})
+					} else {
+						console.log('Checkbox did not have to be changed');
 						wrapUp(callback, "checkboxEvent");
-					})
-				} else {
-					console.log('Checkbox did not have to be changed');
-					wrapUp(callback, "checkboxEvent");
-				}
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox is {checkBoxState}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
-		if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
-			callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
-		}
-		
-		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
-			var input_fld = checkbox.$('input');
-			input_fld.isSelected().then(function (isChecked) {		
-				if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
-					wrapUp(callback, "checkboxEvent");
-				} else {
-					console.log('Validation failed. State of the checkbox does not match the expected state!');
-					tierdown(true);
-				}
-			}).catch(function (error) {			
-				tierdown(true);
-				callback(new Error(error.message));
+		var retObj = getElement('data-bootstrapcomponents-checkbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			if(checkboxOption.toLowerCase() != "checked" && checkboxOption.toLowerCase() != "unchecked") {
+				callback(new Error("The checkboxstate is suppose to be either 'checked' or 'unchecked'."));
+			}
+			
+			var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function () {
+				var input_fld = checkbox.$('input');
+				input_fld.isSelected().then(function (isChecked) {		
+					if (isChecked && checkboxOption.toLowerCase() === "checked" || !isChecked && checkboxOption.toLowerCase() === "unchecked") {				
+						wrapUp(callback, "checkboxEvent");
+					} else {
+						console.log('Validation failed. State of the checkbox does not match the expected state!');
+						tierdown(true);
+					}
+				}).catch(function (error) {			
+					callback(new Error(error.message));
+				});
 			});
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			var input_fld = checkbox.$('span');
-			input_fld.getText().then(function(inputText) {
-				if(inputText === text) {
-					wrapUp(callback, "validateEvent")
-				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + inputText);
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-bootstrapcomponents-checkbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+				var input_fld = checkbox.$('span');
+				input_fld.getText().then(function(inputText) {
+					if(inputText === text) {
+						wrapUp(callback, "validateEvent")
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + inputText);
+					}
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-checkbox component with name {elementName} I want to validate that the checkbox label partially equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var checkbox = element(by.css(`data-bootstrapcomponents-checkbox[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
-			var input_fld = checkbox.$('span');
-			input_fld.getText().then(function(inputText) {
-				if(inputText.indexOf(text) > -1) {
-					wrapUp(callback, "validateEvent")
-				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + inputText);
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-bootstrapcomponents-checkbox',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var checkbox = retObj.elem;
+			browser.wait(EC.visibilityOf(checkbox), 15 * 1000, 'Checkbox not found!').then(function(){
+				var input_fld = checkbox.$('span');
+				input_fld.getText().then(function(inputText) {
+					if(inputText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent")
+					} else {
+						console.log("Validation failed. Expected " + text + ". Got " + inputText);
+					}
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END BOOTSTRAP CHECKBOX
 
