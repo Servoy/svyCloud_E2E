@@ -2250,58 +2250,70 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP BUTTON GROUP
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select button number {number}', {timeout: 30 * 1000}, function(elementName, number, callback){
-		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
-			var button = group.all(by.css("button")).get(number - 1);
-			browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function(){
-				clickElement(button).then(function(){
-					wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-bootstrapextracomponents-buttons-group',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var group = retObj.elem;
+			browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+				var button = group.all(by.css("button")).get(number - 1);
+				browser.wait(EC.visibilityOf(button), 30 * 1000, 'Button not found!').then(function(){
+					clickElement(button).then(function(){
+						wrapUp(callback, "clickEvent");
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
-			group.all(by.css("button")).each(function(button){
-				button.getText().then(function(buttonText){
-					if(buttonText.toLowerCase() === text.toLowerCase()) {
-						clickElement(button).then(function(){
-							wrapUp(callback, "clickEvent");
-						});
-					}
-				})
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var found = false;
-		var group = element.all(by.xpath("//data-bootstrapextracomponents-buttons-group[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
-			group.all(by.css("button")).each(function(button){
-				button.getText().then(function(buttonText){
-					if(buttonText.toLowerCase().indexOf(text) > -1) {
-						if(found === false) {
+		var retObj = getElement('data-bootstrapextracomponents-buttons-group',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var group = retObj.elem;
+			browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+				group.all(by.css("button")).each(function(button){
+					button.getText().then(function(buttonText){
+						if(buttonText.toLowerCase() === text.toLowerCase()) {
 							clickElement(button).then(function(){
-								found = true;					
 								wrapUp(callback, "clickEvent");
 							});
 						}
-					}
+					})
 				})
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	When('bootstrap data-bootstrapextracomponents-buttons-group component with name {elementName} I want to select the button with the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-bootstrapextracomponents-buttons-group',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var group = retObj.elem;
+			var found = false;
+			browser.wait(EC.presenceOf(group.first()), 30 * 1000, 'Buttons group not found!').then(function(){
+				group.all(by.css("button")).each(function(button){
+					button.getText().then(function(buttonText){
+						if(buttonText.toLowerCase().indexOf(text) > -1) {
+							if(found === false) {
+								clickElement(button).then(function(){
+									found = true;					
+									wrapUp(callback, "clickEvent");
+								});
+							}
+						}
+					})
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END BOOTSTRAP BUTTON GROUP
 
