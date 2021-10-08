@@ -2232,17 +2232,19 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP BADGE COMPONENT
 	When('bootstrap data-bootstrapextracomponents-badge component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		browser.wait(EC.visibilityOf(element(by.xpath("//data-bootstrapextracomponents-badge[@data-svy-name='" + elementName + "']")))).then(function () {
-			element(by.xpath("//data-bootstrapextracomponents-badge[@data-svy-name='" + elementName + "']")).click().then(function () {
-				wrapUp(callback, "clickEvent");
-			}).catch(function (error) {
-				console.log(error.message);
-				tierdown(true);
+		var retObj = getElement('data-bootstrapextracomponents-badge',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var badge = retObj.elem;
+			browser.wait(EC.visibilityOf(badge), 15 * 1000, 'Badge component could not be found!').then(function () {
+				clickElement(badge).then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});	
 	//END BOOTSTRAP BADGE COMPONENT
 
