@@ -2318,34 +2318,126 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP BUTTON GROUP
 
 	//BOOTSTRAP CHOICEGROUP
-	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want option {optionNumber} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
-		var choiceGroup = element.all(by.css(`data-bootstrapcomponents-choicegroup[data-svy-name='${elementName}']`));
-		browser.wait(EC.presenceOf(choiceGroup.first()), 30 * 1000, 'Choicegroup not found!').then(function(){
-			var option = choiceGroup.all(by.css("input")).get(optionNumber - 1);
-			browser.wait(EC.presenceOf(option), 15 * 1000, 'Option not found!').then(function(){
-				option.isSelected().then(function(isChecked){
-					return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
-				}).then(function(isChecked){
-					if(isChecked) {
-						clickElement(option.element(by.xpath(".."))).then(function () {
+	When('bootstrap data-bootstrapcomponents-choicegroup component with the name {elementName} I want option {optionNumber} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
+		var retObj = getElement('data-bootstrapcomponents-choicegroup',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var choiceGroup = retObj.elem;
+			browser.wait(EC.presenceOf(choiceGroup.first()), 30 * 1000, 'Choicegroup not found!').then(function(){
+				var option = choiceGroup.all(by.css("input")).get(optionNumber - 1);
+				browser.wait(EC.presenceOf(option), 15 * 1000, 'Option not found!').then(function(){
+					option.isSelected().then(function(isChecked){
+						return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
+					}).then(function(isChecked){
+						if(isChecked) {
+							clickElement(option.element(by.xpath(".."))).then(function () {
+								wrapUp(callback, "checkboxEvent");
+							})
+						} else {
 							wrapUp(callback, "checkboxEvent");
-						})
-					} else {
-						wrapUp(callback, "checkboxEvent");
-					}
-				}).catch(function (error) {
-					console.log(error.message);
-					tierdown(true);
+						}
+					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-choicegroup component with name {elementName} I want the option with the text {text} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, checkboxOption, callback) {
-		
+	When('bootstrap data-bootstrapcomponents-choicegroup component with the name {elementName} I want the option with the text {text} to be {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, text, checkboxOption, callback) {
+		var retObj = getElement('data-bootstrapcomponents-choicegroup',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var choiceGroup = retObj.elem;
+			browser.wait(EC.presenceOf(choiceGroup), 30 * 1000, 'Choicegroup not found!').then(function(){
+				var option = choiceGroup.element(by.css(`input[value='${text}']`));
+				browser.wait(EC.presenceOf(option), 30 * 1000, `Option with the text '${text}' does not exist!'`).then(function(){
+					option.isSelected().then(function(isChecked){
+						return isChecked && checkboxOption.toLowerCase() === "unchecked" || !isChecked && checkboxOption.toLowerCase() === "checked";
+					}).then(function(isChecked){
+						if(isChecked) {
+							clickElement(option.element(by.xpath(".."))).then(function () {
+								wrapUp(callback, "checkboxEvent");
+							})
+						} else {
+							wrapUp(callback, "checkboxEvent");
+						}
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapcomponents-choicegroup component with the name {elementName} I want to validate that an option with the text {text} exists', { timeout: 30 * 1000 }, function (elementName, text, callback) {
+		var retObj = getElement('data-bootstrapcomponents-choicegroup',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var choiceGroup = retObj.elem;
+			browser.wait(EC.presenceOf(choiceGroup), 30 * 1000, 'Choicegroup not found!').then(function(){
+				var option = choiceGroup.element(by.css(`input[value='${text}']`))
+				browser.wait(EC.presenceOf(option), 15 * 1000, `Option with the text '${text}' not found!`).then(function(){
+					wrapUp(callback, "");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapcomponents-choicegroup component with the name {elementName} I want to validate that option {optionNumber} is {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, optionNumber, checkboxOption, callback) {
+		var retObj = getElement('data-bootstrapcomponents-choicegroup',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var choiceGroup = retObj.elem;
+			browser.wait(EC.presenceOf(choiceGroup.first()), 30 * 1000, 'Choicegroup not found!').then(function(){
+				var option = choiceGroup.all(by.css("input")).get(optionNumber - 1);
+				browser.wait(EC.presenceOf(option), 15 * 1000, 'Option not found!').then(function(){
+					option.isSelected().then(function(isChecked){
+						console.log(isChecked);
+						return !isChecked && checkboxOption.toLowerCase() === "unchecked" || isChecked && checkboxOption.toLowerCase() === "checked";
+					}).then(function(isChecked){
+						if(isChecked) {
+							wrapUp(callback, "checkboxEvent");
+						} else {
+							callback(new Error(`Validation failed. Checkbox option is currently not ${checkboxOption}!`));
+						}
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapcomponents-choicegroup component with the name {elementName} I want to validate that the option with the text {text} is {checkboxOption}', { timeout: 30 * 1000 }, function (elementName, text, checkboxOption, callback) {
+		var retObj = getElement('data-bootstrapcomponents-choicegroup',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var choiceGroup = retObj.elem;
+			browser.wait(EC.presenceOf(choiceGroup), 30 * 1000, 'Choicegroup not found!').then(function(){
+				var option = choiceGroup.element(by.css(`input[value='${text}']`));
+				browser.wait(EC.presenceOf(option), 15 * 1000, `Option with the text '${text}' not found!`).then(function(){
+					option.isSelected().then(function(isChecked){
+						return !isChecked && checkboxOption.toLowerCase() === "unchecked" || isChecked && checkboxOption.toLowerCase() === "checked";
+					}).then(function(isChecked){
+						if(isChecked) {
+							wrapUp(callback, "checkboxEvent");
+						} else {
+							callback(new Error(`Validation failed. Checkbox option is currently not ${checkboxOption}!`));
+						}
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END BOOTSTRAP CHOICEGROUP
 
