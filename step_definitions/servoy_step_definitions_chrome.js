@@ -2042,73 +2042,93 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP TEXTAREA
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} the text {text} is inserted', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
-		browser.wait(EC.presenceOf(textarea), 15 * 1000, 'Textarea not found!').then(function () {
-			sendKeys(textarea, text).then(function () {
-				wrapUp(callback, "insertEvent");
+		var retObj = getElement('data-bootstrapcomponents-textarea',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textarea = retObj.elem.element(by.css("textarea"));
+			browser.wait(EC.presenceOf(textarea), 15 * 1000, 'Textarea not found!').then(function () {
+				sendKeys(textarea, text).then(function () {
+					wrapUp(callback, "insertEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to validate that the input field equals the text {text}', { timeout: 30 * 1000 }, function (elementName, text, callback) {
-		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
-		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
-			textarea.getAttribute('value').then(function(textareaText){
-				if(text === textareaText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error("Validation failed. Expected " + text + ". Got " + textareaText));
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-bootstrapcomponents-textarea',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textarea = retObj.elem.element(by.css("textarea"));
+			browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+				textarea.getAttribute('value').then(function(textareaText){
+					if(text === textareaText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Validation failed. Expected " + text + ". Got " + textareaText));
+					}
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});	
 
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
-		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
-			textarea.click().then(function() {
-				wrapUp(callback, "insertTextEvent");
-			}).catch(function (error) {
+		var retObj = getElement('data-bootstrapcomponents-textarea',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textarea = retObj.elem.element(by.css("textarea"));
+			browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+				textarea.click().then(function() {
+					wrapUp(callback, "insertTextEvent");
+				}).catch(function (error) {
+					callback(new Error(error.message));
+				});
+			}).catch(function (error) {			
 				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to clear the text', {timeout: 15 * 1000}, function(elementName, callback) {
-		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
-		browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
-			textarea.clear().then(function() {
-				wrapUp(callback, "clearEvent");
+		var retObj = getElement('data-bootstrapcomponents-textarea',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textarea = retObj.elem.element(by.css("textarea"));
+			browser.wait(EC.visibilityOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+				textarea.clear().then(function() {
+					wrapUp(callback, "clearEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-textarea component with name {elementName} I want to validate that text text is blank', {timeout: 30 * 1000}, function(elementName, callback){		
-		var textarea = element(by.css("data-bootstrapcomponents-textarea[data-svy-name='" + elementName + "']")).element(by.css("textarea"));
-		browser.wait(EC.presenceOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
-			textarea.getAttribute('value').then(function (value) {
-				if (!value) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error("Validation failed. Expected an empty text area. Got " + value));
-				}
+		var retObj = getElement('data-bootstrapcomponents-textarea',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var textarea = retObj.elem.element(by.css("textarea"));
+			browser.wait(EC.presenceOf(textarea), 30 * 1000, 'Textarea not found!').then(function () {
+				textarea.getAttribute('value').then(function (value) {
+					if (!value) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Validation failed. Expected an empty text area. Got " + value));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP TEXTAREA
 
