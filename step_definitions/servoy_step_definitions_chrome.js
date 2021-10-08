@@ -1749,7 +1749,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('bootstrap data-bootstrapcomponents-button component I want to click on component number {componentNumber} with the name {elementName} is clicked', { timeout: 30 * 1000 }, function (componentNumber, elementName, callback) {
+	When('bootstrap data-bootstrapcomponents-button component I want to click on component number {componentNumber} with the name {elementName}', { timeout: 30 * 1000 }, function (componentNumber, elementName, callback) {
 		var retObj = getElement('data-bootstrapcomponents-button',elementName, componentNumber, null);
 		if(retObj.message) {
 			callback(new Error(retObj.message));
@@ -1870,72 +1870,86 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP SELECT
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
-		var selectComponent = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']"));
-		browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
-			selectComponent.click().then(function () {
-				wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-bootstrapcomponents-select',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var selectComponent = retObj.elem;
+			browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
+				selectComponent.click().then(function () {
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select the row with {text} as text', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var selectComponent = element(by.css(`data-bootstrapcomponents-select[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
-			var inputField = selectComponent.element(by.cssContainingText(`option`,`${text}`));
-			//by.cssContainingText('option', text)
-			inputField.isPresent().then(function (isPresent) {
-				// console.log()
-				if (isPresent) {
-					if (browser.browserName === 'firefox') {
-						inputField.click().then(function () {
-							selectComponent.click().then(function () {
-								wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-bootstrapcomponents-select',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var selectComponent = retObj.elem;
+			browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
+				var inputField = selectComponent.element(by.cssContainingText(`option`,`${text}`));
+				inputField.isPresent().then(function (isPresent) {
+					if (isPresent) {
+						if (browser.browserName === 'firefox') {
+							inputField.click().then(function () {
+								selectComponent.click().then(function () {
+									wrapUp(callback, "clickEvent");
+								});
 							});
-						});
-					} else {
-						clickElement(inputField).then(function () {
-							clickElement(selectComponent).then(function () {
-								wrapUp(callback, "clickEvent");
+						} else {
+							clickElement(inputField).then(function () {
+								clickElement(selectComponent).then(function () {
+									wrapUp(callback, "clickEvent");
+								});
 							});
-						});
+						}
 					}
-				}
+				});
+			}).catch(function (error) {
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to select row number {rowNumber}', { timeout: 45 * 1000 }, function (elementName, rowNumber, callback) {
-		var select = element.all(by.xpath("//data-bootstrapcomponents-select[@data-svy-name='" + elementName + "']/select"));
-		var selectItems = select.all(by.xpath('//option[text()!=""]'));
-		selectItems.get(rowNumber - 1).click().then(function() {
-			wrapUp(callback, "clickEvent");
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		var retObj = getElement('data-bootstrapcomponents-select',elementName, null, null, true);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var select = retObj.elem.all(by.css('select'));
+			var selectItems = select.all(by.xpath('//option[text()!=""]'));
+			selectItems.get(rowNumber - 1).click().then(function() {
+				wrapUp(callback, "clickEvent");
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-select component with name {elementName} I want to validate that the selected row equals {text}', { timeout: 45 * 1000 }, function (elementName, text, callback) {
-		var table = element(by.css("data-bootstrapcomponents-select[data-svy-name='" + elementName + "']")).$('select');
-		var row = table.element(by.css("option[selected=selected]"));
-		browser.wait(EC.presenceOf(row), 30 * 1000, 'No row is selected!').then(function(){
-			row.getText().then(function(rowText){
-				if (rowText === text) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Validation failed. Expected '${text}'. Got '${rowText}' instead!`));
-				}
+		var retObj = getElement('data-bootstrapcomponents-select',elementName, null, null);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var selectComponent = retObj.elem.element(by.css('select'));
+			var row = selectComponent.element(by.css("option[selected=selected]"));
+			browser.wait(EC.presenceOf(row), 30 * 1000, 'No row is selected!').then(function(){
+				row.getText().then(function(rowText){
+					if (rowText === text) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error(`Validation failed. Expected '${text}'. Got '${rowText}' instead!`));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP SELECT
 	When('data-bootstrapcomponents-combobox component with name {elementName} is clicked', { timeout: 30 * 1000 }, function (elementName, callback) {
