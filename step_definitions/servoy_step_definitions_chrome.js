@@ -2775,146 +2775,182 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 
 	//BOOTSTRAP LABEL
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(text.toLowerCase() == labelText.toLowerCase()) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					callback(new Error(`Validation failed. Expected '${text}'. Got '${labelText}' instead!`));
-				}
+		var retObj = getElement('data-bootstrapcomponents-label',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					if(text.toLowerCase() == labelText.toLowerCase()) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error(`Validation failed. Expected '${text}'. Got '${labelText}' instead!`));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(elementName, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				console.log(labelText)
-				if(!labelText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
-				}
+		var retObj = getElement('data-bootstrapcomponents-label',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					console.log(labelText)
+					if(!labelText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected no value. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	Then('bootstrap data-bootstrapcomponents-label component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(labelText.indexOf(text) > -1) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
-				}
+		var retObj = getElement('data-bootstrapcomponents-label',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
+					if(labelText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('bootstrap data-bootstrapcomponents-label component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var label = element(by.xpath("//data-bootstrapcomponents-label[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(label), 15 * 1000, 'Datalabel not found!').then(function(){
-			clickElement(label.element(by.css('span'))).then(function(){
-				wrapUp(callback, "clickEvent");
+		var retObj = getElement('data-bootstrapcomponents-label',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var label = retObj.elem;
+			browser.wait(EC.visibilityOf(label), 15 * 1000, 'Datalabel not found!').then(function(){
+				clickElement(label.element(by.css('span'))).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP LABEL
 
 	//BOOTSTRAP DATA LABEL
-	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(text.toLowerCase() === labelText.toLowerCase()) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
-				}
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the exact text {text}', {timeout: 40 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-bootstrapcomponents-datalabel',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var label = retObj.elem;var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.all(by.css("span")).first().getText().then(function(labelText){
+					if(text.toLowerCase() === labelText.toLowerCase()) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate and click on the label that has the exact text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(text.toLowerCase() === labelText.toLowerCase()) {
-					var span = bootstrapLabel.$('span');
-					clickElement(span).then(function() {
-						wrapUp(callback, "clickAndValidateEvent");
-					})
-				} else {
-					console.log("Validation failed. Expected '" + text + "'. Got '" + labelText + "'");
-				}
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate and click on the label that has the exact text {text}', {timeout: 40 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-bootstrapcomponents-datalabel',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.all(by.css("span")).first().getText().then(function(labelText){
+					if(text.toLowerCase() === labelText.toLowerCase()) {
+						var span = bootstrapLabel.$('span');
+						clickElement(span).then(function() {
+							wrapUp(callback, "clickAndValidateEvent");
+						})
+					} else {
+						callback(new Error("Validation failed. Expected '" + text + "'. Got '" + labelText + "'"));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 30 * 1000}, function(elementName, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				console.log(labelText)
-				if(!labelText) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Validation failed. Expected no value. Got '" + labelText + "'");
-				}
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label has no text', {timeout: 40 * 1000}, function(elementName, callback){
+		var retObj = getElement('data-bootstrapcomponents-datalabel',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.all(by.css("span")).first().getText().then(function(labelText){
+					console.log(labelText)
+					if(!labelText) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Validation failed. Expected no value. Got '" + labelText + "'"));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 30 * 1000}, function(elementName, text, callback){
-		var bootstrapLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='"+elementName+"']"));
-		browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
-			bootstrapLabel.element(by.css("span")).getText().then(function(labelText){
-				if(labelText.indexOf(text) > -1) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'");
-				}
+	Then('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} I want to validate that the label equals the partial text {text}', {timeout: 40 * 1000}, function(elementName, text, callback){
+		var retObj = getElement('data-bootstrapcomponents-datalabel',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var bootstrapLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(bootstrapLabel), 30 * 1000, 'Label not found!').then(function(){
+				bootstrapLabel.all(by.css("span")).first().getText().then(function(labelText){
+					if(labelText.indexOf(text) > -1) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						callback(new Error("Partial validation failed. Expected '" + text + "'. Got '" + labelText + "'"));
+					}
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	}); 
 
-	When('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} is clicked', {timeout: 30 * 1000}, function(elementName, callback){
-		var dataLabel = element(by.xpath("//data-bootstrapcomponents-datalabel[@data-svy-name='" + elementName + "']"));
-		browser.wait(EC.visibilityOf(dataLabel), 15 * 1000, 'Datalabel not found!').then(function(){
-			clickElement(dataLabel.$('span')).then(function(){
-				wrapUp(callback, "clickEvent");
+	When('bootstrap data-bootstrapcomponents-datalabel component with name {elementName} is clicked', {timeout: 40 * 1000}, function(elementName, callback){
+		var retObj = getElement('data-bootstrapcomponents-datalabel',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var dataLabel = retObj.elem;
+			browser.wait(EC.visibilityOf(dataLabel), 15 * 1000, 'Datalabel not found!').then(function(){
+				clickElement(dataLabel.$$('span').first()).then(function(){
+					wrapUp(callback, "clickEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 	//END BOOTSTRAP DATA LABEL
 
