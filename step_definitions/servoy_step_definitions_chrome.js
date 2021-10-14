@@ -2698,62 +2698,78 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 	//END BOOTSTRAP CALENDAR
 
 	//BOOTSTRAP INPUT GROUP
-	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to insert the text {text} in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, text, fieldNumber, callback){
-		var inputGroup = element.all(by.xpath("//data-bootstrapextracomponents-input-group[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
-			var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
-			sendKeys(inputField, text).then(function(){
-				wrapUp(callback, "insertEvent");
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
-		var inputGroup = element.all(by.xpath("//data-bootstrapextracomponents-input-group[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
-			var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
-			inputField.clear().then(function(){
-				wrapUp(callback, "insertEvent");
-			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
-	});
-
-	When('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
-		var inputGroup = element.all(by.xpath("//data-bootstrapextracomponents-input-group[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
-			var button = inputGroup.all(by.css("button")).get(fieldNumber - 1);
-			browser.wait(EC.visibilityOf(button), 20 * 1000, 'Button not found!').then(function(){
-				clickElement(button).then(function(){
+	When('bootstrap data-bootstrapextracomponents-input-group component with the name {elementName} I want to insert the text {text} in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, text, fieldNumber, callback){
+		var retObj = getElement('data-bootstrapextracomponents-input-group',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputGroup = retObj.elem;
+			browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
+				var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
+				sendKeys(inputField, text).then(function(){
 					wrapUp(callback, "insertEvent");
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
-	Then('bootstrap data-bootstrapextracomponents-input-group component with name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(elementName, fieldNumber, text, callback){
-		var inputGroup = element.all(by.xpath("//data-bootstrapextracomponents-input-group[@data-svy-name='" + elementName+"']"));
-		browser.wait(EC.presenceOf(inputGroup.first()), 20 * 1000, 'Input group not found!').then(function(){
-			var inputField = inputGroup.all(by.xpath("input")).get(fieldNumber - 1);
-			inputField.getAttribute('value').then(function(fieldText) {
-				if(fieldText === text) {
-					wrapUp(callback, "validateEvent");
-				} else {
-					console.log("Validation failed. Expected " + text + ". Got " + fieldText);
-				}
-			})
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+	When('bootstrap data-bootstrapextracomponents-input-group component with the name {elementName} I want to clear the text in field number {fieldNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
+		var retObj = getElement('data-bootstrapextracomponents-input-group',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputGroup = retObj.elem;
+			browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
+				var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
+				inputField.clear().then(function(){
+					wrapUp(callback, "insertEvent");
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	When('bootstrap data-bootstrapextracomponents-input-group component with the name {elementName} I want to click on button number {buttonNumber}', {timeout: 30 * 1000}, function(elementName, fieldNumber, callback){
+		var retObj = getElement('data-bootstrapextracomponents-input-group',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputGroup = retObj.elem;
+			browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
+				var button = inputGroup.all(by.css("button")).get(fieldNumber - 1);
+				browser.wait(EC.visibilityOf(button), 20 * 1000, 'Button not found!').then(function(){
+					clickElement(button).then(function(){
+						wrapUp(callback, "insertEvent");
+					});
+				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
+	});
+
+	Then('bootstrap data-bootstrapextracomponents-input-group component with the name {elementName} I want to validate that the text in field number {fieldNumber} equals the text {text}', {timeout: 30 * 1000}, function(elementName, fieldNumber, text, callback){
+		var retObj = getElement('data-bootstrapextracomponents-input-group',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+			var inputGroup = retObj.elem;
+			browser.wait(EC.presenceOf(inputGroup), 20 * 1000, 'Input group not found!').then(function(){
+				var inputField = inputGroup.all(by.css("input[type='text']")).get(fieldNumber - 1);
+				inputField.getAttribute('value').then(function(fieldText) {
+					if(fieldText === text) {
+						wrapUp(callback, "validateEvent");
+					} else {
+						console.log("Validation failed. Expected '" + text + "'. Got '" + fieldText + "'!");
+					}
+				})
+			}).catch(function (error) {			
+				callback(new Error(error.message));
+			});
+		}
 	});
 	//END BOOTSTRAP INPUT GROUP
 
