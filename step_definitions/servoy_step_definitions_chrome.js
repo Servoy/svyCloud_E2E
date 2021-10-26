@@ -4994,45 +4994,47 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		
 
 	//GROUPING GRID INSERT EVENTS
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on rownumber {rowNumber} on columnnumber {columnNumber}', { timeout: 30 * 1000 }, function (elementName, text, rowNumber, columnNumber, callback) {
-		rowNumber -= 1;
-		var table = element(by.css(`data-aggrid-groupingtable[data-svy-name='${elementName}']`));
-		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
-			agGridIsGrouped(elementName).then(function (isGrouped) {
-				if (isGrouped) {
-					return "ag-full-width-viewport";
-				} else {
-					return "ag-body-viewport";
-				}
-			}).then(function (containerClass) {
-				var rowContainer = table.element(by.xpath(`//div[contains(@class, '${containerClass}')]`));
-				var row = rowContainer.element(by.css(`div[row-index='${rowNumber}']`));
-				var col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-				browser.wait(EC.presenceOf(col), 15 * 1000).then(function () {					
-					doubleClickElement(col).then(function () {
-						//certain versions of the grid uses an input field. Others a div.
-						var inputField = col.element(by.css("input[class='ag-cell-edit-input']"))
-						inputField.sendKeys(text).then(function () {								
-							col.sendKeys(protractor.Key.TAB).then(function () {
-								browser.wait(EC.visibilityOf(col), 15 * 1000).then(function () {
-									col = row.all(by.css("div[role=gridcell]")).get(columnNumber - 1);
-									col.getText().then(function (newText) {
-										if (newText === text) {
-											wrapUp(callback, "insertEvent");
-										} else {
-											callback(new Error(`Validation failed! Expected '${text}'. Got '${newText}'. Possibility is that the column is not editable`))
-										}
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on the row with the text {columntext} on the column with the id {columnId}', { timeout: 30 * 1000 }, function (elementName, text, columnText, columnId, callback) {
+		var retObj = getElement('data-aggrid-groupingtable',elementName, null, null, false);
+        if(retObj.message) {
+            callback(new Error(retObj.message));
+        } else {
+            var table = retObj.elem;
+			browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
+				agGridIsGrouped(elementName).then(function (isGrouped) {
+					if (isGrouped) {
+						return "ag-full-width-viewport";
+					} else {
+						return "ag-body-viewport";
+					}
+				}).then(function (containerClass) {
+					var rowContainer = table.element(by.className(`${containerClass}`));
+					var row = rowContainer.all(by.cssContainingText('div', columnText)).last();
+					browser.wait(EC.presenceOf(row), 15 * 1000, `Column with the text '${columnText}' does not exist!`).then(function () {	
+						var parent = row.element(by.xpath(".."));
+						var col = parent.element(by.css(`div[col-id='${columnId}']`));
+						browser.wait(EC.presenceOf(col), 15 * 1000, 'Column with the given index does not exist!').then(function () {			
+							doubleClickElement(col).then(function () {
+								var inputField = col.element(by.css("input"));
+								inputField.sendKeys(text).then(function () {								
+									col.sendKeys(protractor.Key.TAB).then(function () {
+										col.getText().then(function (newText) {
+											if (newText === text) {
+												wrapUp(callback, "insertEvent");
+											} else {
+												callback(new Error(`Validation failed! Expected '${text}'. Got '${newText}'. Possibility is that the column is not editable`));
+											}
+										});
 									});
 								});
 							});
 						});
 					});
 				});
+			}).catch(function (error) {			
+				callback(new Error(error.message));
 			});
-		}).catch(function (error) {			
-			tierdown(true);
-			callback(new Error(error.message));
-		});
+		}
 	});
 
 	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {		
