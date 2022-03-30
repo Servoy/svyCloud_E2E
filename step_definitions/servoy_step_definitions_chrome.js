@@ -1876,7 +1876,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
         } else {
 			var selectComponent = retObj.elem;
 			browser.wait(EC.visibilityOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
-				clickElement(selectComponent).then(function () {
+				clickElement(selectComponent.element(by.css('select'))).then(function () {
 					wrapUp(callback, "clickEvent");
 				});
 			}).catch(function (error) {			
@@ -1897,12 +1897,12 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					if (isPresent) {
 						if (browser.browserName === 'firefox') {
 							clickElement(inputField).then(function () {
-								clickElement(selectComponent).then(function () {
+								clickElement(selectComponent.element(by.css('select'))).then(function () {
 									wrapUp(callback, "clickEvent");
 								});
 							});
 						} else {
-							clickElement(inputField).then(function () {
+							clickElement(inputField.element(by.css('select'))).then(function () {
 								clickElement(selectComponent).then(function () {
 									wrapUp(callback, "clickEvent");
 								});
