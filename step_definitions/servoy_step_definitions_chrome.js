@@ -1875,8 +1875,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
             callback(new Error(retObj.message));
         } else {
 			var selectComponent = retObj.elem;
-			browser.wait(EC.presenceOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
-				selectComponent.click().then(function () {
+			browser.wait(EC.visibilityOf(selectComponent), 15 * 1000, 'Select component not found!').then(function () {
+				clickElement(selectComponent).then(function () {
 					wrapUp(callback, "clickEvent");
 				});
 			}).catch(function (error) {			
@@ -1896,8 +1896,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				inputField.isPresent().then(function (isPresent) {
 					if (isPresent) {
 						if (browser.browserName === 'firefox') {
-							inputField.click().then(function () {
-								selectComponent.click().then(function () {
+							clickElement(inputField).then(function () {
+								clickElement(selectComponent).then(function () {
 									wrapUp(callback, "clickEvent");
 								});
 							});
