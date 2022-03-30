@@ -1902,8 +1902,8 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 								});
 							});
 						} else {
-							clickElement(inputField.element(by.css('select'))).then(function () {
-								clickElement(selectComponent).then(function () {
+							clickElement(inputField).then(function () {
+								clickElement(selectComponent.element(by.css('select'))).then(function () {
 									wrapUp(callback, "clickEvent");
 								});
 							});
