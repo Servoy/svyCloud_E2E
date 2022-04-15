@@ -5722,7 +5722,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
 			listBox.all(by.css("option")).each(function(row){
-				row.getAttribute('value').then(function(value){
+				row.getText().then(function(value){
 					if(value.indexOf(text) > -1) {
 						clickElement(row).then(function(){
 							wrapUp(callback, "validateEvent");
@@ -5731,7 +5731,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
@@ -5741,7 +5740,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		var listBox = element.all(by.xpath("//data-servoydefault-listbox[@data-svy-name='" + elementName + "']"));
 		browser.wait(EC.presenceOf(listBox.first()), 30 * 1000, 'Listbox not found!').then(function(){
 			listBox.all(by.css("option")).each(function(row){
-				row.getAttribute('value').then(function(value){
+				row.getText().then(function(value){
 					if(value === text) {
 						clickElement(row).then(function(){
 							wrapUp(callback, "validateEvent");
@@ -5750,7 +5749,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				});
 			});
 		}).catch(function (error) {			
-			tierdown(true);
 			callback(new Error(error.message));
 		});
 	});
