@@ -1886,7 +1886,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 			var selectComponent = retObj.elem;
 			browser.wait(EC.visibilityOf(selectComponent), 30 * 1000, 'Select component not visible!').then(function () {
 				var inputField = selectComponent.element(by.cssContainingText(`option`,`${text}`));
-				inputField.isPresent().then(function (isPresent) {
+				browser.wait(EC.presenceOf(inputField), 30 * 1000, `Option with the text '${text}' could not be found!`).then(function (isPresent) {
 					if (isPresent) {
 						if (browser.browserName === 'firefox') {
 							clickElement(inputField).then(function () {
