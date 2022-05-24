@@ -4987,7 +4987,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		
 
 	//GROUPING GRID INSERT EVENTS
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on the row with the text {columntext} on the column with the id {columnId}', { timeout: 30 * 1000 }, function (elementName, text, columnText, columnId, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to insert the text {text} on the row with the text {columntext} on the column with the id {columnId}', { timeout: 45 * 1000 }, function (elementName, text, columnText, columnId, callback) {
 		var retObj = getElement('data-aggrid-groupingtable',elementName, null, null, false);
         if(retObj.message) {
             callback(new Error(retObj.message));
@@ -5030,7 +5030,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		}
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {		
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the combobox on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 45 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {		
 		rowNumber -= 1;
 		var table = element(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table), 30 * 1000, 'Table not found!').then(function () {
@@ -5077,7 +5077,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the typeahead on rownumber {rowNumber} on columnnumber {columnNumber} and select the item with the text {text}', {timeout: 45 * 1000}, function(elementName, rowNumber, columnNumber, text, callback) {
 		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
@@ -5124,7 +5124,7 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 		});
 	});
 
-	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 30 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
+	When('servoy data-aggrid-groupingtable component with name {elementName} I want to double click on the calendar on rownumber {rowNumber} on columnnumber {columnNumber} and set the date to {day} {month} {year}', {timeout: 45 * 1000}, function(elementName, rowNumber, columnNumber, day, month, year, callback) {
 		var table = element.all(by.css("data-aggrid-groupingtable[data-svy-name='" + elementName + "']"));
 		browser.wait(EC.visibilityOf(table.first()), 30 * 1000, 'Table not found!').then(function(){
 			table.each(function(tableItems){
