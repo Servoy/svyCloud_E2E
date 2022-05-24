@@ -5005,18 +5005,24 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					var row = rowContainer.all(by.cssContainingText('div', columnText)).last();
 					browser.wait(EC.presenceOf(row), 15 * 1000, `Column with the text '${columnText}' does not exist!`).then(function () {	
 						var parent = row.element(by.xpath(".."));
-						var col = parent.element(by.css(`div[col-id='${columnId}']`));
-						browser.wait(EC.presenceOf(col), 15 * 1000, 'Column with the given index does not exist!').then(function () {			
-							doubleClickElement(col).then(function () {
-								var inputField = col.element(by.css("input"));
-								inputField.sendKeys(text).then(function () {								
-									col.sendKeys(protractor.Key.TAB).then(function () {
-										col.getText().then(function (newText) {
-											if (newText === text) {
-												wrapUp(callback, "insertEvent");
-											} else {
-												callback(new Error(`Validation failed! Expected '${text}'. Got '${newText}'. Possibility is that the column is not editable`));
-											}
+						parent.getAttribute('class').then(function(classes) {
+							if(classes.indexOf('ag-row') == -1) {
+								parent = parent.element(by.xpath('..'));
+							} 
+							var col = parent.element(by.css(`div[col-id='${columnId}']`));
+							
+							browser.wait(EC.presenceOf(col), 15 * 1000, 'Column with the given index does not exist!').then(function () {			
+								doubleClickElement(col).then(function () {
+									var inputField = col.element(by.css("input"));
+									inputField.sendKeys(text).then(function () {								
+										col.sendKeys(protractor.Key.TAB).then(function () {
+											col.getText().then(function (newText) {
+												if (newText === text) {
+													wrapUp(callback, "insertEvent");
+												} else {
+													callback(new Error(`Validation failed! Expected '${text}'. Got '${newText}'. Possibility is that the column is not editable`));
+												}
+											});
 										});
 									});
 								});
