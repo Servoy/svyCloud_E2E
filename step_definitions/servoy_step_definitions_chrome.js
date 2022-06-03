@@ -4758,12 +4758,18 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					var columnWithText = rowContainer.element(by.xpath(`//div[text()='${text}']`));
 					browser.wait(EC.presenceOf(columnWithText), 10 * 1000, `Column with the text '${text}' could not be found!`).then(function() {
 						var parent = columnWithText.element(by.xpath(".."));
-						var columnToClick = parent.element(by.css(`div[col-id='${columnID}' i]`));
-						browser.wait(EC.presenceOf(columnToClick), 10 * 1000, `Column with the text exists, but no column with the ID '${columnID}' could be found!`).then(function() {
-							clickElement(columnToClick).then(function() {
-								wrapUp(callback, null);
-							});
-						});					
+						parent.getAttribute('class').then(function(classes) {
+                            if(classes.indexOf('ag-row') == -1) {
+                                parent = parent.element(by.xpath('..'));
+                            } 
+							var columnToClick = parent.element(by.css(`div[col-id='${columnID}' i]`));
+							browser.wait(EC.presenceOf(columnToClick), 10 * 1000, `Column with the text exists, but no column with the ID '${columnID}' could be found!`).then(function() {
+								clickElement(columnToClick).then(function() {
+									wrapUp(callback, null);
+								});
+							});	
+						});
+										
 					});		
 				});
 			}).catch(function (error) {			
