@@ -1688,11 +1688,11 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 				clickElement(textField).then(function() {
 					textField.sendKeys(newDate.getDate()).then(function() {
 						if((newDate.getDate()) < 4) {
-							browser.actions().sendKeys(protractor.Key.TAB).perform()
+							textField.sendKeys(protractor.Key.TAB);
 						}
 						textField.sendKeys(newDate.getMonth() + 1).then(function() {
 							if((newDate.getMonth() + 1) < 2) {
-								browser.actions().sendKeys(protractor.Key.TAB).perform();
+								textField.sendKeys(protractor.Key.TAB);
 							}
 							
 							textField.sendKeys(newDate.getFullYear()).then(function() {
@@ -1702,7 +1702,6 @@ defineSupportCode(({ Given, Then, When, Before, After }) => {
 					});
 				});
 			}).catch(function (error) {			
-				tierdown(true);
 				callback(new Error(error.message));
 			});
 		}
