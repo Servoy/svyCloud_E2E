@@ -7016,7 +7016,7 @@ function groupingGridTableScroll(elementName, text, callback, shouldClick, class
 						if(partialTextMatch) {
 							elementToScroll = rowContainer.all(by.cssContainingText(`*`, `${text}`)).first();
 						} else if(text) {
-							elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).last();	 
+							elementToScroll = rowContainer.all(by.xpath(`//*[text()="${text}"]`)).first();	 
 						} 
 					}
 					if(className && !text) {
